@@ -11,6 +11,12 @@
 
 # define MYIRC_PORT "3490"
 # define MYIRC_ALLOWED_PENDING_CONNECTIONS 5
+
+
+# include <set>
+# include "Client.hpp"
+
+class Client;
 class Server
 {
 	public:
@@ -47,7 +53,7 @@ class Server
 		struct addrinfo	hints;
 		struct addrinfo	*_servinfo;
 		int				_socketFD;
-
+		std::set<Client> _clients;
 };
 
 
