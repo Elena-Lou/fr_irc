@@ -35,6 +35,7 @@ class Server
 		struct sockaddr *getSockaddr() const;
 
 		void	startListening() const;
+		void	addUser(int);
 
 		/* exceptions */
 		class CannotRetrieveAddrinfoException : public std::exception
@@ -53,7 +54,7 @@ class Server
 		struct addrinfo	hints;
 		struct addrinfo	*_servinfo;
 		int				_socketFD;
-		std::set<Client> _clients;
+		std::set<Client*> _clients;
 };
 
 

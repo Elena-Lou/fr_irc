@@ -25,10 +25,6 @@ Client& Client::operator=(const Client &rhs)
 	return (*this);
 }
 
-void	Client::closeSocketFD()
-{
-}
-
 void	Client::setUsername(std::string name)
 {
 	this->_username = name;

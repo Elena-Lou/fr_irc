@@ -10,7 +10,6 @@ class Client
 		~Client();
 		Client(int);
 
-		void	closeSocketFD();
 		void	setUsername(std::string name);
 
 		/* Getters */

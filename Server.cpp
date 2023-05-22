@@ -70,6 +70,9 @@ Server::Server()
 
 Server::~Server()
 {
+	for (std::set<Client*>::iterator it = this->_clients.begin();
+			it != this->_clients.end(); it++)
+		delete *it;
 	close(this->_socketFD);
 	freeaddrinfo(this->_servinfo);
 }
@@ -185,7 +188,6 @@ int	Server::getSocketFD() const
 	return (this->_socketFD);
 }
 
-
 struct addrinfo *Server::getServinfo() const
 {
 	return (this->_servinfo);
@@ -205,3 +207,7 @@ void	Server::startListening() const
 	}
 }
 
+void	Server::addUser(int socketFD)
+{
+	this->_clients.insert(new Client(socketFD));
+}
