@@ -11,7 +11,7 @@ Server::Server()
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	if ((status = getaddrinfo(NULL, "3490", &hints, &servinfo)) != 0)
+	if ((status = getaddrinfo(NULL, MYIRC_PORT,  &hints, &servinfo)) != 0)
 	{
 		std::cerr << gai_strerror(status) << std::endl;
 		throw Server::CannotRetrieveAddrinfoException();
@@ -43,7 +43,6 @@ Server::Server()
 		{
 			status |= 0b100;
 			close(this->_socketFD);
-			close(this->_socketFD);
 			continue;
 		}
 
@@ -51,6 +50,13 @@ Server::Server()
 		if (bind(this->_socketFD, focus->ai_addr, focus->ai_addrlen) < 0)
 		{
 			status |= 0b1000;
+			close(this->_socketFD);
+			continue;
+		}
+		/* listens to the port bound to the socket descriptor for incoming connections */
+		if (listen(this->_socketFD, MYIRC_ALLOWED_PENDING_CONNECTIONS) < 0)
+		{
+			status |= 0b10000;
 			close(this->_socketFD);
 			continue;
 		}
@@ -121,6 +127,13 @@ Server::Server(const char *portNumber, const char *domain)
 			close(this->_socketFD);
 			continue;
 		}
+		/* listens to the port bound to the socket descriptor for incoming connections */
+		if (listen(this->_socketFD, MYIRC_ALLOWED_PENDING_CONNECTIONS) < 0)
+		{
+			status |= 0b10000;
+			close(this->_socketFD);
+			continue;
+		}
 	}
 	if (status != 0)
 	{
@@ -162,10 +175,33 @@ void	Server::socketErrorHandler(int errorBitField) const
 	if (errorBitField & ERRSOCKNOBLOCK)
 		std::cout << "fcntl() failed." << std::endl;
 	if (errorBitField & ERRSOCKBIND)
-		std::cout << "" << std::endl;
+		std::cout << "bind() failed." << std::endl;
+	if (errorBitField & ERRSOCKLISTEN)
+		std::cout << "listen() failed." << std::endl;
 }
 
-int	Server::getSocketFD()
+int	Server::getSocketFD() const
 {
 	return (this->_socketFD);
 }
+
+
+struct addrinfo *Server::getServinfo() const
+{
+	return (this->_servinfo);
+}
+
+struct sockaddr *Server::getSockaddr() const
+{
+	return (this->_servinfo->ai_addr);
+}
+
+void	Server::startListening() const
+{
+	if (listen(this->_socketFD, 5) < 0)
+	{
+		std::cerr << "listen() failed : " << std::strerror(errno) << std::endl;
+		exit(1);
+	}
+}
+

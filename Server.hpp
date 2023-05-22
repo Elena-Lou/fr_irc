@@ -7,7 +7,10 @@
 # define ERRSOCKOPT 0b10
 # define ERRSOCKNOBLOCK 0b100
 # define ERRSOCKBIND 0b1000
+# define ERRSOCKLISTEN 0b10000
 
+# define MYIRC_PORT "3490"
+# define MYIRC_ALLOWED_PENDING_CONNECTIONS 5
 class Server
 {
 	public:
@@ -17,10 +20,17 @@ class Server
 		Server(const Server &source);
 		Server& operator=(const Server &rhs);
 
-		int		getSocketFD();
 		void	closeSocketFD();
 		void	socketErrorHandler(int errorBitField) const;
 
+		/* Getters */
+		int		getSocketFD() const;
+		struct addrinfo *getServinfo() const;
+		struct sockaddr *getSockaddr() const;
+
+		void	startListening() const;
+
+		/* exceptions */
 		class CannotRetrieveAddrinfoException : public std::exception
 		{
 			public:
