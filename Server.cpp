@@ -6,6 +6,7 @@ Server::Server()
 	struct addrinfo hints;
 	struct addrinfo	*servinfo;
 
+	this->_fdMax = 0;
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
@@ -66,13 +67,24 @@ Server::Server()
 		this->socketErrorHandler(status);
 		throw Server::CannotRetrieveSocketException();
 	}
+	FD_ZERO(&(this->_masterSet));
+	FD_ZERO(&(this->_readingSet));
+	FD_ZERO(&(this->_writingSet));
+	FD_SET(this->_socketFD, &(this->_masterSet)); //add the current socket descriptor to the set
+	if (this->_socketFD > this->_fdMax)
+		this->_fdMax = this->_socketFD;
+	this->_pendingAddrSize = sizeof(this->_pendingAddr);
 }
 
 Server::~Server()
 {
 	for (std::set<Client*>::iterator it = this->_clients.begin();
-			it != this->_clients.end(); it++)
-		delete *it;
+			it != this->_clients.end();)
+	{
+		std::set<Client*>::iterator tmp = it;
+		it++;
+		delete *tmp;
+	}
 	close(this->_socketFD);
 	freeaddrinfo(this->_servinfo);
 }
@@ -83,6 +95,7 @@ Server::Server(const char *portNumber, const char *domain)
 	struct addrinfo hints;
 	struct addrinfo	*servinfo;
 
+	this->_fdMax = 0;
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
@@ -93,7 +106,8 @@ Server::Server(const char *portNumber, const char *domain)
 		std::cerr << gai_strerror(status) << std::endl;
 		throw Server::CannotRetrieveAddrinfoException();
 	}
-	for (struct addrinfo *focus = servinfo; focus != NULL; focus = focus->ai_next)
+	struct addrinfo *focus;
+	for (focus = servinfo; focus != NULL; focus = focus->ai_next)
 	{
 		/* retrieving a socket file descriptor */
 		this->_socketFD = socket(focus->ai_family, focus->ai_socktype,
@@ -137,12 +151,20 @@ Server::Server(const char *portNumber, const char *domain)
 			close(this->_socketFD);
 			continue;
 		}
+		break;
 	}
-	if (status != 0)
+	if (status != 0 || focus == NULL)
 	{
 		this->socketErrorHandler(status);
 		throw Server::CannotRetrieveSocketException();
 	}
+	FD_ZERO(&(this->_masterSet));
+	FD_ZERO(&(this->_readingSet));
+	FD_ZERO(&(this->_writingSet));
+	FD_SET(this->_socketFD, &(this->_masterSet)); //add the current socket descriptor to the set
+	if (this->_socketFD > this->_fdMax)
+		this->_fdMax = this->_socketFD;
+	this->_pendingAddrSize = sizeof(this->_pendingAddr);
 }
 
 Server::Server(const Server &source)
@@ -170,17 +192,17 @@ const char *Server::CannotRetrieveAddrinfoException::what(void) const throw()
 void	Server::socketErrorHandler(int errorBitField) const
 {
 	if (errorBitField & (errorBitField - 1))
-		std::cout << "multiple error encountered:" << std::endl;
+		std::cerr << "multiple error encountered:" << std::endl;
 	if (errorBitField & ERRSOCKFD)
-		std::cout << "socket() failed." << std::endl;
+		std::cerr << "socket() failed." << std::endl;
 	if (errorBitField & ERRSOCKOPT)
-		std::cout << "setsockopt() failed." << std::endl;
+		std::cerr << "setsockopt() failed." << std::endl;
 	if (errorBitField & ERRSOCKNOBLOCK)
-		std::cout << "fcntl() failed." << std::endl;
+		std::cerr << "fcntl() failed." << std::endl;
 	if (errorBitField & ERRSOCKBIND)
-		std::cout << "bind() failed." << std::endl;
+		std::cerr << "bind() failed." << std::endl;
 	if (errorBitField & ERRSOCKLISTEN)
-		std::cout << "listen() failed." << std::endl;
+		std::cerr << "listen() failed." << std::endl;
 }
 
 int	Server::getSocketFD() const
@@ -198,16 +220,136 @@ struct sockaddr *Server::getSockaddr() const
 	return (this->_servinfo->ai_addr);
 }
 
-void	Server::startListening() const
+std::set<Client*> &Server::getClients()
 {
-	if (listen(this->_socketFD, 5) < 0)
-	{
-		std::cerr << "listen() failed : " << std::strerror(errno) << std::endl;
-		exit(1);
-	}
+	return (this->_clients);
 }
 
 void	Server::addUser(int socketFD)
 {
 	this->_clients.insert(new Client(socketFD));
+}
+
+void	Server::deleteUser(int socketFD)
+{
+	for (std::set<Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	{
+		if ((*it)->getSocketFD() == socketFD)
+		{
+			this->_clients.erase(it);
+			break;
+		}
+	}
+}
+
+int		Server::fillSets()
+{
+	/* inits timeval struct to shut down after MYIRC_TIMEOUT seconds of inactivity */
+	struct timeval	timeOut;
+	timeOut.tv_sec = MYIRC_TIMEOUT;
+	timeOut.tv_usec = 0;
+
+	int selectRet = 0;
+	memcpy(&(this->_readingSet), &(this->_masterSet), sizeof(this->_masterSet));
+	memcpy(&(this->_writingSet), &(this->_masterSet), sizeof(this->_masterSet));
+
+	selectRet = select(this->_fdMax + 1, &(this->_readingSet), &(this->_writingSet), NULL, &timeOut);
+	if (selectRet < 0)
+	{
+		std::cerr << "select() failed :  " << std::strerror(errno) << std::endl;
+		return (1);
+	}
+	else if (selectRet == 0)
+	{
+		std::cerr << "select() timed out. Bye Bye" << std::endl;
+		return (1);
+	}
+	return (0);
+}
+
+void	Server::checkNewConnections()
+{
+	int newFD = accept(this->_socketFD,
+			reinterpret_cast<struct sockaddr*>(&(this->_pendingAddr)),
+			&(this->_pendingAddrSize));
+	if (newFD == -1) {
+		// std::cout << "NO WORRIES MAN" << std::endl;
+	}
+	else
+	{
+		this->addUser(newFD);
+		FD_SET(newFD, &(this->_masterSet));
+		if (newFD > this->_fdMax)
+			this->_fdMax = newFD;
+	}
+}
+
+void	Server::readLoop()
+{
+	for (std::set<Client*>::iterator it = this->_clients.begin();
+					it != this->_clients.end();)
+	{
+		/* Reading loop */
+		if (FD_ISSET((*it)->getSocketFD(), &(this->_readingSet)))
+		{
+			bzero((*it)->buffer, sizeof(char) * IRC_BUFFER_SIZE);
+			int recvRet = recv((*it)->getSocketFD(), (*it)->buffer, sizeof(char) * (IRC_BUFFER_SIZE - 1), 0);
+			if (recvRet < 0)
+			{
+				std::cerr << "recv() failed : " << std::strerror(errno) << "fd = " << (*it)->getSocketFD() << std::endl;
+				break;
+			}
+			else if ( recvRet == 0)
+			{
+				std::set<Client*>::iterator tmp = it;
+				std::cerr << "connection closed by the client. Bye Bye" << std::endl;
+				FD_CLR((*it)->getSocketFD(), &(this->_masterSet));
+				it++;
+				this->_clients.erase(tmp);
+				continue ;
+			}
+			else
+			{
+				std::cout << recvRet << " bytes received" << std::endl;
+				std::cout << "received : " << (*it)->buffer << std::endl;
+
+			}
+		}
+		it++;
+	}
+}
+
+void	Server::writeLoop()
+{
+	for (std::set<Client*>::iterator it = this->_clients.begin();
+			it != this->_clients.end();)
+	{
+		/* Reading loop */
+		if (FD_ISSET((*it)->getSocketFD(), &(this->_readingSet)))
+		{
+			bzero((*it)->buffer, sizeof(char) * IRC_BUFFER_SIZE);
+			int sendRet = send((*it)->getSocketFD(), (*it)->buffer, sizeof(char) * (IRC_BUFFER_SIZE - 1), MSG_NOSIGNAL);
+			if (sendRet < 0)
+			{
+				std::cerr << "send() failed : " << std::strerror(errno) << "fd = " << (*it)->getSocketFD() << std::endl;
+				break;
+			}
+			else if ( sendRet == 0)
+			{
+				std::set<Client*>::iterator tmp = it;
+				std::cerr << "connection closed by the client. Bye Bye" << std::endl;
+				FD_CLR((*it)->getSocketFD(), &(this->_masterSet));
+				it++;
+				this->_clients.erase(tmp);
+				continue ;
+			}
+			else
+			{
+				std::cout << sendRet << " bytes sent" << std::endl;
+				std::cout << "sent : " << (*it)->buffer << std::endl;
+
+			}
+		}
+		it++;
+	}
 }

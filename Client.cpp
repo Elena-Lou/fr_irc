@@ -29,3 +29,8 @@ void	Client::setUsername(std::string name)
 {
 	this->_username = name;
 }
+
+int	Client::getSocketFD() const
+{
+	return (this->_socketFD);
+}

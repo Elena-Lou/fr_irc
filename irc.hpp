@@ -1,5 +1,7 @@
 #ifndef IRC_HPP
 # define IRC_HPP
+# define IRC_BUFFER_SIZE 80
+
 # include <iostream>
 # include <netinet/in.h>
 # include <cstdlib>
@@ -15,5 +17,6 @@
 # include <sys/time.h>
 # include <sys/select.h>
 # include "Server.hpp"
+
 
 #endif

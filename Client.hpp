@@ -13,6 +13,9 @@ class Client
 		void	setUsername(std::string name);
 
 		/* Getters */
+		int	getSocketFD() const;
+
+		char	buffer[IRC_BUFFER_SIZE];
 	private:
 		Client();
 		Client(const Client &source);
