@@ -70,7 +70,7 @@ class Server
 		fd_set		_writingSet;
 		struct sockaddr_storage	_pendingAddr;
 		socklen_t				_pendingAddrSize;
-
+		char	buffer[IRC_BUFFER_SIZE];
 };
 
 

@@ -292,11 +292,14 @@ void	Server::readLoop()
 		/* Reading loop */
 		if (FD_ISSET((*it)->getSocketFD(), &(this->_readingSet)))
 		{
-			bzero((*it)->buffer, sizeof(char) * IRC_BUFFER_SIZE);
-			int recvRet = recv((*it)->getSocketFD(), (*it)->buffer, sizeof(char) * (IRC_BUFFER_SIZE - 1), 0);
+			bzero(this->buffer, sizeof(char) * IRC_BUFFER_SIZE - 1);
+			int recvRet = recv((*it)->getSocketFD(), this->buffer, sizeof(char) * (IRC_BUFFER_SIZE - 1), 0);
 			if (recvRet < 0)
 			{
 				std::cerr << "recv() failed : " << std::strerror(errno) << "fd = " << (*it)->getSocketFD() << std::endl;
+				std::set<Client*>::iterator tmp = it;
+				it++;
+				this->_clients.erase(tmp);
 				break;
 			}
 			else if ( recvRet == 0)
@@ -311,8 +314,8 @@ void	Server::readLoop()
 			else
 			{
 				std::cout << recvRet << " bytes received" << std::endl;
-				std::cout << "received : " << (*it)->buffer << std::endl;
-
+				std::cout << "received : " << this->buffer << std::endl;
+				(*it)->readBuffer.append(this->buffer);
 			}
 		}
 		it++;
@@ -325,29 +328,28 @@ void	Server::writeLoop()
 			it != this->_clients.end();)
 	{
 		/* Reading loop */
-		if (FD_ISSET((*it)->getSocketFD(), &(this->_readingSet)))
+		if (FD_ISSET((*it)->getSocketFD(), &(this->_readingSet))
+			&& (*it)->writeBuffer.size())
 		{
-			bzero((*it)->buffer, sizeof(char) * IRC_BUFFER_SIZE);
-			int sendRet = send((*it)->getSocketFD(), (*it)->buffer, sizeof(char) * (IRC_BUFFER_SIZE - 1), MSG_NOSIGNAL);
+			//bzero((*it)->buffer, sizeof(char) * IRC_BUFFER_SIZE);
+			int sendRet = send((*it)->getSocketFD(), (*it)->writeBuffer.c_str(),
+				sizeof(char) * (*it)->writeBuffer.size(), MSG_NOSIGNAL);
 			if (sendRet < 0)
 			{
-				std::cerr << "send() failed : " << std::strerror(errno) << "fd = " << (*it)->getSocketFD() << std::endl;
-				break;
-			}
-			else if ( sendRet == 0)
-			{
 				std::set<Client*>::iterator tmp = it;
-				std::cerr << "connection closed by the client. Bye Bye" << std::endl;
+				std::cerr << "send() failed : " << std::strerror(errno) << "fd = " << (*it)->getSocketFD() << std::endl;
 				FD_CLR((*it)->getSocketFD(), &(this->_masterSet));
-				it++;
 				this->_clients.erase(tmp);
-				continue ;
+				break;
 			}
 			else
 			{
+				if (static_cast<size_t>(sendRet) == (*it)->writeBuffer.size())
+					(*it)->writeBuffer.erase();
+				else
+					(*it)->writeBuffer.erase((*it)->writeBuffer.begin() + sendRet);
 				std::cout << sendRet << " bytes sent" << std::endl;
-				std::cout << "sent : " << (*it)->buffer << std::endl;
-
+				std::cout << "sent : " << (*it)->writeBuffer << std::endl;
 			}
 		}
 		it++;
