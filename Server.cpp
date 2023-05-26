@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "irc.hpp"
 
 Server::Server()
 {
@@ -353,5 +353,43 @@ void	Server::writeLoop()
 			}
 		}
 		it++;
+	}
+}
+
+
+void	Server::createChannel(std::string newChannelName)
+{
+	int	channelAlreadyExists = 0;
+	for (std::set<Channel>::iterator it = this->_channels.begin();
+			it != this->_channels.end(); it++)
+	{
+		if (it->getName() == newChannelName)
+			channelAlreadyExists = 1;
+	}
+	if (channelAlreadyExists == 0)
+	{
+		std::pair<std::set<Channel>::iterator, bool> newlyCreatedChannel;
+		newlyCreatedChannel = this->_channels.insert(Channel());
+		newlyCreatedChannel.first->updateChannelName(newChannelName);
+	}
+}
+
+void	Server::destroyChannel(Channel&)
+{
+}
+
+void	Server::destroyChannel(std::string newChannelName)
+{
+	int	channelAlreadyExists = 0;
+	for (std::set<Channel>::iterator it = this->_channels.begin();
+			it != this->_channels.end(); it++)
+	{
+		if (it->getName() == newChannelName)
+			channelAlreadyExists = 1;
+	}
+	if (channelAlreadyExists == 0)
+	{
+		std::pair<std::set<Channel>::iterator, bool> newlyCreatedChannel;
+		newlyCreatedChannel = this->_channels.insert(Channel());
 	}
 }

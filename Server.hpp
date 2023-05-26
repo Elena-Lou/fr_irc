@@ -18,6 +18,7 @@
 # define MYIRC_TIMEOUT 30
 
 class Client;
+class Channel;
 class Server
 {
 	public:
@@ -40,6 +41,11 @@ class Server
 		void	addUser(int);
 		void	deleteUser(int);
 		void	checkNewConnections();
+
+		/* Channel handlers */
+		void	createChannel(std::string);
+		void	destroyChannel(Channel&);
+		void	destroyChannel(std::string);
 
 		/* read/write loops and set handler */
 		int		fillSets();
@@ -71,6 +77,7 @@ class Server
 		struct sockaddr_storage	_pendingAddr;
 		socklen_t				_pendingAddrSize;
 		char	buffer[IRC_BUFFER_SIZE];
+		std::set<Channel>	_channels;
 };
 
 

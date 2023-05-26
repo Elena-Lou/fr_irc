@@ -4,6 +4,7 @@
 
 #include "irc.hpp"
 
+class Channel;
 class Client
 {
 	public:
@@ -17,6 +18,11 @@ class Client
 
 		std::string	readBuffer;
 		std::string writeBuffer;
+
+		/* channel handlers */
+		int		isInChannel(Channel&) const;
+		void	joinChannel(Channel&);
+		std::set<Channel*> _connectedChannels;
 	private:
 		Client();
 		Client(const Client &source);

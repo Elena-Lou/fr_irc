@@ -34,3 +34,15 @@ int	Client::getSocketFD() const
 {
 	return (this->_socketFD);
 }
+
+int	Client::isInChannel(Channel& toFind) const
+{
+	if (this->_connectedChannels.find(&toFind) != this->_connectedChannels.end())
+		return (CONNECTED);
+	return (NOT_CONNECTED);
+}
+
+void	Client::joinChannel(Channel& toJoin)
+{
+	this->_connectedChannels.insert(&toJoin);
+}
