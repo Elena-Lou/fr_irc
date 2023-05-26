@@ -3,24 +3,39 @@
 
 Channel::Channel()
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Channel default constructor" << std::endl;
+#endif
 	//this is prohibited
 }
 
 Channel::~Channel()
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Channel default destructor" << std::endl;
+#endif
 }
 
 Channel::Channel(std::string name, Client& owner) :  _owner(&owner), _nbOfClients(0), _name(name)
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Channel string Client constructor" << std::endl;
+#endif
 }
 
 Channel::Channel(const Channel &source)
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Channel copy constructor" << std::endl;
+#endif
 	*this = source;
 }
 
 Channel &Channel::operator=(const Channel &rhs)
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Channel = overload" << std::endl;
+#endif
 	this->_owner = rhs._owner;
 	this->_nbOfClients = rhs._nbOfClients;
 	this->_name = rhs._name;

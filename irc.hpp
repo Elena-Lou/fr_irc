@@ -9,6 +9,8 @@
 # define CONNECTED 1
 # define NOT_CONNECTED 0
 
+# define SHOW_CONSTRUCTOR 1
+
 # include <iostream>
 # include <netinet/in.h>
 # include <cstdlib>

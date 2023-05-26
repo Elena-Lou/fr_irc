@@ -2,27 +2,39 @@
 
 Client::Client()
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Client default constructor" << std::endl;
+#endif
 	//this is prohibited
 }
 
 Client::~Client()
 {
-	std::cout << "Channel Client start" << std::endl;
-	//close(this->_socketFD);
-	std::cout << "Channel Client end" << std::endl;
+#if SHOW_CONSTRUCTOR
+	std::cout << "Client destructor" << std::endl;
+#endif
 }
 
 Client::Client(int socketFD) : _socketFD(socketFD)
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Client socketFD constructor" << std::endl;
+#endif
 }
 
 Client::Client(const Client &source)
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Client copy constructor" << std::endl;
+#endif
 	*this = source;
 }
 
 Client& Client::operator=(const Client &rhs)
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Client = overload" << std::endl;
+#endif
 	this->_socketFD = rhs._socketFD;
 	this->_username = rhs._username;
 	return (*this);
