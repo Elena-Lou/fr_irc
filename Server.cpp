@@ -216,7 +216,7 @@ std::map<int, Client> &Server::getClients()
 	return (this->_clients);
 }
 
-void	Server::addUser(int socketFD)
+void	Server::connectUser(const int socketFD)
 {
 	this->_clients.insert(std::make_pair(socketFD, Client(socketFD)));
 }
@@ -280,7 +280,7 @@ void	Server::checkNewConnections()
 	}
 	else
 	{
-		this->addUser(newFD);
+		this->connectUser(newFD);
 		FD_SET(newFD, &(this->_masterSet));
 		if (newFD > this->_fdMax)
 			this->_fdMax = newFD;
@@ -359,7 +359,6 @@ void	Server::writeLoop()
 		it++;
 	}
 }
-
 
 void	Server::createChannel(std::string newChannelName, Client& owner)
 {
