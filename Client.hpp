@@ -9,6 +9,8 @@ class Client
 {
 	public:
 		~Client();
+		Client(const Client &source);
+		Client& operator=(const Client &rhs);
 		Client(int);
 
 		void	setUsername(std::string name);
@@ -22,15 +24,14 @@ class Client
 		/* channel handlers */
 		int		isInChannel(Channel&) const;
 		void	joinChannel(Channel&);
-		std::set<Channel*> _connectedChannels;
+		void	quitChannel(Channel&);
 	private:
 		Client();
-		Client(const Client &source);
-		Client& operator=(const Client &rhs);
 
 		/* Attributes */
 		int			_socketFD;
 		std::string	_username;
+		std::set<Channel*> _connectedChannels;
 	protected:
 };
 

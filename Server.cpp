@@ -34,7 +34,6 @@ Server::Server()
 				SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0)
 		{
 			status |= 0b10;
-			close(this->_socketFD);
 			continue;
 		}
 
@@ -43,7 +42,6 @@ Server::Server()
 		if (fcntl(this->_socketFD, F_SETFL, flag | O_NONBLOCK) < 0)
 		{
 			status |= 0b100;
-			close(this->_socketFD);
 			continue;
 		}
 
@@ -51,14 +49,12 @@ Server::Server()
 		if (bind(this->_socketFD, focus->ai_addr, focus->ai_addrlen) < 0)
 		{
 			status |= 0b1000;
-			close(this->_socketFD);
 			continue;
 		}
 		/* listens to the port bound to the socket descriptor for incoming connections */
 		if (listen(this->_socketFD, MYIRC_ALLOWED_PENDING_CONNECTIONS) < 0)
 		{
 			status |= 0b10000;
-			close(this->_socketFD);
 			continue;
 		}
 	}
@@ -79,14 +75,9 @@ Server::Server()
 
 Server::~Server()
 {
-	for (std::set<Client*>::iterator it = this->_clients.begin();
-			it != this->_clients.end();)
-	{
-		std::set<Client*>::iterator tmp = it;
-		it++;
-		delete *tmp;
-	}
+	std::cout << "Server destructor start" << std::endl;
 	close(this->_socketFD);
+	std::cout << "Server destructor end" << std::endl;
 }
 
 Server::Server(const char *portNumber, const char *domain)
@@ -124,7 +115,6 @@ Server::Server(const char *portNumber, const char *domain)
 				SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0)
 		{
 			status |= 0b10;
-			close(this->_socketFD);
 			continue;
 		}
 
@@ -133,7 +123,6 @@ Server::Server(const char *portNumber, const char *domain)
 		if (fcntl(this->_socketFD, F_SETFL, flag | O_NONBLOCK) < 0)
 		{
 			status |= 0b100;
-			close(this->_socketFD);
 			continue;
 		}
 
@@ -141,14 +130,12 @@ Server::Server(const char *portNumber, const char *domain)
 		if (bind(this->_socketFD, focus->ai_addr, focus->ai_addrlen) < 0)
 		{
 			status |= 0b1000;
-			close(this->_socketFD);
 			continue;
 		}
 		/* listens to the port bound to the socket descriptor for incoming connections */
 		if (listen(this->_socketFD, MYIRC_ALLOWED_PENDING_CONNECTIONS) < 0)
 		{
 			status |= 0b10000;
-			close(this->_socketFD);
 			continue;
 		}
 		break;
@@ -218,19 +205,31 @@ std::map<int, Client> &Server::getClients()
 
 void	Server::addUser(int socketFD)
 {
-	this->_clients.insert(new Client(socketFD));
+	this->_clients.insert(std::make_pair(socketFD, Client(socketFD)));
 }
 
-void	Server::deleteUser(int socketFD)
+void	Server::disconnectUser(int socketFD)
 {
-	for (std::set<Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
 	{
-		if ((*it)->getSocketFD() == socketFD)
+		if (it->first == socketFD)
 		{
-			this->_clients.erase(it);
+			this->disconnectUser(it);
 			break;
 		}
 	}
+}
+
+void	Server::disconnectUser(std::map<int, Client>::iterator clientIterator)
+{
+	for (std::list<Channel>::iterator channelIterator = this->_channels.begin();
+		channelIterator != this->_channels.end(); channelIterator++)
+	{
+		if (channelIterator->removeUserFromChannel(clientIterator->second) == 0)
+			this->_channels.erase(channelIterator);
+	}
+	close(clientIterator->second.getSocketFD());
+	this->_clients.erase(clientIterator);
 }
 
 int		Server::fillSets()
@@ -277,36 +276,36 @@ void	Server::checkNewConnections()
 
 void	Server::readLoop()
 {
-	for (std::set<Client*>::iterator it = this->_clients.begin();
+	for (std::map<int, Client>::iterator it = this->_clients.begin();
 					it != this->_clients.end();)
 	{
 		/* Reading loop */
-		if (FD_ISSET((*it)->getSocketFD(), &(this->_readingSet)))
+		if (FD_ISSET(it->second.getSocketFD(), &(this->_readingSet)))
 		{
 			bzero(this->buffer, sizeof(char) * IRC_BUFFER_SIZE - 1);
-			int recvRet = recv((*it)->getSocketFD(), this->buffer, sizeof(char) * (IRC_BUFFER_SIZE - 1), 0);
+			int recvRet = recv(it->second.getSocketFD(), this->buffer, sizeof(char) * (IRC_BUFFER_SIZE - 1), 0);
 			if (recvRet < 0)
 			{
-				std::cerr << "recv() failed : " << std::strerror(errno) << "fd = " << (*it)->getSocketFD() << std::endl;
-				std::set<Client*>::iterator tmp = it;
+				std::cerr << "recv() failed : " << std::strerror(errno) << "fd = " << it->first << std::endl;
+				std::map<int, Client>::iterator disconnectedClient = it;
 				it++;
-				this->_clients.erase(tmp);
+				this->disconnectUser(disconnectedClient);
 				break;
 			}
 			else if ( recvRet == 0)
 			{
-				std::set<Client*>::iterator tmp = it;
+				std::map<int, Client>::iterator disconnectedClient = it;
 				std::cerr << "connection closed by the client. Bye Bye" << std::endl;
-				FD_CLR((*it)->getSocketFD(), &(this->_masterSet));
+				FD_CLR(it->second.getSocketFD(), &(this->_masterSet));
 				it++;
-				this->_clients.erase(tmp);
+				this->disconnectUser(disconnectedClient);
 				continue ;
 			}
 			else
 			{
 				std::cout << recvRet << " bytes received" << std::endl;
 				std::cout << "received : " << this->buffer << std::endl;
-				(*it)->readBuffer.append(this->buffer);
+				it->second.readBuffer.append(this->buffer);
 			}
 		}
 		it++;
@@ -315,32 +314,33 @@ void	Server::readLoop()
 
 void	Server::writeLoop()
 {
-	for (std::set<Client*>::iterator it = this->_clients.begin();
+	for (std::map<int, Client>::iterator it = this->_clients.begin();
 			it != this->_clients.end();)
 	{
 		/* Reading loop */
-		if (FD_ISSET((*it)->getSocketFD(), &(this->_readingSet))
-			&& (*it)->writeBuffer.size())
+		if (FD_ISSET(it->first, &(this->_readingSet))
+			&& it->second.writeBuffer.size())
 		{
 			//bzero((*it)->buffer, sizeof(char) * IRC_BUFFER_SIZE);
-			int sendRet = send((*it)->getSocketFD(), (*it)->writeBuffer.c_str(),
-				sizeof(char) * (*it)->writeBuffer.size(), MSG_NOSIGNAL);
+			int sendRet = send(it->first, it->second.writeBuffer.c_str(),
+				sizeof(char) * it->second.writeBuffer.size(), MSG_NOSIGNAL);
 			if (sendRet < 0)
 			{
-				std::set<Client*>::iterator tmp = it;
-				std::cerr << "send() failed : " << std::strerror(errno) << "fd = " << (*it)->getSocketFD() << std::endl;
-				FD_CLR((*it)->getSocketFD(), &(this->_masterSet));
+				std::map<int, Client>::iterator tmp = it;
+				std::cerr << "send() failed : " << std::strerror(errno) << "fd = "
+					<< it->first << std::endl;
+				FD_CLR(it->first, &(this->_masterSet));
 				this->_clients.erase(tmp);
 				break;
 			}
 			else
 			{
-				if (static_cast<size_t>(sendRet) == (*it)->writeBuffer.size())
-					(*it)->writeBuffer.erase();
+				if (static_cast<size_t>(sendRet) == it->second.writeBuffer.size())
+					it->second.writeBuffer.erase();
 				else
-					(*it)->writeBuffer.erase((*it)->writeBuffer.begin() + sendRet);
+					it->second.writeBuffer.erase(it->second.writeBuffer.begin() + sendRet);
 				std::cout << sendRet << " bytes sent" << std::endl;
-				std::cout << "sent : " << (*it)->writeBuffer << std::endl;
+				std::cout << "sent : " << it->second.writeBuffer << std::endl;
 			}
 		}
 		it++;
@@ -351,7 +351,7 @@ void	Server::writeLoop()
 void	Server::createChannel(std::string newChannelName, Client& owner)
 {
 	int	channelAlreadyExists = 0;
-	for (std::set<Channel>::iterator it = this->_channels.begin();
+	for (std::list<Channel>::iterator it = this->_channels.begin();
 			it != this->_channels.end(); it++)
 	{
 		if (it->getName() == newChannelName)
@@ -359,27 +359,28 @@ void	Server::createChannel(std::string newChannelName, Client& owner)
 	}
 	if (channelAlreadyExists == 0)
 	{
-		std::pair<std::set<Channel>::iterator, bool> newlyCreatedChannel;
-		newlyCreatedChannel = this->_channels.insert(Channel(newChannelName, owner));
+		this->_channels.push_front(Channel(newChannelName, owner));
 	}
 }
 
-void	Server::destroyChannel(Channel&)
+void	Server::destroyChannel(const Channel& chanToDelete)
 {
+	(void)chanToDelete;
+	//supprimer le chan dans la liste de chaque personne connectée
+	//supprimer le chan dans Server
 }
 
-void	Server::destroyChannel(std::string newChannelName)
+void	Server::destroyChannel(std::string channelName)
 {
-	int	channelAlreadyExists = 0;
-	for (std::set<Channel>::iterator it = this->_channels.begin();
-			it != this->_channels.end(); it++)
+	for (std::list<Channel>::iterator it = this->_channels.begin();
+		it != this->_channels.end(); it++)
 	{
-		if (it->getName() == newChannelName)
-			channelAlreadyExists = 1;
+		if (it->getName() == channelName)
+		{
+			this->destroyChannel(*it);
+			break;
+		}
 	}
-	if (channelAlreadyExists == 0)
-	{
-		std::pair<std::set<Channel>::iterator, bool> newlyCreatedChannel;
-		newlyCreatedChannel = this->_channels.insert(Channel());
-	}
+	//trouver le channel dans la liste de Server
+	//appeler destroychannel(Channel&)
 }

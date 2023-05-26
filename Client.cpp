@@ -7,7 +7,9 @@ Client::Client()
 
 Client::~Client()
 {
-	close(this->_socketFD);
+	std::cout << "Channel Client start" << std::endl;
+	//close(this->_socketFD);
+	std::cout << "Channel Client end" << std::endl;
 }
 
 Client::Client(int socketFD) : _socketFD(socketFD)
@@ -22,6 +24,7 @@ Client::Client(const Client &source)
 Client& Client::operator=(const Client &rhs)
 {
 	this->_socketFD = rhs._socketFD;
+	this->_username = rhs._username;
 	return (*this);
 }
 
@@ -42,7 +45,12 @@ int	Client::isInChannel(Channel& toFind) const
 	return (NOT_CONNECTED);
 }
 
-void	Client::joinChannel(Channel& toJoin)
+void	Client::joinChannel(Channel& channelToJoin)
 {
-	this->_connectedChannels.insert(&toJoin);
+	this->_connectedChannels.insert(&channelToJoin);
+}
+
+void	Client::quitChannel(Channel& channelToQuit)
+{
+	this->_connectedChannels.erase(&channelToQuit);
 }

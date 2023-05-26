@@ -3,14 +3,14 @@
 
 Channel::Channel()
 {
-	this->_nbOfClients = 0;
+	//this is prohibited
 }
 
 Channel::~Channel()
 {
 }
 
-Channel::Channel(std::string name) :  _nbOfClients(0), _name(name)
+Channel::Channel(std::string name, Client& owner) :  _owner(&owner), _nbOfClients(0), _name(name)
 {
 }
 
@@ -21,6 +21,7 @@ Channel::Channel(const Channel &source)
 
 Channel &Channel::operator=(const Channel &rhs)
 {
+	this->_owner = rhs._owner;
 	this->_nbOfClients = rhs._nbOfClients;
 	this->_name = rhs._name;
 	return (*this);
@@ -43,35 +44,33 @@ void	Channel::updateChannelName(std::string name)
 
 int		Channel::isUserConnected(Client& user)
 {
-	std::set<Client*>::iterator it = this->_connectedClients.find(&user);
+	std::map<int, Client*>::iterator it = this->_connectedClients.find(user.getSocketFD());
 	if (it != this->_connectedClients.end())
 		return (CONNECTED);
 	return (NOT_CONNECTED);
 }
 
-void	Channel::connectUser(Client& user)
+void	Channel::addUserToChannel(Client& user)
 {
 	if (this->isUserConnected(user) == NOT_CONNECTED)
 	{
-		this->_connectedClients.insert(&user);
+		this->_connectedClients.insert(std::make_pair(user.getSocketFD(), &user));
 		this->_nbOfClients++;
 		user.joinChannel(*this);
 	}
 }
 
 /* returns the number of connected clients after the operation to delete chan if empty*/
-int		Channel::disconnectUser(Client& user)
+int		Channel::removeUserFromChannel(Client& user)
 {
 	if (this->isUserConnected(user) == CONNECTED)
 	{
 		this->_nbOfClients--;
-		std::set<Channel*>::iterator channelIterator = user._connectedChannels.find(this);
-		if (channelIterator != user._connectedChannels.end())
-			user._connectedChannels.erase(channelIterator);
+		user.quitChannel(*this);
 
-		std::set<Client*>::iterator clientIterator = this->_connectedClients.find(&user);
+		std::map<int, Client*>::iterator clientIterator = this->_connectedClients.find(user.getSocketFD());
 		if (clientIterator != this->_connectedClients.end())
-			this->_connectedClients.erase(&user);
+			this->_connectedClients.erase(clientIterator);
 	}
 	return (this->_nbOfClients);
 }

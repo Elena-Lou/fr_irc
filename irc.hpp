@@ -1,6 +1,11 @@
 #ifndef IRC_HPP
 # define IRC_HPP
+
 # define IRC_BUFFER_SIZE 80
+# define MYIRC_PORT "3490"
+# define MYIRC_ALLOWED_PENDING_CONNECTIONS 5
+# define MYIRC_TIMEOUT 30
+
 # define CONNECTED 1
 # define NOT_CONNECTED 0
 
@@ -18,11 +23,13 @@
 # include <fcntl.h>
 # include <sys/time.h>
 # include <sys/select.h>
+# include <set>
+# include <list>
+# include <map>
+# include <exception>
 # include "Server.hpp"
 # include "Client.hpp"
 # include "Channel.hpp"
-# include <set>
-# include <exception>
 
 
 #endif
