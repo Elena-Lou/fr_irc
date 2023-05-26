@@ -25,17 +25,13 @@ class Server
 		Server();
 		~Server();
 		Server(const char *portNumber, const char *domain = NULL);
-		Server(const Server &source);
-		Server& operator=(const Server &rhs);
 
 		void	closeSocketFD();
 		void	socketErrorHandler(int errorBitField) const;
 
 		/* Getters */
 		int		getSocketFD() const;
-		struct addrinfo *getServinfo() const;
-		struct sockaddr *getSockaddr() const;
-		std::set<Client*> &getClients();
+		std::map<int, Client> &getClients();
 
 		/* Client handlers */
 		void	addUser(int);
@@ -65,12 +61,12 @@ class Server
 				const char* what(void) const throw();
 		};
 	private:
+		Server(const Server &source);
+		Server& operator=(const Server &rhs);
 	protected:
-		struct addrinfo	hints;
-		struct addrinfo	*_servinfo;
 		int				_socketFD;
 		int				_fdMax;
-		std::set<Client*> _clients;
+		std::map<int, Client> _clients;
 		fd_set		_masterSet;
 		fd_set		_readingSet;
 		fd_set		_writingSet;

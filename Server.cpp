@@ -62,6 +62,7 @@ Server::Server()
 			continue;
 		}
 	}
+	freeaddrinfo(servinfo);
 	if (status != 0)
 	{
 		this->socketErrorHandler(status);
@@ -86,7 +87,6 @@ Server::~Server()
 		delete *tmp;
 	}
 	close(this->_socketFD);
-	freeaddrinfo(this->_servinfo);
 }
 
 Server::Server(const char *portNumber, const char *domain)
@@ -153,6 +153,7 @@ Server::Server(const char *portNumber, const char *domain)
 		}
 		break;
 	}
+	freeaddrinfo(servinfo);
 	if (status != 0 || focus == NULL)
 	{
 		this->socketErrorHandler(status);
@@ -175,7 +176,7 @@ Server::Server(const Server &source)
 Server& Server::operator=(const Server &rhs)
 {
 	this->_socketFD = rhs._socketFD;
-	this->_servinfo = rhs._servinfo;
+	this->_fdMax = rhs._fdMax;
 	return (*this);
 }
 
@@ -210,17 +211,7 @@ int	Server::getSocketFD() const
 	return (this->_socketFD);
 }
 
-struct addrinfo *Server::getServinfo() const
-{
-	return (this->_servinfo);
-}
-
-struct sockaddr *Server::getSockaddr() const
-{
-	return (this->_servinfo->ai_addr);
-}
-
-std::set<Client*> &Server::getClients()
+std::map<int, Client> &Server::getClients()
 {
 	return (this->_clients);
 }
@@ -357,7 +348,7 @@ void	Server::writeLoop()
 }
 
 
-void	Server::createChannel(std::string newChannelName)
+void	Server::createChannel(std::string newChannelName, Client& owner)
 {
 	int	channelAlreadyExists = 0;
 	for (std::set<Channel>::iterator it = this->_channels.begin();
@@ -369,8 +360,7 @@ void	Server::createChannel(std::string newChannelName)
 	if (channelAlreadyExists == 0)
 	{
 		std::pair<std::set<Channel>::iterator, bool> newlyCreatedChannel;
-		newlyCreatedChannel = this->_channels.insert(Channel());
-		newlyCreatedChannel.first->updateChannelName(newChannelName);
+		newlyCreatedChannel = this->_channels.insert(Channel(newChannelName, owner));
 	}
 }
 
