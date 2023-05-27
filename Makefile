@@ -2,7 +2,8 @@ NAME = ircserv
 
 SRCS =	main.cpp\
 		Server.cpp\
-		Client.cpp
+		Client.cpp\
+		Channel.cpp
 
 CXX = c++
 
@@ -39,7 +40,7 @@ test: $(NAME)
 		./$(NAME)
 
 vtest:	$(NAME)
-		valgrind --leak-check=full ./$(NAME)
+		valgrind --leak-check=full --track-fds=yes ./$(NAME)
 
 -include $(DEPS)
 

@@ -2,7 +2,6 @@
 # define SERVER_HPP
 
 #include "irc.hpp"
-# include <set>
 # include "Client.hpp"
 # include <exception>
 
@@ -12,12 +11,8 @@
 # define ERRSOCKBIND 0b1000
 # define ERRSOCKLISTEN 0b10000
 
-# define MYIRC_PORT "3490"
-# define MYIRC_ALLOWED_PENDING_CONNECTIONS 5
-
-# define MYIRC_TIMEOUT 30
-
 class Client;
+class Channel;
 class Server
 {
 	public:
@@ -32,14 +27,18 @@ class Server
 
 		/* Getters */
 		int		getSocketFD() const;
-		struct addrinfo *getServinfo() const;
-		struct sockaddr *getSockaddr() const;
-		std::set<Client*> &getClients();
+		std::map<int, Client> &getClients();
 
 		/* Client handlers */
 		void	addUser(int);
-		void	deleteUser(int);
+		void	disconnectUser(int);
+		void	disconnectUser(std::map<int, Client>::iterator clientIterator);
 		void	checkNewConnections();
+
+		/* Channel handlers */
+		void	createChannel(std::string, Client&);
+		void	destroyChannel(const Channel&);
+		void	destroyChannel(std::string);
 
 		/* read/write loops and set handler */
 		int		fillSets();
@@ -60,17 +59,16 @@ class Server
 		};
 	private:
 	protected:
-		struct addrinfo	hints;
-		struct addrinfo	*_servinfo;
 		int				_socketFD;
 		int				_fdMax;
-		std::set<Client*> _clients;
+		std::map<int, Client> _clients;
 		fd_set		_masterSet;
 		fd_set		_readingSet;
 		fd_set		_writingSet;
 		struct sockaddr_storage	_pendingAddr;
 		socklen_t				_pendingAddrSize;
-
+		char	buffer[IRC_BUFFER_SIZE];
+		std::list<Channel>	_channels;
 };
 
 

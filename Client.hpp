@@ -4,10 +4,13 @@
 
 #include "irc.hpp"
 
+class Channel;
 class Client
 {
 	public:
 		~Client();
+		Client(const Client &source);
+		Client& operator=(const Client &rhs);
 		Client(int);
 
 		void	setUsername(std::string name);
@@ -15,17 +18,21 @@ class Client
 		/* Getters */
 		int	getSocketFD() const;
 
-		char	buffer[IRC_BUFFER_SIZE];
+		std::string	readBuffer;
+		std::string writeBuffer;
+
+		/* channel handlers */
+		int		isInChannel(Channel&) const;
+		void	joinChannel(Channel&);
+		void	quitChannel(Channel&);
 	private:
 		Client();
-		Client(const Client &source);
-		Client& operator=(const Client &rhs);
 
 		/* Attributes */
 		int			_socketFD;
 		std::string	_username;
+		std::set<Channel*> _connectedChannels;
 	protected:
 };
-
 
 #endif
