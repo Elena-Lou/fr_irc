@@ -2,6 +2,9 @@
 
 Server::Server()
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Server Default constructor" << std::endl;
+#endif
 	int				status = 0;
 	struct addrinfo hints;
 	struct addrinfo	*servinfo;
@@ -75,13 +78,17 @@ Server::Server()
 
 Server::~Server()
 {
-	std::cout << "Server destructor start" << std::endl;
+#if SHOW_CONSTRUCTOR
+	std::cout << "Server destructor" << std::endl;
+#endif
 	close(this->_socketFD);
-	std::cout << "Server destructor end" << std::endl;
 }
 
 Server::Server(const char *portNumber, const char *domain)
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Server char* char* constructor" << std::endl;
+#endif
 	int				status = 0;
 	struct addrinfo hints;
 	struct addrinfo	*servinfo;
@@ -157,11 +164,17 @@ Server::Server(const char *portNumber, const char *domain)
 
 Server::Server(const Server &source)
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Server copy constructor" << std::endl;
+#endif
 	*this = source;
 }
 
 Server& Server::operator=(const Server &rhs)
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Server = overload" << std::endl;
+#endif
 	this->_socketFD = rhs._socketFD;
 	this->_fdMax = rhs._fdMax;
 	return (*this);
@@ -203,7 +216,7 @@ std::map<int, Client> &Server::getClients()
 	return (this->_clients);
 }
 
-void	Server::addUser(int socketFD)
+void	Server::connectUser(const int socketFD)
 {
 	this->_clients.insert(std::make_pair(socketFD, Client(socketFD)));
 }
@@ -267,7 +280,7 @@ void	Server::checkNewConnections()
 	}
 	else
 	{
-		this->addUser(newFD);
+		this->connectUser(newFD);
 		FD_SET(newFD, &(this->_masterSet));
 		if (newFD > this->_fdMax)
 			this->_fdMax = newFD;
@@ -346,7 +359,6 @@ void	Server::writeLoop()
 		it++;
 	}
 }
-
 
 void	Server::createChannel(std::string newChannelName, Client& owner)
 {

@@ -30,7 +30,7 @@ class Server
 		std::map<int, Client> &getClients();
 
 		/* Client handlers */
-		void	addUser(int);
+		void	connectUser(int);
 		void	disconnectUser(int);
 		void	disconnectUser(std::map<int, Client>::iterator clientIterator);
 		void	checkNewConnections();
