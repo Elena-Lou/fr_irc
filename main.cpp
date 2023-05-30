@@ -1,17 +1,3 @@
-#include <iostream>
-#include <netinet/in.h>
-#include <cstdlib>
-#include <cstring>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netdb.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <cerrno>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/time.h>
-#include <sys/select.h>
 #include "irc.hpp"
 
 // int setsockopt(int sockfd, int level, int optname,  const void *optval, socklen_t optlen);
@@ -29,6 +15,12 @@ void *get_in_addr(struct sockaddr *sa)
 	return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
+void sigIntHandler(int signal)
+{
+	(void)signal;
+	throw Server::InterruptionSignalException();
+}
+
 int main( int ac, char** av ) {
 
 	// if (ac != 2)
@@ -37,13 +29,15 @@ int main( int ac, char** av ) {
 	// 	return 1;
 	// }
 
+
 	(void)ac;
 	(void)av;
 
 	try
 	{
-		Server	myIrc("3490", NULL);
+		std::signal(SIGINT, sigIntHandler);
 
+		Server	myIrc("3490", NULL);
 		std::cout << "entering the while loop" << std::endl;
 		/* WAITING FOR CONNECTIONS LOOP */
 		while(1)
@@ -60,7 +54,6 @@ int main( int ac, char** av ) {
 	catch (std::exception &e)
 	{
 		std::cerr << "Abort: " << e.what() << std::endl;
-		exit(1);
 	}
 	return 0;
 }
