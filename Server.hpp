@@ -57,6 +57,13 @@ class Server
 			public:
 				const char* what(void) const throw();
 		};
+
+		class InterruptionSignalException : public std::exception
+		{
+			public:
+				const char* what(void) const throw();
+		};
+
 	private:
 	protected:
 		int				_socketFD;

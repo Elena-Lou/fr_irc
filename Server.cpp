@@ -81,6 +81,9 @@ Server::~Server()
 #if SHOW_CONSTRUCTOR
 	std::cout << "Server destructor" << std::endl;
 #endif
+	for (std::map<int, Client>::iterator it = this->_clients.begin();
+		it != this->_clients.end(); it++)
+		close(it->second.getSocketFD());
 	close(this->_socketFD);
 }
 
@@ -182,12 +185,17 @@ Server& Server::operator=(const Server &rhs)
 
 const char *Server::CannotRetrieveSocketException::what(void) const throw()
 {
-	return ("Aborting\n");
+	return ("cannot retrieve socket");
 }
 
 const char *Server::CannotRetrieveAddrinfoException::what(void) const throw()
 {
-	return ("Aborting\n");
+	return ("cannot retrieve AddrInfo");
+}
+
+const char *Server::InterruptionSignalException::what(void) const throw()
+{
+	return ("Program Interrupted");
 }
 
 void	Server::socketErrorHandler(int errorBitField) const

@@ -29,6 +29,7 @@
 # include <list>
 # include <map>
 # include <exception>
+# include <csignal>
 # include "Server.hpp"
 # include "Client.hpp"
 # include "Channel.hpp"
