@@ -45,6 +45,9 @@ class Server
 		void	readLoop();
 		void	writeLoop();
 
+		/* COMMANDS */
+		void	JOIN(Command &wesh);
+
 		/* exceptions */
 		class CannotRetrieveAddrinfoException : public std::exception
 		{
