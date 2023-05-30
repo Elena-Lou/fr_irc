@@ -16,8 +16,9 @@ Channel::~Channel()
 #endif
 }
 
-Channel::Channel(std::string name, Client& owner) :  _owner(&owner), _nbOfClients(0), _name(name)
+Channel::Channel(std::string name, Client& owner) :  _nbOfClients(0), _name(name)
 {
+	this->setOperator(owner);
 #if SHOW_CONSTRUCTOR
 	std::cout << "Channel string Client constructor" << std::endl;
 #endif
@@ -36,7 +37,7 @@ Channel &Channel::operator=(const Channel &rhs)
 #if SHOW_CONSTRUCTOR
 	std::cout << "Channel = overload" << std::endl;
 #endif
-	this->_owner = rhs._owner;
+	this->_chanOps = rhs._chanOps;
 	this->_nbOfClients = rhs._nbOfClients;
 	this->_name = rhs._name;
 	return (*this);
@@ -88,4 +89,14 @@ int		Channel::removeUserFromChannel(Client& user)
 			this->_connectedClients.erase(clientIterator);
 	}
 	return (this->_nbOfClients);
+}
+
+void	Channel::setOperator(Client &chanOp)
+{
+	this->_chanOps.insert(std::make_pair(chanOp.getSocketFD(), &chanOp));
+}
+
+void	Channel::removeOperator(Client &chanOp)
+{
+	this->_chanOps.erase(chanOp.getSocketFD());
 }

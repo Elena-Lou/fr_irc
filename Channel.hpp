@@ -23,12 +23,14 @@ class Channel
 		int		isUserConnected(Client& user);
 		int		removeUserFromChannel(Client& user);
 		void	addUserToChannel(Client&);
+		void	setOperator(Client &chanOp);
+		void	removeOperator(Client &chanOp);
 
 	private:
 		Channel();
-		Client*				_owner;
 		int					_nbOfClients;
 		std::string			_name;
+		std::map<int, Client*>	_chanOps;
 		std::map<int, Client*>	_connectedClients;
 	protected:
 };
