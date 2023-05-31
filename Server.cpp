@@ -327,6 +327,13 @@ void	Server::readLoop()
 				std::cout << recvRet << " bytes received" << std::endl;
 				std::cout << "received : " << this->buffer << std::endl;
 				it->second.readBuffer.append(this->buffer);
+				if (this->checkRawInput(it->second.readBuffer))
+				{
+					std::cout << "buffer sent to parsing : " << it->second.readBuffer << std::endl;
+					this->parsingCommand(it->second.readBuffer);
+				}
+				std::cout << "buffer after parsing : " << it->second.readBuffer << std::endl;
+
 			}
 		}
 		it++;
@@ -417,4 +424,56 @@ void	Server::broadcastAllClients(std::string &message)
 void	Server::broadcastChannel(Channel& targetChannel, std::string &message)
 {
 	targetChannel.broadcastAllClients(message);
+}
+
+bool Server::checkRawInput( std::string & rawInput )
+{
+	std::size_t it = rawInput.find("\r\n");
+	if (it != std::string::npos)
+	{
+		rawInput.erase(rawInput.begin() + it, rawInput.end());
+		return true;
+	}
+	return false;
+}
+
+void Server::parsingCommand( std::string & rawInput )
+{
+	int index = 3;
+	ACommand* newCmd;
+
+	std::cout << "parsingCommand - rawInput : [" << rawInput << "]" << std::endl;
+	std::string commands[] = { "KICK", "JOIN" };
+
+	for (int i = 0; i < 2; i++)
+	{
+		std::cout << "commands[i] : " << commands[i] << std::endl;
+		if (commands[i] == rawInput)
+		{
+			std::cout << "index = " << index << std::endl;
+			index = i;
+			std::cout << "index = " << index << std::endl;
+			break ;
+		}
+	}
+	switch (index)
+	{
+	case 0 :
+		newCmd = new Kick();
+		rawInput.clear();
+		delete newCmd;
+		break;
+	
+	case 1 :
+		std::cout << "need to create a JOIN command" << std::endl;
+		rawInput.clear();
+		break;
+	
+	default:
+		std::cout << "not a known command" << std::endl;
+		rawInput.clear();
+		break;
+	}
+
+
 }
