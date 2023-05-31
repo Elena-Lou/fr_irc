@@ -5,6 +5,7 @@
 # include <string>
 
 class Client;
+class Server;
 class ACommand
 {
 	public:
@@ -12,7 +13,7 @@ class ACommand
 
 	protected:
 		ACommand();
-		ACommand(Client &user, std::string cmd);
+		ACommand(Server &server, Client &user, std::string cmd);
 		ACommand(const ACommand &source);
 		ACommand &operator=(const ACommand &rhs);
 
@@ -24,6 +25,7 @@ class ACommand
 		//bool	targetIsUserOrChannel;
 		//void	*_target;
 
+		Server	*_server;
 		Client	*_user;
 		std::list<std::string>	_cmd;
 	private:

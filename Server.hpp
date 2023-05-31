@@ -13,6 +13,7 @@
 
 class Client;
 class Channel;
+class ACommand;
 class Server
 {
 	public:
@@ -46,7 +47,7 @@ class Server
 		void	writeLoop();
 
 		/* COMMANDS */
-		void	JOIN(Command &wesh);
+		void	JOIN(ACommand &placeholder);
 
 		/* exceptions */
 		class CannotRetrieveAddrinfoException : public std::exception

@@ -9,9 +9,10 @@ ACommand::~ACommand()
 {
 }
 
-ACommand::ACommand(Client &user, std::string rawInput)
+ACommand::ACommand(Server &server, Client &user, std::string rawInput)
 {
-	this->_user = _user;
+	this->_server = &server;
+	this->_user = &user;
 	this->tokenise(rawInput);
 }
 

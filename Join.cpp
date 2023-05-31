@@ -9,7 +9,7 @@ Join::~Join()
 {
 }
 
-Join::Join(Client &user, std::string rawInput) : ACommand(user, rawInput)
+Join::Join(Server &server, Client &user, std::string rawInput) : ACommand(server, user, rawInput)
 {
 }
 
