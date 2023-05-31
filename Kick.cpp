@@ -2,12 +2,17 @@
 
 Kick::Kick( void ) : ACommand()
 {
-	std::cout << "KICK constructor" << std::endl;
 }
 
 Kick::Kick( Kick const & src )
 {
 	*this = src;
+}
+
+Kick::Kick(Server &server, Client &user, std::string rawInput) : ACommand(server, user, rawInput)
+{
+	std::cout << "KICK constructor" << std::endl;
+	std::cout << "client socketFD : " << this->_user->getSocketFD() << std::endl;
 }
 
 Kick & Kick::operator=( Kick const & rhs )
@@ -28,7 +33,7 @@ Kick::~Kick()
 
 void Kick::execute( void ) const
 {
-	std::cout << "Execute()" << std::endl;
+	
 }
 
 void Kick::error( std::string ) const

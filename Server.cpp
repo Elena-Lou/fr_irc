@@ -330,7 +330,7 @@ void	Server::readLoop()
 				if (this->checkRawInput(it->second.readBuffer))
 				{
 					std::cout << "buffer sent to parsing : " << it->second.readBuffer << std::endl;
-					this->parsingCommand(it->second.readBuffer);
+					this->parsingCommand(it->second.readBuffer, it->second);
 				}
 				std::cout << "buffer after parsing : " << it->second.readBuffer << std::endl;
 
@@ -437,7 +437,7 @@ bool Server::checkRawInput( std::string & rawInput )
 	return false;
 }
 
-void Server::parsingCommand( std::string & rawInput )
+void Server::parsingCommand( std::string & rawInput, Client & user )
 {
 	std::cout << "parsingCommand - rawInput : [" << rawInput << "]" << std::endl;
 	
@@ -471,7 +471,7 @@ void Server::parsingCommand( std::string & rawInput )
 	switch (index)
 	{
 	case 0 :
-		newCmd = new Kick();
+		newCmd = new Kick(*this, user, rawInput);
 		rawInput.clear();
 		delete newCmd;
 		break;

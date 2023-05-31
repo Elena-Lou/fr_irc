@@ -54,7 +54,7 @@ class Server
 		void	JOIN(ACommand &placeholder);
 		/* parsing commands */
 		bool	checkRawInput(std::string & rawInput);
-		void	parsingCommand(std::string & rawInput);
+		void	parsingCommand(std::string & rawInput, Client & user);
 
 		/* exceptions */
 		class CannotRetrieveAddrinfoException : public std::exception
