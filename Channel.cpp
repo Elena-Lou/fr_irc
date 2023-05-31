@@ -91,6 +91,17 @@ int		Channel::removeUserFromChannel(Client& user)
 	return (this->_nbOfClients);
 }
 
+bool Channel::isChannelOperator(Client & user)
+{
+	std::map<int, Client*>::iterator it = this->_chanOps.find(user.getSocketFD());
+	if (it != this->_chanOps.end())
+	{
+		return true;
+	}
+	else
+		return false;
+}
+
 void	Channel::setOperator(Client &chanOp)
 {
 	this->_chanOps.insert(std::make_pair(chanOp.getSocketFD(), &chanOp));

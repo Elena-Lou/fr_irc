@@ -29,6 +29,7 @@ class Server
 		/* Getters */
 		int		getSocketFD() const;
 		std::map<int, Client> &getClients();
+		std::deque<Channel>& getChannels();
 
 		/* Client handlers */
 		void	connectUser(int);

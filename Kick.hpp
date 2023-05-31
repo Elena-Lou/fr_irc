@@ -27,7 +27,7 @@ class Kick : public ACommand
 		~Kick();
 
 		void execute( void ) const;
-		void error( std::string ) const;
+		void error( int errorCode ) const;
 };
 
 #endif

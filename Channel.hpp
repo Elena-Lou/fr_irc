@@ -23,6 +23,9 @@ class Channel
 		int		isUserConnected(Client& user);
 		int		removeUserFromChannel(Client& user);
 		void	addUserToChannel(Client&);
+
+		/* Operator handler */
+		bool	isChannelOperator(Client & user);
 		void	setOperator(Client &chanOp);
 		void	removeOperator(Client &chanOp);
 

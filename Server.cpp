@@ -224,6 +224,11 @@ std::map<int, Client> &Server::getClients()
 	return (this->_clients);
 }
 
+std::deque<Channel> & Server::getChannels( void )
+{
+	return this->_channels;
+}
+
 void	Server::connectUser(const int socketFD)
 {
 	this->_clients.insert(std::make_pair(socketFD, Client(socketFD)));
@@ -443,7 +448,6 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 	
 	int index = 9;
 	std::string rawCommand;
-	ACommand* newCmd;
 
 	for (size_t i = 0; i < rawInput.size(); i++)
 	{
@@ -480,56 +484,66 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 	switch (index)
 	{
 	case 0 :
-		newCmd = new Kick(*this, user, rawInput);
-		rawInput.clear();
-		delete newCmd;
-		break;
-	
-	case 1 :
-		std::cout << "need to create JOIN command" << std::endl;
-		rawInput.clear();
-		break;
-	
-	case 2 :
-		std::cout << "need to create INVITE command" << std::endl;
-		rawInput.clear();
-		break;
-
-	case 3 :
-		std::cout << "need to create USER command" << std::endl;
-		rawInput.clear();
-		break;
-	
-	case 4 :
-		std::cout << "need to create OPER command" << std::endl;
-		rawInput.clear();
-		break;
-
-	case 5 :
-		std::cout << "need to create NICK command" << std::endl;
-		rawInput.clear();
-		break;
-	
-	case 6 :
-		std::cout << "need to create TOPIC command" << std::endl;
-		rawInput.clear();
-		break;
-	
-	case 7 :
-		std::cout << "need to create MODE command" << std::endl;
-		rawInput.clear();
-		break;
-	
-	case 8 :
-		std::cout << "need to create PRIVMSG command" << std::endl;
-		rawInput.clear();
-		break;
-
-	default:
-		std::cerr << "invalid command" << std::endl;
-		rawInput.clear();
+	{
+		Kick newKick(*this, user, rawInput);
 		break;
 	}
+	
+	case 1 :
+	{
+		std::cout << "need to create JOIN command" << std::endl;
+		break;
+	}
+	
+	case 2 :
+	{
+		std::cout << "need to create INVITE command" << std::endl;
+		break;
+	}
+
+	case 3 :
+	{
+		std::cout << "need to create USER command" << std::endl;
+		break;
+	}
+	
+	case 4 :
+	{
+		std::cout << "need to create OPER command" << std::endl;
+		break;
+	}
+
+	case 5 :
+	{
+		std::cout << "need to create NICK command" << std::endl;
+		break;
+	}
+	
+	case 6 :
+	{
+		std::cout << "need to create TOPIC command" << std::endl;
+		break;
+	}
+	
+	case 7 :
+	{
+		std::cout << "need to create MODE command" << std::endl;
+		break;
+	}
+	
+	case 8 :
+	{
+		std::cout << "need to create PRIVMSG command" << std::endl;
+		break;
+	}
+
+	default:
+	{
+		std::cerr << "invalid command" << std::endl;
+		break;
+	}
+	}
+	rawInput.clear();
 
 
 }
