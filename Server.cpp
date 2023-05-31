@@ -439,16 +439,28 @@ bool Server::checkRawInput( std::string & rawInput )
 
 void Server::parsingCommand( std::string & rawInput )
 {
+	std::cout << "parsingCommand - rawInput : [" << rawInput << "]" << std::endl;
+	
 	int index = 3;
+	std::string rawCommand;
 	ACommand* newCmd;
 
-	std::cout << "parsingCommand - rawInput : [" << rawInput << "]" << std::endl;
+	for (size_t i = 0; i < rawInput.size(); i++)
+	{
+		if (isspace(rawInput[i]))
+		{
+			rawCommand = rawInput.substr(0, i);
+			break;
+		}
+	}
+	
+	std::cout << "rawCommand : " << rawCommand << std::endl;
 	std::string commands[] = { "KICK", "JOIN" };
 
 	for (int i = 0; i < 2; i++)
 	{
 		std::cout << "commands[i] : " << commands[i] << std::endl;
-		if (commands[i] == rawInput)
+		if (commands[i] == rawCommand)
 		{
 			std::cout << "index = " << index << std::endl;
 			index = i;
