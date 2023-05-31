@@ -441,7 +441,7 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 {
 	std::cout << "parsingCommand - rawInput : [" << rawInput << "]" << std::endl;
 	
-	int index = 3;
+	int index = 9;
 	std::string rawCommand;
 	ACommand* newCmd;
 
@@ -455,9 +455,18 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 	}
 	
 	std::cout << "rawCommand : " << rawCommand << std::endl;
-	std::string commands[] = { "KICK", "JOIN" };
+	std::string commands[] = { "KICK",
+								"JOIN",
+								"INVITE",
+								"USER",
+								"OPER",
+								"NICK",
+								"TOPIC",
+								"MODE",
+								"PRIVMSG"
+							};
 
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 9; i++)
 	{
 		std::cout << "commands[i] : " << commands[i] << std::endl;
 		if (commands[i] == rawCommand)
@@ -477,12 +486,47 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 		break;
 	
 	case 1 :
-		std::cout << "need to create a JOIN command" << std::endl;
+		std::cout << "need to create JOIN command" << std::endl;
 		rawInput.clear();
 		break;
 	
+	case 2 :
+		std::cout << "need to create INVITE command" << std::endl;
+		rawInput.clear();
+		break;
+
+	case 3 :
+		std::cout << "need to create USER command" << std::endl;
+		rawInput.clear();
+		break;
+	
+	case 4 :
+		std::cout << "need to create OPER command" << std::endl;
+		rawInput.clear();
+		break;
+
+	case 5 :
+		std::cout << "need to create NICK command" << std::endl;
+		rawInput.clear();
+		break;
+	
+	case 6 :
+		std::cout << "need to create TOPIC command" << std::endl;
+		rawInput.clear();
+		break;
+	
+	case 7 :
+		std::cout << "need to create MODE command" << std::endl;
+		rawInput.clear();
+		break;
+	
+	case 8 :
+		std::cout << "need to create PRIVMSG command" << std::endl;
+		rawInput.clear();
+		break;
+
 	default:
-		std::cout << "not a known command" << std::endl;
+		std::cerr << "invalid command" << std::endl;
 		rawInput.clear();
 		break;
 	}
