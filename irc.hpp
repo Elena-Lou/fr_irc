@@ -11,6 +11,7 @@
 
 # define SHOW_CONSTRUCTOR 1
 
+# include <string>
 # include <iostream>
 # include <netinet/in.h>
 # include <cstdlib>
@@ -30,9 +31,11 @@
 # include <map>
 # include <exception>
 # include <csignal>
+#include <algorithm>
 # include "Server.hpp"
 # include "Client.hpp"
 # include "Channel.hpp"
+# include "Kick.hpp"
 
 
 #endif
