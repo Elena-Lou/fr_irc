@@ -11,7 +11,7 @@ Kick::Kick( Kick const & src )
 
 Kick::Kick(Server &server, Client &user, std::string rawInput) : ACommand(server, user, rawInput)
 {
-	std::cout << "KICK constructor" << std::endl;
+	std::cout << "KICK overloaded constructor" << std::endl;
 	std::cout << "client socketFD : " << this->_user->getSocketFD() << std::endl;
 }
 
