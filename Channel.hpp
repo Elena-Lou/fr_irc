@@ -21,6 +21,7 @@ class Channel
 
 		/* users handler */
 		int		isUserConnected(Client& user);
+		bool	isUserConnected(std::string userName);
 		int		removeUserFromChannel(Client& user);
 		void	addUserToChannel(Client&);
 

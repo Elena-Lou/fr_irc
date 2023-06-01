@@ -66,6 +66,18 @@ int		Channel::isUserConnected(Client& user)
 	return (NOT_CONNECTED);
 }
 
+bool Channel::isUserConnected(std::string userName)
+{
+	std::map<int, Client*>::iterator it;
+	for (it = this->_connectedClients.begin();
+		it != this->_connectedClients.end(); it++)
+	{
+		if (it->second->getUsername() == userName)
+			return true;
+	}
+	return false;
+}
+
 void	Channel::addUserToChannel(Client& user)
 {
 	if (this->isUserConnected(user) == NOT_CONNECTED)
