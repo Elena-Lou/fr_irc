@@ -18,6 +18,7 @@ class Client
 		/* Getters */
 		int	getSocketFD() const;
 		std::string getUsername() const;
+		const std::set<Channel*> &getConnectedChannels() const;
 
 		std::string	readBuffer;
 		std::string writeBuffer;

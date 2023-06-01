@@ -55,6 +55,10 @@ std::string Client::getUsername() const
 	return (this->_username);
 }
 
+const std::set<Channel*> &Client::getConnectedChannels() const
+{
+	return (this->_connectedChannels);
+}
 int	Client::isInChannel(Channel& toFind) const
 {
 	if (this->_connectedChannels.find(&toFind) != this->_connectedChannels.end())
