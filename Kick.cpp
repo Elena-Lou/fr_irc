@@ -1,6 +1,6 @@
 #include "Kick.hpp"
 
-Kick::Kick( void ) : ACommand()
+Kick::Kick() : ACommand()
 {
 }
 
@@ -32,9 +32,9 @@ Kick::~Kick()
 	std::cout << "KICK destructor" << std::endl;
 }
 
-void Kick::execute( void ) const
+void Kick::execute() const
 {
-	if (this->_cmd.size() < 2)
+	if (this->_cmd.size() < 3)
 	{
 		error(ERR_NEEDMOREPARAMS);
 		return ;
@@ -53,24 +53,29 @@ void Kick::execute( void ) const
 		error(ERR_NOSUCHCHANNEL);
 		return ;
 	}
-
-	/* Is the user a Channel Operator ? */
-	if (it->isChannelOperator(*(this->_user)))
+	
+	/* Is the user connected to that channel ? */
+	if (!it->isUserConnected(*(this->_user)))
 	{
-		
+		error(ERR_NOTONCHANNEL);
+		return ; 
+	}
+	
+	/* Is the user a Channel Operator ? */
+	if (!it->isChannelOperator(*(this->_user)))
+	{
+		error(ERR_CHANOPRIVSNEEDED);
+		return ;
 	}
 
-	// /* Is the user connected to that channel ? */
-	// 	-> map of connected users _connectedClients
-	// 	=> method isUserConnected(Client & user)
+	/* Is the user the user wants to kick conected to that channel ?*/
+	std::string targetName = this->_cmd[2];
+		if (!it->isUserConnected(*(this->_user)))
+	{
+		error(ERR_NOTONCHANNEL);
+		return ; 
+	}
 
-	// /* Is the user the user wants to kick conected to that channel ?*/
-	// 	=> method isUserConnected(Client & user)
-	
-	// if error
-	// 	error(int)
-	// */
-	
 }
 
 void Kick::error( int errorCode ) const
