@@ -229,6 +229,20 @@ std::deque<Channel> & Server::getChannels( void )
 	return this->_channels;
 }
 
+bool	Server::isUserConnected(std::string userName) const
+{
+	for (std::map<int, Client>::const_iterator it = this->_clients.begin();
+		it != this->_clients.end(); it++)
+	{
+		if (userName == it->second.getUsername())
+		{
+			return true;
+		}
+	}
+	return false;
+
+}
+
 void	Server::connectUser(const int socketFD)
 {
 	this->_clients.insert(std::make_pair(socketFD, Client(socketFD)));
