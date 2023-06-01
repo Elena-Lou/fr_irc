@@ -14,7 +14,7 @@ class ACommand
 
 	protected:
 		ACommand();
-		ACommand(Server &server, Client &user, std::string cmd);
+		ACommand(Server &server, Client &author, std::string cmd);
 		ACommand(const ACommand &source);
 		ACommand &operator=(const ACommand &rhs);
 
@@ -27,7 +27,7 @@ class ACommand
 		//void	*_target;
 
 		Server	*_server;
-		Client	*_user;
+		Client	*_author;
 		std::deque<std::string>	_cmd;
 	private:
 		void	tokenise(std::string rawInput);

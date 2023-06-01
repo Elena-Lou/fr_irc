@@ -82,7 +82,7 @@ bool Channel::isUserConnected(std::string nickName)
 	for (it = this->_connectedClients.begin();
 		it != this->_connectedClients.end(); it++)
 	{
-		if (isCaseInsensitiveEqual(it->second->getUsername(), nickName))
+		if (isCaseInsensitiveEqual(it->second->getNickname(), nickName))
 			return true;
 	}
 	return false;

@@ -40,7 +40,7 @@ re: clean
 	@make all
 
 test: $(NAME)
-		./$(NAME)
+		./$(NAME) 3490
 
 vtest:	$(NAME)
 		valgrind --leak-check=full --track-fds=yes ./$(NAME)

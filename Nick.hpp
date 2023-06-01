@@ -17,7 +17,7 @@ class Nick : public ACommand
 		~Nick();
 
 	protected:
-		Nick(Server &server, Client &user, std::string rawInput);
+		Nick(Server &server, Client &author, std::string rawInput);
 		Nick(const Nick &source);
 		Nick &operator=(const Nick &rhs);
 

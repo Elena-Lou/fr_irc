@@ -36,13 +36,13 @@ Client& Client::operator=(const Client &rhs)
 	std::cout << "Client = overload" << std::endl;
 #endif
 	this->_socketFD = rhs._socketFD;
-	this->_username = rhs._username;
+	this->_nickname = rhs._nickname;
 	return (*this);
 }
 
-void	Client::setUsername(std::string name)
+void	Client::setNickname(std::string name)
 {
-	this->_username = name;
+	this->_nickname = name;
 }
 
 int	Client::getSocketFD() const
@@ -50,15 +50,21 @@ int	Client::getSocketFD() const
 	return (this->_socketFD);
 }
 
-std::string Client::getUsername() const
+std::string Client::getNickname() const
 {
-	return (this->_username);
+	return (this->_nickname);
+}
+
+std::string Client::getFullName() const
+{
+	return (this->_nickname + "!" + this->_username + "@" + this->_hostname);
 }
 
 const std::set<Channel*> &Client::getConnectedChannels() const
 {
 	return (this->_connectedChannels);
 }
+
 int	Client::isInChannel(Channel& toFind) const
 {
 	if (this->_connectedChannels.find(&toFind) != this->_connectedChannels.end())

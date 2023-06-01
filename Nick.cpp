@@ -11,7 +11,7 @@ Nick::~Nick()
 {
 }
 
-Nick::Nick(Server &server, Client &user, std::string rawInput) : ACommand(server, user, rawInput)
+Nick::Nick(Server &server, Client &author, std::string rawInput) : ACommand(server, author, rawInput)
 {
 	this->execute();
 }
@@ -24,7 +24,7 @@ Nick::Nick(const Nick &source)
 Nick &Nick::operator=(const Nick &rhs)
 {
 	this->_cmd = rhs._cmd;
-	this->_user = rhs._user;
+	this->_author = rhs._author;
 	return (*this);
 }
 
@@ -44,16 +44,16 @@ void Nick::execute() const
 			return ;
 		}
 	}
-	
+
 	if (!this->_server->isUserConnected(newName))
 	{
 		error(ERR_NICKNAMEINUSE);
 		return ;
 	}
-	
+
 	//No condition for ERR_NICKCOLLISION not required by subject
 	std::string message;
-	message += this->_user->getUsername() + " changed his nickname to " + newName + ".\r\n";
+	message += this->_author->getNickname() + " changed his nickname to " + newName + ".\r\n";
 	this->_server->broadcastAllClients(message);
 }
 
@@ -63,14 +63,14 @@ void Nick::error(int errorCode) const
 	std::string errorMessage;
 	if (errorCode != ERR_NONICKNAMEGIVEN)
 	{
-		converter << errorCode << " :" << this->_user->getUsername() << " "
+		converter << errorCode << " :" << this->_author->getNickname() << " "
 			<< this->_cmd[1];
 		errorMessage = converter.str();
 	}
 	switch (errorCode)
 	{
 		case ERR_NONICKNAMEGIVEN:
-			errorMessage += this->_user->getUsername() + ": No nickname given\r\n";
+			errorMessage += this->_author->getNickname() + ": No nickname given\r\n";
 			break;
 		case ERR_ERRONEUSNICKNAME:
 			errorMessage += "Erroneus nickname\r\n";
@@ -82,5 +82,5 @@ void Nick::error(int errorCode) const
 			std::cerr << "Error: Unrecognised error code." << std::endl;
 			break;
 	}
-	this->_user->writeBuffer += errorMessage;
+	this->_author->writeBuffer += errorMessage;
 }
