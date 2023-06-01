@@ -1,8 +1,9 @@
 #ifndef ACOMMAND_HPP
 # define ACOMMAND_HPP
 
-# include <list>
+# include <deque>
 # include <string>
+# include <sstream>
 
 class Client;
 class Server;
@@ -19,7 +20,7 @@ class ACommand
 
 
 		virtual void	execute() const = 0;
-		virtual void	error(std::string) const = 0;
+		virtual void	error(int errorCode) const = 0;
 
 		//TODO: create a bool for the target to be used in derived classes
 		//bool	targetIsUserOrChannel;
@@ -27,7 +28,7 @@ class ACommand
 
 		Server	*_server;
 		Client	*_user;
-		std::list<std::string>	_cmd;
+		std::deque<std::string>	_cmd;
 	private:
 		void	tokenise(std::string rawInput);
 };
