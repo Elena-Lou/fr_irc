@@ -13,6 +13,7 @@
 
 class Client;
 class Channel;
+class ACommand;
 class Server
 {
 	public:
@@ -45,6 +46,13 @@ class Server
 		void	readLoop();
 		void	writeLoop();
 
+		/* messages */
+		void	broadcastAllClients(std::string &msg);
+		void	broadcastChannel(Channel& targetChan, std::string &msg);
+
+		/* COMMANDS */
+		void	JOIN(ACommand &placeholder);
+
 		/* exceptions */
 		class CannotRetrieveAddrinfoException : public std::exception
 		{
@@ -65,17 +73,17 @@ class Server
 		};
 
 	private:
-	protected:
 		int				_socketFD;
 		int				_fdMax;
-		std::map<int, Client> _clients;
 		fd_set		_masterSet;
 		fd_set		_readingSet;
 		fd_set		_writingSet;
 		struct sockaddr_storage	_pendingAddr;
 		socklen_t				_pendingAddrSize;
 		char	buffer[IRC_BUFFER_SIZE];
-		std::list<Channel>	_channels;
+
+		std::map<int, Client> _clients;
+		std::deque<Channel>	_channels;
 };
 
 

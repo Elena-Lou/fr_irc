@@ -50,6 +50,11 @@ int	Client::getSocketFD() const
 	return (this->_socketFD);
 }
 
+std::string Client::getUsername() const
+{
+	return (this->_username);
+}
+
 int	Client::isInChannel(Channel& toFind) const
 {
 	if (this->_connectedChannels.find(&toFind) != this->_connectedChannels.end())

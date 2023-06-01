@@ -243,7 +243,7 @@ void	Server::disconnectUser(int socketFD)
 
 void	Server::disconnectUser(std::map<int, Client>::iterator clientIterator)
 {
-	for (std::list<Channel>::iterator channelIterator = this->_channels.begin();
+	for (std::deque<Channel>::iterator channelIterator = this->_channels.begin();
 		channelIterator != this->_channels.end(); channelIterator++)
 	{
 		if (channelIterator->removeUserFromChannel(clientIterator->second) == 0)
@@ -371,7 +371,7 @@ void	Server::writeLoop()
 void	Server::createChannel(std::string newChannelName, Client& owner)
 {
 	int	channelAlreadyExists = 0;
-	for (std::list<Channel>::iterator it = this->_channels.begin();
+	for (std::deque<Channel>::iterator it = this->_channels.begin();
 			it != this->_channels.end(); it++)
 	{
 		if (it->getName() == newChannelName)
@@ -392,7 +392,7 @@ void	Server::destroyChannel(const Channel& chanToDelete)
 
 void	Server::destroyChannel(std::string channelName)
 {
-	for (std::list<Channel>::iterator it = this->_channels.begin();
+	for (std::deque<Channel>::iterator it = this->_channels.begin();
 		it != this->_channels.end(); it++)
 	{
 		if (it->getName() == channelName)
@@ -403,4 +403,18 @@ void	Server::destroyChannel(std::string channelName)
 	}
 	//trouver le channel dans la liste de Server
 	//appeler destroychannel(Channel&)
+}
+
+void	Server::broadcastAllClients(std::string &message)
+{
+	for (std::map<int, Client>::iterator it = this->_clients.begin();
+		it != this->_clients.end(); it++)
+	{
+		it->second.writeBuffer += message;
+	}
+}
+
+void	Server::broadcastChannel(Channel& targetChannel, std::string &message)
+{
+	targetChannel.broadcastAllClients(message);
 }
