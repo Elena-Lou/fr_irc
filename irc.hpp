@@ -26,7 +26,7 @@
 # include <sys/time.h>
 # include <sys/select.h>
 # include <set>
-# include <list>
+# include <deque>
 # include <map>
 # include <exception>
 # include <csignal>

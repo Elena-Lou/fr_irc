@@ -26,6 +26,9 @@ class Channel
 		void	setOperator(Client &chanOp);
 		void	removeOperator(Client &chanOp);
 
+		/* message */
+		void	broadcastAllClients(std::string &msg);
+
 	private:
 		Channel();
 		int					_nbOfClients;

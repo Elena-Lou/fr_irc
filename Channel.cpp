@@ -100,3 +100,13 @@ void	Channel::removeOperator(Client &chanOp)
 {
 	this->_chanOps.erase(chanOp.getSocketFD());
 }
+
+
+void	Channel::broadcastAllClients(std::string &msg)
+{
+	for (std::map<int, Client*>::iterator it = this->_connectedClients.begin();
+		it != this->_connectedClients.end(); it++)
+	{
+		it->second->writeBuffer += msg;
+	}
+}
