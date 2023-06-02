@@ -31,9 +31,10 @@ class Server
 		void	socketErrorHandler(unsigned int errorBitField) const;
 
 		/* Getters */
-		int		getSocketFD() const;
-		std::map<int, Client> &getClients();
-		std::deque<Channel>& getChannels();
+		int						getSocketFD() const;
+		const std::string		&getHostname() const;
+		std::map<int, Client>	&getClients();
+		std::deque<Channel>		&getChannels();
 
 		/* Client handlers */
 		void	connectUser(int);

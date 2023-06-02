@@ -165,6 +165,11 @@ int	Server::getSocketFD() const
 	return (this->_socketFD);
 }
 
+const std::string &Server::getHostname() const
+{
+	return (this->_hostname);
+}
+
 std::map<int, Client> &Server::getClients()
 {
 	return (this->_clients);
