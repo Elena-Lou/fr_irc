@@ -44,16 +44,13 @@ void Nick::execute() const
 			return ;
 		}
 	}
-	std::map<int, Client> clientsConnectedCopy = this->_server->getClients();
-	for (std::map<int, Client>::iterator it = clientsConnectedCopy.begin();
-		it != clientsConnectedCopy.end(); it++)
+	
+	if (!this->_server->isUserConnected(newName))
 	{
-		if (newName == it->second.getUsername())
-		{
-			error(ERR_NICKNAMEINUSE);
-			return ;
-		}
+		error(ERR_NICKNAMEINUSE);
+		return ;
 	}
+	
 	//No condition for ERR_NICKCOLLISION not required by subject
 	std::string message;
 	message += this->_user->getUsername() + " changed his nickname to " + newName + ".\r\n";

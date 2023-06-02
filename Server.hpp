@@ -29,17 +29,20 @@ class Server
 		/* Getters */
 		int		getSocketFD() const;
 		std::map<int, Client> &getClients();
+		std::deque<Channel>& getChannels();
 
 		/* Client handlers */
 		void	connectUser(int);
 		void	disconnectUser(int);
 		void	disconnectUser(std::map<int, Client>::iterator clientIterator);
 		void	checkNewConnections();
+		bool	isUserConnected(std::string) const;
 
 		/* Channel handlers */
 		void	createChannel(std::string, Client&);
 		void	destroyChannel(const Channel&);
 		void	destroyChannel(std::string);
+		Channel	*getChannelIfExist(std::string chanName);
 
 		/* read/write loops and set handler */
 		int		fillSets();
@@ -52,6 +55,9 @@ class Server
 
 		/* COMMANDS */
 		void	JOIN(ACommand &placeholder);
+		/* parsing commands */
+		bool	checkRawInput(std::string & rawInput);
+		void	parsingCommand(std::string & rawInput, Client & user);
 
 		/* exceptions */
 		class CannotRetrieveAddrinfoException : public std::exception

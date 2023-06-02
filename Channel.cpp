@@ -66,6 +66,28 @@ int		Channel::isUserConnected(Client& user)
 	return (NOT_CONNECTED);
 }
 
+bool	isCaseInsensitiveEqual(std::string str1, std::string str2)
+{
+	if (str1.size() != str2.size())
+		return (false);
+	for (unsigned int i = 0; i < str1.size(); i++)
+	if (tolower(str1[i]) != tolower(str2[i]))
+		return (false);
+	return (true);
+}
+
+bool Channel::isUserConnected(std::string nickName)
+{
+	std::map<int, Client*>::iterator it;
+	for (it = this->_connectedClients.begin();
+		it != this->_connectedClients.end(); it++)
+	{
+		if (isCaseInsensitiveEqual(it->second->getUsername(), nickName))
+			return true;
+	}
+	return false;
+}
+
 void	Channel::addUserToChannel(Client& user)
 {
 	if (this->isUserConnected(user) == NOT_CONNECTED)
@@ -89,6 +111,15 @@ int		Channel::removeUserFromChannel(Client& user)
 			this->_connectedClients.erase(clientIterator);
 	}
 	return (this->_nbOfClients);
+}
+
+bool Channel::isChannelOperator(Client & user)
+{
+	std::map<int, Client*>::iterator it = this->_chanOps.find(user.getSocketFD());
+	if (it != this->_chanOps.end())
+		return (true);
+	else
+		return (false);
 }
 
 void	Channel::setOperator(Client &chanOp)

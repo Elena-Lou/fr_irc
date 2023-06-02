@@ -224,6 +224,25 @@ std::map<int, Client> &Server::getClients()
 	return (this->_clients);
 }
 
+std::deque<Channel> & Server::getChannels( void )
+{
+	return this->_channels;
+}
+
+bool	Server::isUserConnected(std::string userName) const
+{
+	for (std::map<int, Client>::const_iterator it = this->_clients.begin();
+		it != this->_clients.end(); it++)
+	{
+		if (userName == it->second.getUsername())
+		{
+			return true;
+		}
+	}
+	return false;
+
+}
+
 void	Server::connectUser(const int socketFD)
 {
 	this->_clients.insert(std::make_pair(socketFD, Client(socketFD)));
@@ -327,6 +346,13 @@ void	Server::readLoop()
 				std::cout << recvRet << " bytes received" << std::endl;
 				std::cout << "received : " << this->buffer << std::endl;
 				it->second.readBuffer.append(this->buffer);
+				if (this->checkRawInput(it->second.readBuffer))
+				{
+					std::cout << "buffer sent to parsing : " << it->second.readBuffer << std::endl;
+					this->parsingCommand(it->second.readBuffer, it->second);
+				}
+				std::cout << "buffer after parsing : " << it->second.readBuffer << std::endl;
+
 			}
 		}
 		it++;
@@ -405,6 +431,17 @@ void	Server::destroyChannel(std::string channelName)
 	//appeler destroychannel(Channel&)
 }
 
+Channel	*Server::getChannelIfExist(std::string chanName)
+{
+	for (std::deque<Channel>::iterator it = this->_channels.begin();
+		it != this->_channels.end(); it++)
+	{
+		if (chanName == it->getName())
+			return (&(*it));
+	}
+	return (NULL);
+}
+
 void	Server::broadcastAllClients(std::string &message)
 {
 	for (std::map<int, Client>::iterator it = this->_clients.begin();
@@ -417,4 +454,121 @@ void	Server::broadcastAllClients(std::string &message)
 void	Server::broadcastChannel(Channel& targetChannel, std::string &message)
 {
 	targetChannel.broadcastAllClients(message);
+}
+
+bool Server::checkRawInput( std::string & rawInput )
+{
+	std::size_t it = rawInput.find("\r\n");
+	if (it != std::string::npos)
+	{
+		rawInput.erase(rawInput.begin() + it, rawInput.end());
+		return true;
+	}
+	return false;
+}
+
+void Server::parsingCommand( std::string & rawInput, Client & user )
+{
+	std::cout << "parsingCommand - rawInput : [" << rawInput << "]" << std::endl;
+
+	int index = 9;
+	std::string rawCommand;
+
+	for (size_t i = 0; i < rawInput.size(); i++)
+	{
+		if (isspace(rawInput[i]))
+		{
+			rawCommand = rawInput.substr(0, i);
+			break;
+		}
+	}
+
+	std::cout << "rawCommand : " << rawCommand << std::endl;
+	std::string commands[] = { "KICK",
+								"JOIN",
+								"INVITE",
+								"USER",
+								"OPER",
+								"NICK",
+								"TOPIC",
+								"MODE",
+								"PRIVMSG"
+							};
+
+	for (int i = 0; i < 9; i++)
+	{
+		std::cout << "commands[i] : " << commands[i] << std::endl;
+		if (commands[i] == rawCommand)
+		{
+			std::cout << "index = " << index << std::endl;
+			index = i;
+			std::cout << "index = " << index << std::endl;
+			break ;
+		}
+	}
+	switch (index)
+	{
+	case 0 :
+	{
+		Kick newKick(*this, user, rawInput);
+		break;
+	}
+
+	case 1 :
+	{
+		std::cout << "need to create JOIN command" << std::endl;
+		break;
+	}
+
+	case 2 :
+	{
+		std::cout << "need to create INVITE command" << std::endl;
+		break;
+	}
+
+	case 3 :
+	{
+		std::cout << "need to create USER command" << std::endl;
+		break;
+	}
+
+	case 4 :
+	{
+		std::cout << "need to create OPER command" << std::endl;
+		break;
+	}
+
+	case 5 :
+	{
+		std::cout << "need to create NICK command" << std::endl;
+		break;
+	}
+
+	case 6 :
+	{
+		std::cout << "need to create TOPIC command" << std::endl;
+		break;
+	}
+
+	case 7 :
+	{
+		std::cout << "need to create MODE command" << std::endl;
+		break;
+	}
+
+	case 8 :
+	{
+		std::cout << "need to create PRIVMSG command" << std::endl;
+		break;
+	}
+
+	default:
+	{
+		std::cerr << "invalid command" << std::endl;
+		break;
+	}
+	}
+	rawInput.clear();
+
+
 }
