@@ -54,33 +54,36 @@ void Nick::execute() const
 	//No condition for ERR_NICKCOLLISION not required by subject
 	std::string message;
 	message += this->_author->getNickname() + " changed his nickname to " + newName + ".\r\n";
-	this->_server->broadcastAllClients(message);
+	this->confirm();
 }
 
 void Nick::error(int errorCode) const
 {
-	std::stringstream converter;
-	std::string errorMessage;
-	if (errorCode != ERR_NONICKNAMEGIVEN)
-	{
-		converter << errorCode << " :" << this->_author->getNickname() << " "
-			<< this->_cmd[1];
-		errorMessage = converter.str();
-	}
+	std::stringstream errorMessage;
+	errorMessage << ":" << this->_server->getHostname() << " " << errorCode << " "
+	<< this->_author->getNickname();
 	switch (errorCode)
 	{
 		case ERR_NONICKNAMEGIVEN:
-			errorMessage += this->_author->getNickname() + ": No nickname given\r\n";
+			errorMessage << " :" << ERR_NONICKNAMEGIVEN_MSG << CRLF;
 			break;
 		case ERR_ERRONEUSNICKNAME:
-			errorMessage += "Erroneus nickname\r\n";
+			errorMessage << this->_cmd[1] << " :" << ERR_ERRONEUSNICKNAME_MSG << CRLF;
 			break;
 		case ERR_NICKNAMEINUSE:
-			errorMessage += "Nickname is already in use\r\n";
+			errorMessage << this->_cmd[1] << " :" << ERR_NICKNAMEINUSE_MSG << CRLF;
 			break;
 		default:
 			std::cerr << "Error: Unrecognised error code." << std::endl;
 			break;
 	}
-	this->_author->writeBuffer += errorMessage;
+	this->_author->writeBuffer += errorMessage.str();
+}
+
+void	Nick::confirm() const
+{
+	std::stringstream replyMessageBuilder;
+	replyMessageBuilder << ":" << this->_author->getFullName() << this->_cmd[0] << " "  << this->_cmd[1];
+	std::string replyMessage = replyMessageBuilder.str();
+	this->_server->broadcastAllClients(replyMessage);
 }
