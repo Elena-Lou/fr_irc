@@ -41,7 +41,7 @@ class Server
 
 		/* Channel handlers */
 		void	createChannel(std::string, Client&);
-		void	destroyChannel(const Channel&);
+		void	destroyChannel(Channel&);
 		void	destroyChannel(std::string);
 		Channel	*getChannelIfExist(std::string chanName);
 

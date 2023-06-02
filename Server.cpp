@@ -421,26 +421,31 @@ void	Server::createChannel(std::string newChannelName, Client& owner)
 	}
 }
 
-void	Server::destroyChannel(const Channel& chanToDelete)
+void	Server::destroyChannel(Channel& chanToDelete)
 {
-	(void)chanToDelete;
-	//supprimer le chan dans la liste de chaque personne connectée
-	//supprimer le chan dans Server
+	for (std::map<int, Client>::iterator clientIterator = this->_clients.begin();
+		clientIterator != this->_clients.end(); clientIterator++)
+	{
+			clientIterator->second.quitChannel(chanToDelete);
+	}
+	for (std::deque<Channel>::iterator channelIterator = this->_channels.begin();
+		channelIterator != this->_channels.end(); channelIterator++)
+	{
+		if (*channelIterator == chanToDelete)
+		{
+			this->_channels.erase(channelIterator);
+			break;
+		}
+	}
 }
 
 void	Server::destroyChannel(std::string channelName)
 {
-	for (std::deque<Channel>::iterator it = this->_channels.begin();
-		it != this->_channels.end(); it++)
-	{
-		if (it->getName() == channelName)
-		{
-			this->destroyChannel(*it);
-			break;
-		}
-	}
-	//trouver le channel dans la liste de Server
-	//appeler destroychannel(Channel&)
+	Channel *foundChannel;
+	foundChannel = this->getChannelIfExist(channelName);
+	if (foundChannel == NULL)
+		return ;
+	this->destroyChannel(*foundChannel);
 }
 
 Channel	*Server::getChannelIfExist(std::string chanName)
