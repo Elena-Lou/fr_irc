@@ -240,7 +240,19 @@ bool	Server::isUserConnected(std::string userName) const
 		}
 	}
 	return false;
+}
 
+Client	*Server::getUserIfConnected(std::string userName)
+{
+	for (std::map<int, Client>::iterator it = this->_clients.begin();
+		it != this->_clients.end(); it++)
+	{
+		if (userName == it->second.getUsername())
+		{
+			return (&(it->second));
+		}
+	}
+	return (NULL);
 }
 
 void	Server::connectUser(const int socketFD)
