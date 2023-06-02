@@ -23,7 +23,7 @@ class Server
 	public:
 		Server();
 		~Server();
-		Server(const char *portNumber);
+		Server(const char *portNumber, const char *password = "");
 		Server(const Server &source);
 		Server& operator=(const Server &rhs);
 
@@ -35,6 +35,7 @@ class Server
 		const std::string		&getHostname() const;
 		std::map<int, Client>	&getClients();
 		std::deque<Channel>		&getChannels();
+		bool	isPasswordProtected() const { return (this->_restricted);};
 
 		/* Client handlers */
 		void	connectUser(int);
@@ -61,6 +62,7 @@ class Server
 
 		/* COMMANDS */
 		void	JOIN(ACommand &placeholder);
+
 		/* parsing commands */
 		bool	checkRawInput(std::string & rawInput);
 		void	parsingCommand(std::string & rawInput, Client & user);
@@ -85,6 +87,8 @@ class Server
 		};
 
 	private:
+		bool			_restricted;
+		std::string		_password;
 		int				_socketFD;
 		int				_fdMax;
 		std::string	_hostname;

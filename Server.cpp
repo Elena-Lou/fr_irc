@@ -15,7 +15,7 @@ Server::~Server()
 	close(this->_socketFD);
 }
 
-Server::Server(const char *portNumber)
+Server::Server(const char *portNumber, const char *password)
 {
 #if SHOW_CONSTRUCTOR
 	std::cout << "Server char* char* constructor" << std::endl;
@@ -25,6 +25,13 @@ Server::Server(const char *portNumber)
 	struct addrinfo hints;
 	struct addrinfo	*servinfo;
 
+	if (strlen(password))
+		this->_restricted = false;
+	else
+	{
+		this->_restricted = true;
+		this->_password = password;
+	}
 	this->_hostname = "mismatched_sock(et)s_irc";
 	this->_fdMax = 0;
 	memset(&hints, 0, sizeof(hints));
