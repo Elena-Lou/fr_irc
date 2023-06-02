@@ -58,7 +58,7 @@ void	Channel::updateChannelName(std::string name)
 	this->_name = name;
 }
 
-int		Channel::isUserConnected(Client& user)
+bool		Channel::isUserConnected(Client& user)
 {
 	std::map<int, Client*>::iterator it = this->_connectedClients.find(user.getSocketFD());
 	if (it != this->_connectedClients.end())
@@ -76,6 +76,7 @@ bool	isCaseInsensitiveEqual(std::string str1, std::string str2)
 	return (true);
 }
 
+
 bool Channel::isUserConnected(std::string nickName)
 {
 	std::map<int, Client*>::iterator it;
@@ -86,6 +87,17 @@ bool Channel::isUserConnected(std::string nickName)
 			return true;
 	}
 	return false;
+}
+
+Client	*Channel::getUserIfConnected(std::string userName)
+{
+	for (std::map<int, Client*>::iterator it = this->_connectedClients.begin();
+		it != this->_connectedClients.end(); it++)
+	{
+		if (userName == it->second->getUsername())
+			return (it->second);
+	}
+	return (NULL);
 }
 
 void	Channel::addUserToChannel(Client& user)
