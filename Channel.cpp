@@ -48,6 +48,11 @@ bool Channel::operator<(const Channel &rhs) const
 	return (this->_name < rhs._name);
 }
 
+bool Channel::operator==(const Channel &rhs) const
+{
+	return (this->_name == rhs._name);
+}
+
 std::string	Channel::getName() const
 {
 	return (this->_name);

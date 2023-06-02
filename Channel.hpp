@@ -11,10 +11,13 @@ class Channel
 		~Channel();
 		Channel(const Channel &source);
 		Channel &operator=(const Channel &rhs);
-		bool operator<(const Channel &rhs) const;
 		Channel(std::string name, Client& owner);
 
 		void	updateChannelName(std::string);
+
+		/* comparison operators */
+		bool operator<(const Channel &rhs) const;
+		bool operator==(const Channel &rhs) const;
 
 		/* getters */
 		std::string getName() const;
