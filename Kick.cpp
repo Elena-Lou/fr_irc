@@ -41,28 +41,22 @@ void Kick::execute() const
 	}
 
 	/* Does the channel exist ? */
-	std::deque<Channel> serverChannelsCopy = this->_server->getChannels();
-	std::deque<Channel>::iterator it;
-	for (it = serverChannelsCopy.begin(); it != serverChannelsCopy.end(); it++)
-	{
-		if (this->_cmd[1] == it->getName())
-		break ;
-	}
-	if (it == serverChannelsCopy.end())
+	Channel *foundChannel;
+	if ((foundChannel = this->_server->getChannelIfExist(this->_cmd[1])) == NULL)
 	{
 		error(ERR_NOSUCHCHANNEL);
 		return ;
 	}
-	
+
 	/* Is the user connected to that channel ? */
-	if (!it->isUserConnected(*(this->_user)))
+	if (!foundChannel->isUserConnected(*(this->_user)))
 	{
 		error(ERR_NOTONCHANNEL);
-		return ; 
+		return ;
 	}
-	
+
 	/* Is the user a Channel Operator ? */
-	if (!it->isChannelOperator(*(this->_user)))
+	if (!foundChannel->isChannelOperator(*(this->_user)))
 	{
 		error(ERR_CHANOPRIVSNEEDED);
 		return ;
@@ -70,10 +64,10 @@ void Kick::execute() const
 
 	/* Is the user the user wants to kick conected to that channel ?*/
 	std::string targetName = this->_cmd[2];
-		if (!it->isUserConnected(*(this->_user)))
+		if (!foundChannel->isUserConnected(*(this->_user)))
 	{
 		error(ERR_NOTONCHANNEL);
-		return ; 
+		return ;
 	}
 
 }

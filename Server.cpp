@@ -431,6 +431,17 @@ void	Server::destroyChannel(std::string channelName)
 	//appeler destroychannel(Channel&)
 }
 
+Channel	*Server::getChannelIfExist(std::string chanName)
+{
+	for (std::deque<Channel>::iterator it = this->_channels.begin();
+		it != this->_channels.end(); it++)
+	{
+		if (chanName == it->getName())
+			return (&(*it));
+	}
+	return (NULL);
+}
+
 void	Server::broadcastAllClients(std::string &message)
 {
 	for (std::map<int, Client>::iterator it = this->_clients.begin();
@@ -459,7 +470,7 @@ bool Server::checkRawInput( std::string & rawInput )
 void Server::parsingCommand( std::string & rawInput, Client & user )
 {
 	std::cout << "parsingCommand - rawInput : [" << rawInput << "]" << std::endl;
-	
+
 	int index = 9;
 	std::string rawCommand;
 
@@ -471,7 +482,7 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 			break;
 		}
 	}
-	
+
 	std::cout << "rawCommand : " << rawCommand << std::endl;
 	std::string commands[] = { "KICK",
 								"JOIN",
@@ -502,13 +513,13 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 		Kick newKick(*this, user, rawInput);
 		break;
 	}
-	
+
 	case 1 :
 	{
 		std::cout << "need to create JOIN command" << std::endl;
 		break;
 	}
-	
+
 	case 2 :
 	{
 		std::cout << "need to create INVITE command" << std::endl;
@@ -520,7 +531,7 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 		std::cout << "need to create USER command" << std::endl;
 		break;
 	}
-	
+
 	case 4 :
 	{
 		std::cout << "need to create OPER command" << std::endl;
@@ -532,19 +543,19 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 		std::cout << "need to create NICK command" << std::endl;
 		break;
 	}
-	
+
 	case 6 :
 	{
 		std::cout << "need to create TOPIC command" << std::endl;
 		break;
 	}
-	
+
 	case 7 :
 	{
 		std::cout << "need to create MODE command" << std::endl;
 		break;
 	}
-	
+
 	case 8 :
 	{
 		std::cout << "need to create PRIVMSG command" << std::endl;
