@@ -92,6 +92,7 @@ class Server
 		int				_socketFD;
 		int				_fdMax;
 		std::string	_hostname;
+		struct tm	*_startTime;
 		fd_set		_masterSet;
 		fd_set		_readingSet;
 		fd_set		_writingSet;

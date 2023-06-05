@@ -31,30 +31,16 @@ User &User::operator=(const User &rhs)
 
 void User::execute() const
 {
-	if (this->_cmd.size() != 2)
+	if (this->_author.username)
 	{
-		error(ERR_NONICKNAMEGIVEN);
+		error(ERR_ALREADYREGISTERED);
 		return ;
 	}
-	std::string newName = this->_cmd[1];
-	for (unsigned int i = 0; i < newName.size(); i++)
+	if (this->_cmd.size() < 2)
 	{
-		if (!isalpha(newName[i]))
-		{
-			error(ERR_ERRONEUSNICKNAME);
-			return ;
-		}
-	}
-
-	if (!this->_server->isUserConnected(newName))
-	{
-		error(ERR_NICKNAMEINUSE);
+		error(ERR_NEEDMOREPARAMS);
 		return ;
 	}
-
-	//No condition for ERR_NICKCOLLISION not required by subject
-	std::string message;
-	message += this->_author->getNickname() + " changed his nickname to " + newName + ".\r\n";
 	this->confirm();
 }
 
@@ -65,14 +51,11 @@ void User::error(int errorCode) const
 	<< this->_author->getNickname();
 	switch (errorCode)
 	{
-		case ERR_NONICKNAMEGIVEN:
-			errorMessage << " :" << ERR_NONICKNAMEGIVEN_MSG << CRLF;
+		case ERR_NEEDMOREPARAMS
+			errorMessage << this->_cmd[1] << " :" << ERR_NEEDMOREPARAMS_MSG << CRLF;
 			break;
-		case ERR_ERRONEUSNICKNAME:
-			errorMessage << this->_cmd[1] << " :" << ERR_ERRONEUSNICKNAME_MSG << CRLF;
-			break;
-		case ERR_NICKNAMEINUSE:
-			errorMessage << this->_cmd[1] << " :" << ERR_NICKNAMEINUSE_MSG << CRLF;
+		case ERR_ALREADYREGISTERED:
+			errorMessage << " :" << ERR_ERRONEUSNICKNAME_MSG << CRLF;
 			break;
 		default:
 			std::cerr << "Error: Unrecognised error code." << std::endl;
@@ -83,8 +66,62 @@ void User::error(int errorCode) const
 
 void	User::confirm() const
 {
+	/* Setting Nickname */
+	this->_author.setNickname(this->_cmd[1]);
+	/* Setting Username if given or default to nickname */
+	if (this->_cmd.size() >= 3)
+		this->_author.setUsername(this->_cmd[2]);
+	else
+		this->_author.setUsername(this->_cmd[1]);
+
+	/* Setting Hostname if given or default to nickname */
+	if (this->_cmd.size() >= 4)
+		this->_author.setHostname(this->_cmd[3]);
+	else
+		this->_author.setHostname(this->_cmd[1]);
+
+	/* Setting Realname if given or default to nickname */
+	if (this->_cmd.size() >= 5)
+		this->_author.setRealname(this->_cmd[4]);
+	else
+		this->_author.setRealname(this->_cmd[1]);
+
+	this->_author.confirmRegistration();
+
+	/* build message */
 	std::stringstream replyMessageBuilder;
-	replyMessageBuilder << ":" << this->_author->getFullName() << this->_cmd[0] << " "  << this->_cmd[1];
-	std::string replyMessage = replyMessageBuilder.str();
+
+	//broadcast all
+	// RPL_WELCOME
+	this->sendRPLWELCOME();
+	this->sendRPLYOURHOST();
+	this->sendRPLCREATED();
 	this->_server->broadcastAllClients(replyMessage);
+}
+
+void	User::sendRPLWELCOME()
+{
+	replyMessageBuilder << ":" << this->_server.getHostname() << " "
+		<< RPL_WELCOME << " " << this->_author.getNickname() << " :" <<
+		<< "Welcome to the " << this->_server.getHostname() << " Network, "
+		<< this->_author.nick() << "[!" << this->_author.user() << "@"
+		<< this->_author.hostname() << "]" << CRLF;
+	std::string replyMessage = replyMessageBuilder.str();
+	this->_author.writeBuffer += replyMessage;
+}
+
+void	User::sendRPLYOURHOST()
+{
+	replyMessageBuilder << ":" << this->_server.getHostname() << " "
+		<< RPL_YOURHOST << " " << this->_author.getNickname() << " :" <<
+		<< "Your host is " << this->server.getHostname()
+		<< ", running version mismatched sock(et)s !" << CRLF;
+}
+
+void	User::sendRPLCREATED()
+{
+	replyMessageBuilder << ":" << this->_server.getHostname() << " "
+		<< RPL_YOURHOST << " " << this->_author.getNickname() << " :" <<
+		<< "This server was created" << this->getStartTime() << CRLF;
+
 }

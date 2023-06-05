@@ -15,20 +15,27 @@ class Client
 
 		/* Setters */
 		void	setNickname(std::string name);
+		void	setUsername(std::string name);
+		void	setHostname(std::string name);
+		void	setRealname(std::string name);
+		void	confirmRegistration();
 
 		/* Getters */
 		int	getSocketFD() const;
 		std::string getNickname() const;
+		std::string	getUsername() const;
 		std::string getFullName() const;
 		const std::set<Channel*> &getConnectedChannels() const;
 
-		std::string	readBuffer;
-		std::string writeBuffer;
 
 		/* channel handlers */
 		int		isInChannel(Channel&) const;
 		void	joinChannel(Channel&);
 		void	quitChannel(Channel&);
+
+		/* storage */
+		std::string	readBuffer;
+		std::string writeBuffer;
 	private:
 		Client();
 
@@ -37,6 +44,10 @@ class Client
 		std::string	_nickname;
 		std::string _username;
 		std::string	_hostname;
+		std::string	_realname;
+
+		bool	_registered;
+
 		std::set<Channel*> _connectedChannels;
 	protected:
 };

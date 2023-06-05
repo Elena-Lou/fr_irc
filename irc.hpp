@@ -36,7 +36,13 @@
 # include "Client.hpp"
 # include "Channel.hpp"
 # include "Kick.hpp"
+# include <ctime>
 
+# define RPL_WELCOME "001"
+# define RPL_YOURHOST "002"
+# define RPL_CREATED "003"
+# define RPL_INFO "004"
+# define RPL_ISUPPORT "005"
 # define RPL_TOPIC 332
 # define ERR_NOSUCHCHANNEL 403
 # define ERR_TOOMANYCHANNELS 405
@@ -47,6 +53,7 @@
 # define ERR_USERNOTINCHANNEL 441
 # define ERR_NOTONCHANNEL 442
 # define ERR_NEEDMOREPARAMS 461
+# define ERR_ALREADYREGISTERED 462
 # define ERR_CHANNELISFULL 471
 # define ERR_INVITEONLYCHAN 473
 # define ERR_BANNEDFROMCHAN 474
@@ -63,6 +70,7 @@
 # define ERR_USERNOTINCHANNEL_MSG "They aren't on that channel"
 # define ERR_NOTONCHANNEL_MSG "You're not on that channel"
 # define ERR_NEEDMOREPARAMS_MSG "Not enough parameters"
+# define ERR_ALREADYREGISTERED_MSG "You may not reregister"
 # define ERR_CHANNELISFULL_MSG "Cannot join channel (+l)"
 # define ERR_INVITEONLYCHAN_MSG "Cannot join channel (+i)"
 # define ERR_BANNEDFROMCHAN_MSG "Cannot join channel (+b)"

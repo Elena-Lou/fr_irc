@@ -2,6 +2,7 @@
 
 Client::Client()
 {
+	this->_registered = false;
 #if SHOW_CONSTRUCTOR
 	std::cout << "Client default constructor" << std::endl;
 #endif
@@ -17,6 +18,7 @@ Client::~Client()
 
 Client::Client(int socketFD) : _socketFD(socketFD)
 {
+	this->_registered = 0;
 #if SHOW_CONSTRUCTOR
 	std::cout << "Client socketFD constructor" << std::endl;
 #endif
@@ -45,6 +47,26 @@ void	Client::setNickname(std::string name)
 	this->_nickname = name;
 }
 
+void	Client::setUsername(std::string name)
+{
+	this->_username = name;
+}
+
+void	Client::setHostname(std::string name)
+{
+	this->_hostname = name;
+}
+
+void	Client::setRealname(std::string name)
+{
+	this->_realname = name;
+}
+
+void	Client::confirmRegistration()
+{
+	this->_registered = true;
+}
+
 int	Client::getSocketFD() const
 {
 	return (this->_socketFD);
@@ -58,6 +80,11 @@ std::string Client::getNickname() const
 std::string Client::getFullName() const
 {
 	return (this->_nickname + "!" + this->_username + "@" + this->_hostname);
+}
+
+std::string	Client::getUsername() const
+{
+	return (this->_username);
 }
 
 const std::set<Channel*> &Client::getConnectedChannels() const

@@ -108,6 +108,8 @@ Server::Server(const char *portNumber, const char *password)
 	if (this->_socketFD > this->_fdMax)
 		this->_fdMax = this->_socketFD;
 	this->_pendingAddrSize = sizeof(this->_pendingAddr);
+	time_t timeStamp = time(NULL);
+	this->_startTime = localtime(&timestamp);
 }
 
 Server::Server(const Server &source)
@@ -235,6 +237,11 @@ void	Server::disconnectUser(std::map<int, Client>::iterator clientIterator)
 	}
 	close(clientIterator->second.getSocketFD());
 	this->_clients.erase(clientIterator);
+}
+
+std::string	Server::getStartTime()
+{
+	return (asci(this->_startTime));
 }
 
 int		Server::fillSets()
