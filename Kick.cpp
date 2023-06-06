@@ -61,14 +61,15 @@ void Kick::execute() const
 		error(ERR_CHANOPRIVSNEEDED);
 		return ;
 	}
-
-	/* Is the user the user wants to kick conected to that channel ?*/
-	if (!foundChannel->isUserConnected(this->_cmd[2]))
+	/* Is the target_user the author wants to kick conected to that channel ?*/
+	Client *foundClient;
+	if ((foundClient = foundChannel->getUserIfConnected(this->_cmd[2])) == NULL)
 	{
 		error(ERR_NOTONCHANNEL);
 		return ;
 	}
-
+	if (foundChannel->removeUserFromChannel(*foundClient) == 0)
+		this->_server->destroyChannel(*foundChannel);
 }
 
 void Kick::error( int errorCode ) const
