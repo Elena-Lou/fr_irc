@@ -62,14 +62,15 @@ void Kick::execute() const
 		return ;
 	}
 
-	/* Is the user the user wants to kick conected to that channel ?*/
-	std::string targetName = this->_cmd[2];
-		if (!foundChannel->isUserConnected(*(this->_user)))
+	/* Is the target_user the author wants to kick conected to that channel ?*/
+	Client *foundClient;
+	if ((foundClient = foundChannel->getUserIfConnected(this->_cmd[2])) == NULL)
 	{
 		error(ERR_NOTONCHANNEL);
 		return ;
 	}
-
+	if (foundChannel->removeUserFromChannel(*foundClient) == 0)
+		this->_server->destroyChannel(*foundChannel);
 }
 
 void Kick::error( int errorCode ) const

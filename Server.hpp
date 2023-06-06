@@ -37,10 +37,11 @@ class Server
 		void	disconnectUser(std::map<int, Client>::iterator clientIterator);
 		void	checkNewConnections();
 		bool	isUserConnected(std::string) const;
+		Client	*getUserIfConnected(std::string nickName);
 
 		/* Channel handlers */
 		void	createChannel(std::string, Client&);
-		void	destroyChannel(const Channel&);
+		void	destroyChannel(Channel&);
 		void	destroyChannel(std::string);
 		Channel	*getChannelIfExist(std::string chanName);
 
