@@ -24,6 +24,7 @@ Nick::Nick(const Nick &source) : ACommand(source)
 Nick &Nick::operator=(const Nick &rhs)
 {
 	this->_cmd = rhs._cmd;
+	this->_server = rhs._server;
 	this->_author = rhs._author;
 	return (*this);
 }
@@ -44,46 +45,49 @@ void Nick::execute() const
 			return ;
 		}
 	}
-
-	if (!this->_server->isUserConnected(newName))
+	if (this->_author->getNickname() == newName)
+		return ;
+	if (this->_server->isUserConnected(newName) && this->_author->getNickname() != "")
 	{
 		error(ERR_NICKNAMEINUSE);
 		return ;
 	}
 
 	//No condition for ERR_NICKCOLLISION not required by subject
-	std::string message;
-	message += this->_author->getNickname() + " changed his nickname to " + newName + ".\r\n";
-	this->confirm();
+	if (this->_author->getNickname() != "")
+		this->confirm();
+	this->_author->setNickname(newName);
 }
 
 void Nick::error(int errorCode) const
 {
-	std::stringstream errorMessage;
-	errorMessage << ":" << this->_server->getHostname() << " " << errorCode << " "
-	<< this->_author->getNickname();
+	std::stringstream prefix;
+	prefix << ":" << this->_server->getHostname() << " " << errorCode << " ";
+	std::stringstream suffix;
 	switch (errorCode)
 	{
 		case ERR_NONICKNAMEGIVEN:
-			errorMessage << " :" << ERR_NONICKNAMEGIVEN_MSG << CRLF;
+			suffix << " :" << ERR_NONICKNAMEGIVEN_MSG << CRLF;
 			break;
 		case ERR_ERRONEUSNICKNAME:
-			errorMessage << this->_cmd[1] << " :" << ERR_ERRONEUSNICKNAME_MSG << CRLF;
+			suffix << this->_cmd[1] << " :" << ERR_ERRONEUSNICKNAME_MSG << CRLF;
 			break;
 		case ERR_NICKNAMEINUSE:
-			errorMessage << this->_cmd[1] << " :" << ERR_NICKNAMEINUSE_MSG << CRLF;
+			suffix << " " << this->_cmd[1] << " :" << ERR_NICKNAMEINUSE_MSG << CRLF;
 			break;
 		default:
 			std::cerr << "Error: Unrecognised error code." << std::endl;
 			break;
 	}
-	this->_author->writeBuffer += errorMessage.str();
+	this->_author->writeToClient(prefix.str(), suffix.str());
 }
 
 void	Nick::confirm() const
 {
-	std::stringstream replyMessageBuilder;
-	replyMessageBuilder << ":" << this->_author->getFullName() << this->_cmd[0] << " "  << this->_cmd[1] << CRLF;
-	std::string replyMessage = replyMessageBuilder.str();
-	this->_server->broadcastAllClients(replyMessage);
+	std::stringstream prefix;
+	std::stringstream suffix;
+	prefix << ":" << this->_author->getFullName() << " " << this->_cmd[0] << " ";
+	suffix << " :"  << this->_cmd[1] << CRLF;
+	this->_author->setNickname(this->_cmd[1]);
+	this->_server->broadcastAllClients(prefix.str(), suffix.str());
 }
