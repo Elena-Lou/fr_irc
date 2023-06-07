@@ -22,6 +22,12 @@ class User : public ACommand
 		void	execute() const;
 		void	confirm() const;
 		void	error(int errorCode) const;
+
+
+		void	sendRPLWELCOME() const;
+		void	sendRPLYOURHOST() const;
+		void	sendRPLCREATED() const;
+		void	sendRPLISUPPORT() const;
 };
 
 #endif
