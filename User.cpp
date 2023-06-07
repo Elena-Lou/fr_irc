@@ -106,8 +106,7 @@ void	User::sendRPLWELCOME() const
 	replyMessageBuilder << ":" << this->_server->getHostname() << " "
 		<< RPL_WELCOME << " " << this->_author->getNickname() << " :"
 		<< "Welcome to the " << this->_server->getHostname() << " Network, "
-		<< this->_author->getNickname() << "[!" << this->_author->getFullName()
-		<< "]" << CRLF;
+		<< this->_author->getFullName() << CRLF;
 	this->_author->writeBuffer += replyMessageBuilder.str();
 }
 
