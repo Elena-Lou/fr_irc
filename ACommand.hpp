@@ -14,20 +14,21 @@ class ACommand
 
 	protected:
 		ACommand();
-		ACommand(Server &server, Client &user, std::string cmd);
+		ACommand(Server &server, Client &author, std::string cmd);
 		ACommand(const ACommand &source);
 		ACommand &operator=(const ACommand &rhs);
 
 
 		virtual void	execute() const = 0;
 		virtual void	error(int errorCode) const = 0;
+		virtual void	confirm() const = 0;
 
 		//TODO: create a bool for the target to be used in derived classes
 		//bool	targetIsUserOrChannel;
 		//void	*_target;
 
 		Server	*_server;
-		Client	*_user;
+		Client	*_author;
 		std::deque<std::string>	_cmd;
 	private:
 		void	tokenise(std::string rawInput);

@@ -10,6 +10,10 @@
 # define ERRSOCKNOBLOCK 0b100
 # define ERRSOCKBIND 0b1000
 # define ERRSOCKLISTEN 0b10000
+# define ERRNAMERESOLVE 0b100000
+
+# define HOST_BUFFER_SIZE 255
+# define SERV_BUFFER_SIZE 255
 
 class Client;
 class Channel;
@@ -19,17 +23,18 @@ class Server
 	public:
 		Server();
 		~Server();
-		Server(const char *portNumber, const char *domain = NULL);
+		Server(const char *portNumber);
 		Server(const Server &source);
 		Server& operator=(const Server &rhs);
 
 		void	closeSocketFD();
-		void	socketErrorHandler(int errorBitField) const;
+		void	socketErrorHandler(unsigned int errorBitField) const;
 
 		/* Getters */
-		int		getSocketFD() const;
-		std::map<int, Client> &getClients();
-		std::deque<Channel>& getChannels();
+		int						getSocketFD() const;
+		const std::string		&getHostname() const;
+		std::map<int, Client>	&getClients();
+		std::deque<Channel>		&getChannels();
 
 		/* Client handlers */
 		void	connectUser(int);
@@ -82,6 +87,7 @@ class Server
 	private:
 		int				_socketFD;
 		int				_fdMax;
+		std::string	_hostname;
 		fd_set		_masterSet;
 		fd_set		_readingSet;
 		fd_set		_writingSet;

@@ -9,10 +9,10 @@ ACommand::~ACommand()
 {
 }
 
-ACommand::ACommand(Server &server, Client &user, std::string rawInput)
+ACommand::ACommand(Server &server, Client &author, std::string rawInput)
 {
 	this->_server = &server;
-	this->_user = &user;
+	this->_author = &author;
 	this->tokenise(rawInput);
 }
 
@@ -24,7 +24,7 @@ ACommand::ACommand(const ACommand &source)
 ACommand &ACommand::operator=(const ACommand &rhs)
 {
 	this->_cmd = rhs._cmd;
-	this->_user = rhs._user;
+	this->_author = rhs._author;
 	return (*this);
 }
 

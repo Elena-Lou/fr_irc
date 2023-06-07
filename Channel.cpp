@@ -88,18 +88,18 @@ bool Channel::isUserConnected(std::string nickName)
 	for (it = this->_connectedClients.begin();
 		it != this->_connectedClients.end(); it++)
 	{
-		if (isCaseInsensitiveEqual(it->second->getUsername(), nickName))
+		if (isCaseInsensitiveEqual(it->second->getNickname(), nickName))
 			return true;
 	}
 	return false;
 }
 
-Client	*Channel::getUserIfConnected(std::string userName)
+Client	*Channel::getUserIfConnected(std::string nickname)
 {
 	for (std::map<int, Client*>::iterator it = this->_connectedClients.begin();
 		it != this->_connectedClients.end(); it++)
 	{
-		if (userName == it->second->getUsername())
+		if (nickname == it->second->getNickname())
 			return (it->second);
 	}
 	return (NULL);

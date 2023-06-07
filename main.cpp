@@ -23,21 +23,17 @@ void sigIntHandler(int signal)
 
 int main( int ac, char** av ) {
 
-	// if (ac != 2)
-	// {
-	// 	std::cerr << "usage: ./ircserv hostname" << std::endl;
-	// 	return 1;
-	// }
-
-
-	(void)ac;
-	(void)av;
+	if (ac != 2)
+	{
+		std::cerr << "usage: ./ircserv port_to_use" << std::endl;
+		return (1);
+	}
 
 	try
 	{
 		std::signal(SIGINT, sigIntHandler);
 
-		Server	myIrc("3490", NULL);
+		Server	myIrc(av[1]);
 		std::cout << "entering the while loop" << std::endl;
 		/* WAITING FOR CONNECTIONS LOOP */
 		while(1)

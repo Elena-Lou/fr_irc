@@ -2,78 +2,6 @@
 
 Server::Server()
 {
-#if SHOW_CONSTRUCTOR
-	std::cout << "Server Default constructor" << std::endl;
-#endif
-	int				status = 0;
-	struct addrinfo hints;
-	struct addrinfo	*servinfo;
-
-	this->_fdMax = 0;
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE;
-
-	if ((status = getaddrinfo(NULL, MYIRC_PORT,  &hints, &servinfo)) != 0)
-	{
-		std::cerr << gai_strerror(status) << std::endl;
-		throw Server::CannotRetrieveAddrinfoException();
-	}
-	for (struct addrinfo *focus = servinfo; focus != NULL; focus = focus->ai_next)
-	{
-		/* retrieving a socket file descriptor */
-		this->_socketFD = socket(focus->ai_family, focus->ai_socktype,
-				focus->ai_protocol);
-		if (this->_socketFD < 0)
-		{
-			status |= 1;
-			continue;
-		}
-
-		/* sets the descriptor as reusable */
-		int opt = 1;
-		if (setsockopt(this->_socketFD, SOL_SOCKET,
-				SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0)
-		{
-			status |= 0b10;
-			continue;
-		}
-
-		/* sets the socket as non blocking */
-		int flag = fcntl(this->_socketFD, F_GETFL, 0);
-		if (fcntl(this->_socketFD, F_SETFL, flag | O_NONBLOCK) < 0)
-		{
-			status |= 0b100;
-			continue;
-		}
-
-		/* binds the socket descriptor to the port passed to getaddrinfo() */
-		if (bind(this->_socketFD, focus->ai_addr, focus->ai_addrlen) < 0)
-		{
-			status |= 0b1000;
-			continue;
-		}
-		/* listens to the port bound to the socket descriptor for incoming connections */
-		if (listen(this->_socketFD, MYIRC_ALLOWED_PENDING_CONNECTIONS) < 0)
-		{
-			status |= 0b10000;
-			continue;
-		}
-	}
-	freeaddrinfo(servinfo);
-	if (status != 0)
-	{
-		this->socketErrorHandler(status);
-		throw Server::CannotRetrieveSocketException();
-	}
-	FD_ZERO(&(this->_masterSet));
-	FD_ZERO(&(this->_readingSet));
-	FD_ZERO(&(this->_writingSet));
-	FD_SET(this->_socketFD, &(this->_masterSet)); //add the current socket descriptor to the set
-	if (this->_socketFD > this->_fdMax)
-		this->_fdMax = this->_socketFD;
-	this->_pendingAddrSize = sizeof(this->_pendingAddr);
 }
 
 Server::~Server()
@@ -87,22 +15,24 @@ Server::~Server()
 	close(this->_socketFD);
 }
 
-Server::Server(const char *portNumber, const char *domain)
+Server::Server(const char *portNumber)
 {
 #if SHOW_CONSTRUCTOR
 	std::cout << "Server char* char* constructor" << std::endl;
 #endif
-	int				status = 0;
+	int	status = 0;
+	unsigned int	errorCode = 0;
 	struct addrinfo hints;
 	struct addrinfo	*servinfo;
 
+	this->_hostname = "mismatched_sock(et)s_irc";
 	this->_fdMax = 0;
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	if ((status = getaddrinfo(domain, portNumber, &hints, &servinfo)) != 0)
+	if ((status = getaddrinfo(NULL, portNumber, &hints, &servinfo)) != 0)
 	{
 		std::cerr << gai_strerror(status) << std::endl;
 		throw Server::CannotRetrieveAddrinfoException();
@@ -115,7 +45,7 @@ Server::Server(const char *portNumber, const char *domain)
 				focus->ai_protocol);
 		if (this->_socketFD < 0)
 		{
-			status |= 1;
+			errorCode |= ERRSOCKFD;
 			continue;
 		}
 
@@ -124,7 +54,7 @@ Server::Server(const char *portNumber, const char *domain)
 		if (setsockopt(this->_socketFD, SOL_SOCKET,
 				SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0)
 		{
-			status |= 0b10;
+			errorCode |= ERRSOCKOPT;
 			continue;
 		}
 
@@ -132,28 +62,36 @@ Server::Server(const char *portNumber, const char *domain)
 		int flag = fcntl(this->_socketFD, F_GETFL, 0);
 		if (fcntl(this->_socketFD, F_SETFL, flag | O_NONBLOCK) < 0)
 		{
-			status |= 0b100;
+			errorCode |= ERRSOCKNOBLOCK;
 			continue;
 		}
 
 		/* binds the socket descriptor to the port passed to getaddrinfo() */
 		if (bind(this->_socketFD, focus->ai_addr, focus->ai_addrlen) < 0)
 		{
-			status |= 0b1000;
+			errorCode |= ERRSOCKBIND;
 			continue;
 		}
 		/* listens to the port bound to the socket descriptor for incoming connections */
 		if (listen(this->_socketFD, MYIRC_ALLOWED_PENDING_CONNECTIONS) < 0)
 		{
-			status |= 0b10000;
+			errorCode |= ERRSOCKLISTEN;
 			continue;
 		}
+		//this could have been what we would have used if getnameinfo was allowed in the subject
+		//char			hostname[HOST_BUFFER_SIZE + 1];
+		//char			servname[SERV_BUFFER_SIZE + 1];
+		//if ((status = getnameinfo(focus->ai_addr, focus->ai_addrlen,
+				//hostname, HOST_BUFFER_SIZE, servname, SERV_BUFFER_SIZE, NI_NAMEREQD)) == 0)
+		//{
+			//this->_hostname = hostname;
+		//}
 		break;
 	}
 	freeaddrinfo(servinfo);
-	if (status != 0 || focus == NULL)
+	if (errorCode != 0 || focus == NULL)
 	{
-		this->socketErrorHandler(status);
+		this->socketErrorHandler(errorCode);
 		throw Server::CannotRetrieveSocketException();
 	}
 	FD_ZERO(&(this->_masterSet));
@@ -198,8 +136,9 @@ const char *Server::InterruptionSignalException::what(void) const throw()
 	return ("Program Interrupted");
 }
 
-void	Server::socketErrorHandler(int errorBitField) const
+void	Server::socketErrorHandler(unsigned int errorBitField) const
 {
+	std::cout << errorBitField << std::endl;
 	if (errorBitField & (errorBitField - 1))
 		std::cerr << "multiple error encountered:" << std::endl;
 	if (errorBitField & ERRSOCKFD)
@@ -212,11 +151,18 @@ void	Server::socketErrorHandler(int errorBitField) const
 		std::cerr << "bind() failed." << std::endl;
 	if (errorBitField & ERRSOCKLISTEN)
 		std::cerr << "listen() failed." << std::endl;
+	if (errorBitField & ERRNAMERESOLVE)
+		std::cerr << "could not resolve name." << std::endl;
 }
 
 int	Server::getSocketFD() const
 {
 	return (this->_socketFD);
+}
+
+const std::string &Server::getHostname() const
+{
+	return (this->_hostname);
 }
 
 std::map<int, Client> &Server::getClients()
@@ -229,12 +175,12 @@ std::deque<Channel> & Server::getChannels( void )
 	return this->_channels;
 }
 
-bool	Server::isUserConnected(std::string userName) const
+bool	Server::isUserConnected(std::string nickname) const
 {
 	for (std::map<int, Client>::const_iterator it = this->_clients.begin();
 		it != this->_clients.end(); it++)
 	{
-		if (userName == it->second.getUsername())
+		if (nickname == it->second.getNickname())
 		{
 			return true;
 		}
@@ -242,12 +188,12 @@ bool	Server::isUserConnected(std::string userName) const
 	return false;
 }
 
-Client	*Server::getUserIfConnected(std::string userName)
+Client	*Server::getUserIfConnected(std::string nickname)
 {
 	for (std::map<int, Client>::iterator it = this->_clients.begin();
 		it != this->_clients.end(); it++)
 	{
-		if (userName == it->second.getUsername())
+		if (nickname == it->second.getNickname())
 		{
 			return (&(it->second));
 		}

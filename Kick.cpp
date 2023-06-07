@@ -4,7 +4,7 @@ Kick::Kick() : ACommand()
 {
 }
 
-Kick::Kick( Kick const & src )
+Kick::Kick( Kick const & src ) : ACommand(src)
 {
 	*this = src;
 }
@@ -12,7 +12,7 @@ Kick::Kick( Kick const & src )
 Kick::Kick(Server &server, Client &user, std::string rawInput) : ACommand(server, user, rawInput)
 {
 	std::cout << "KICK overloaded constructor" << std::endl;
-	std::cout << "client socketFD : " << this->_user->getSocketFD() << std::endl;
+	std::cout << "client socketFD : " << this->_author->getSocketFD() << std::endl;
 	this->execute();
 }
 
@@ -22,7 +22,7 @@ Kick & Kick::operator=( Kick const & rhs )
 	{
 		this->_cmd = rhs._cmd;
 		this->_server = rhs._server;
-		this->_user = rhs._user;
+		this->_author = rhs._author;
 	}
 	return *this;
 }
@@ -49,19 +49,18 @@ void Kick::execute() const
 	}
 
 	/* Is the user connected to that channel ? */
-	if (!foundChannel->isUserConnected(*(this->_user)))
+	if (!foundChannel->isUserConnected(*(this->_author)))
 	{
 		error(ERR_NOTONCHANNEL);
 		return ;
 	}
 
 	/* Is the user a Channel Operator ? */
-	if (!foundChannel->isChannelOperator(*(this->_user)))
+	if (!foundChannel->isChannelOperator(*(this->_author)))
 	{
 		error(ERR_CHANOPRIVSNEEDED);
 		return ;
 	}
-
 	/* Is the target_user the author wants to kick conected to that channel ?*/
 	Client *foundClient;
 	if ((foundClient = foundChannel->getUserIfConnected(this->_cmd[2])) == NULL)
@@ -73,18 +72,22 @@ void Kick::execute() const
 		this->_server->destroyChannel(*foundChannel);
 }
 
+void	Kick::confirm() const
+{
+}
+
 void Kick::error( int errorCode ) const
 {
 	std::string errorMsg;
 	errorMsg += errorCode;
 	errorMsg += ":";
-	errorMsg += this->_user->getUsername();
+	errorMsg += this->_author->getNickname();
 	errorMsg += this->_cmd[0];
 	errorMsg += "\n";
 // switch (errorCode)
 // {
 // case /* constant-expression :*/
-// 	/* this->_user->write_buffer += errorMsg; */
+// 	/* this->_author->write_buffer += errorMsg; */
 // 	// break;
 
 // // default:
