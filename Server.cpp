@@ -511,12 +511,12 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 	{
 		case 0 :
 		{
-			Kick newKick(*this, user, rawInput);
+			Kick(*this, user, rawInput);
 			break;
 		}
 		case 1 :
 		{
-			Join newJoin(*this, user, rawInput);
+			Join(*this, user, rawInput);
 			break;
 		}
 		case 2 :
@@ -526,7 +526,7 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 		}
 		case 3 :
 		{
-			User newUser(*this, user, rawInput);
+			User(*this, user, rawInput);
 			break;
 		}
 		case 4 :
@@ -536,7 +536,7 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 		}
 		case 5 :
 		{
-			Nick newNick(*this, user, rawInput);
+			Nick(*this, user, rawInput);
 			break;
 		}
 		case 6 :
