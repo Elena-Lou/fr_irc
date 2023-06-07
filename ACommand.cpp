@@ -33,13 +33,17 @@ void	ACommand::tokenise(std::string rawInput)
 {
 	std::string::iterator start = rawInput.begin();
 	std::string::iterator it = start;
-	while (it != rawInput.end())//raw input not over
+	while (start != rawInput.end()) //raw input not over
 	{
-		if (isspace(*it))
+		if ((isspace(*it) && *it != '\n') || it == rawInput.end())
 		{
 			this->_cmd.push_back(std::string(start, it));
-			start = it;
+			start = it + 1;
 		}
+		if (*it == '\n')
+			start = it + 1;
+		if (it == rawInput.end())
+			start = rawInput.end();
 		it++;
 	}
 }
