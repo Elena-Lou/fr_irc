@@ -83,7 +83,7 @@ void Nick::error(int errorCode) const
 void	Nick::confirm() const
 {
 	std::stringstream replyMessageBuilder;
-	replyMessageBuilder << ":" << this->_author->getFullName() << this->_cmd[0] << " "  << this->_cmd[1];
+	replyMessageBuilder << ":" << this->_author->getFullName() << this->_cmd[0] << " "  << this->_cmd[1] << CRLF;
 	std::string replyMessage = replyMessageBuilder.str();
 	this->_server->broadcastAllClients(replyMessage);
 }

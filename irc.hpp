@@ -36,6 +36,9 @@
 # include "Client.hpp"
 # include "Channel.hpp"
 # include "Kick.hpp"
+# include "Join.hpp"
+# include "User.hpp"
+# include "Nick.hpp"
 # include <ctime>
 
 # define RPL_WELCOME "001"

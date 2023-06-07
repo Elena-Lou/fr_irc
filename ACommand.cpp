@@ -24,6 +24,7 @@ ACommand::ACommand(const ACommand &source)
 ACommand &ACommand::operator=(const ACommand &rhs)
 {
 	this->_cmd = rhs._cmd;
+	this->_server = rhs._server;
 	this->_author = rhs._author;
 	return (*this);
 }

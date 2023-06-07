@@ -36,6 +36,8 @@ class Server
 		std::map<int, Client>	&getClients();
 		std::deque<Channel>		&getChannels();
 		bool	isPasswordProtected() const { return (this->_restricted);};
+		std::string	getStartTime() const;
+
 
 		/* Client handlers */
 		void	connectUser(int);
@@ -64,8 +66,9 @@ class Server
 		void	JOIN(ACommand &placeholder);
 
 		/* parsing commands */
-		bool	checkRawInput(std::string & rawInput);
-		void	parsingCommand(std::string & rawInput, Client & user);
+		bool		checkRawInput(std::string & rawInput) const;
+		std::string	extractCmd(std::string &rawInput);
+		void		parsingCommand(std::string & rawInput, Client & user);
 
 		/* exceptions */
 		class CannotRetrieveAddrinfoException : public std::exception

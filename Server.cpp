@@ -109,7 +109,7 @@ Server::Server(const char *portNumber, const char *password)
 		this->_fdMax = this->_socketFD;
 	this->_pendingAddrSize = sizeof(this->_pendingAddr);
 	time_t timeStamp = time(NULL);
-	this->_startTime = localtime(&timestamp);
+	this->_startTime = localtime(&timeStamp);
 }
 
 Server::Server(const Server &source)
@@ -239,9 +239,9 @@ void	Server::disconnectUser(std::map<int, Client>::iterator clientIterator)
 	this->_clients.erase(clientIterator);
 }
 
-std::string	Server::getStartTime()
+std::string	Server::getStartTime() const
 {
-	return (asci(this->_startTime));
+	return (asctime(this->_startTime));
 }
 
 int		Server::fillSets()
@@ -320,11 +320,23 @@ void	Server::readLoop()
 				it->second.readBuffer.append(this->buffer);
 				if (this->checkRawInput(it->second.readBuffer))
 				{
-					std::cout << "buffer sent to parsing : " << it->second.readBuffer << std::endl;
-					this->parsingCommand(it->second.readBuffer, it->second);
+					std::cout << "entered condition !" << std::endl;
+					for (;;)
+					{
+						std::cout << "full buffer before: ["
+							<< it->second.readBuffer << "]" << std::endl;
+						std::string cmd = extractCmd(it->second.readBuffer);
+						if (cmd == "")
+							break;
+						else
+						{
+							std::cout << "buffer sent to parsing : " << cmd << std::endl;
+							this->parsingCommand(cmd, it->second);
+						}
+						std::cout << "full buffer after: ["
+							<< it->second.readBuffer << "]" << std::endl;
+					}
 				}
-				std::cout << "buffer after parsing : " << it->second.readBuffer << std::endl;
-
 			}
 		}
 		it++;
@@ -433,15 +445,28 @@ void	Server::broadcastChannel(Channel& targetChannel, std::string &message)
 	targetChannel.broadcastAllClients(message);
 }
 
-bool Server::checkRawInput( std::string & rawInput )
+bool Server::checkRawInput( std::string & rawInput ) const
 {
-	std::size_t it = rawInput.find("\r\n");
-	if (it != std::string::npos)
+	std::size_t pos = rawInput.find(CRLF);
+	if (pos != std::string::npos)
 	{
-		rawInput.erase(rawInput.begin() + it, rawInput.end());
-		return true;
+		return (true);
 	}
-	return false;
+	return (false);
+}
+
+std::string	Server::extractCmd(std::string &rawInput)
+{
+	std::size_t pos = rawInput.find(CRLF);
+	if (pos != std::string::npos)
+	{
+		std::string cmd(rawInput, 0, pos);
+		std::cout << "cmd: [" << cmd << "]" << std::endl;
+		rawInput.erase(0, pos + 2);
+		std::cout << "new first letter: [" << rawInput[0] << "]" << std::endl;
+		return (cmd);
+	}
+	return ("");
 }
 
 void Server::parsingCommand( std::string & rawInput, Client & user )
@@ -469,83 +494,77 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 								"NICK",
 								"TOPIC",
 								"MODE",
-								"PRIVMSG"
+								"PRIVMSG",
+								"CAP"
 							};
 
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		std::cout << "commands[i] : " << commands[i] << std::endl;
 		if (commands[i] == rawCommand)
 		{
-			std::cout << "index = " << index << std::endl;
 			index = i;
-			std::cout << "index = " << index << std::endl;
+			std::cout << "found a " << commands[i] << " comparing with ["
+				<< rawCommand << "]" << std::endl;
 			break ;
 		}
 	}
 	switch (index)
 	{
-	case 0 :
-	{
-		Kick newKick(*this, user, rawInput);
-		break;
-	}
-
-	case 1 :
-	{
-		std::cout << "need to create JOIN command" << std::endl;
-		break;
-	}
-
-	case 2 :
-	{
-		std::cout << "need to create INVITE command" << std::endl;
-		break;
-	}
-
-	case 3 :
-	{
-		std::cout << "need to create USER command" << std::endl;
-		break;
-	}
-
-	case 4 :
-	{
-		std::cout << "need to create OPER command" << std::endl;
-		break;
-	}
-
-	case 5 :
-	{
-		std::cout << "need to create NICK command" << std::endl;
-		break;
-	}
-
-	case 6 :
-	{
-		std::cout << "need to create TOPIC command" << std::endl;
-		break;
-	}
-
-	case 7 :
-	{
-		std::cout << "need to create MODE command" << std::endl;
-		break;
-	}
-
-	case 8 :
-	{
-		std::cout << "need to create PRIVMSG command" << std::endl;
-		break;
-	}
-
-	default:
-	{
-		std::cerr << "invalid command" << std::endl;
-		break;
-	}
+		case 0 :
+		{
+			Kick newKick(*this, user, rawInput);
+			break;
+		}
+		case 1 :
+		{
+			Join newJoin(*this, user, rawInput);
+			break;
+		}
+		case 2 :
+		{
+			std::cout << "need to create INVITE command" << std::endl;
+			break;
+		}
+		case 3 :
+		{
+			User newUser(*this, user, rawInput);
+			break;
+		}
+		case 4 :
+		{
+			std::cout << "need to create OPER command" << std::endl;
+			break;
+		}
+		case 5 :
+		{
+			Nick newNick(*this, user, rawInput);
+			break;
+		}
+		case 6 :
+		{
+			std::cout << "need to create TOPIC command" << std::endl;
+			break;
+		}
+		case 7 :
+		{
+			std::cout << "need to create MODE command" << std::endl;
+			break;
+		}
+		case 8 :
+		{
+			std::cout << "need to create PRIVMSG command" << std::endl;
+			break;
+		}
+		case 9 :
+		{
+			std::cout << "CAP recognised, continuing" << std::endl;
+			break;
+		}
+		default:
+		{
+			std::cerr << "invalid command" << std::endl;
+			break;
+		}
 	}
 	rawInput.clear();
-
-
 }

@@ -42,7 +42,10 @@ int main( int ac, char** av ) {
 		while(1)
 		{
 			if (myIrc.fillSets())
+			{
+				std::cerr << "Error building the sets" << std::endl;
 				break;
+			}
 			/* Check socket for new connections */
 			// std::cout << "Waiting for connections..." << std::endl;
 			myIrc.checkNewConnections();
