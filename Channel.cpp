@@ -150,11 +150,11 @@ void	Channel::removeOperator(Client &chanOp)
 }
 
 
-void	Channel::broadcastAllClients(std::string &msg)
+void	Channel::broadcastToChannel(std::string prefix, std::string suffix)
 {
 	for (std::map<int, Client*>::iterator it = this->_connectedClients.begin();
 		it != this->_connectedClients.end(); it++)
 	{
-		it->second->writeBuffer += msg;
+		it->second->writeToClient(prefix, suffix);
 	}
 }

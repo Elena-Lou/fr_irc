@@ -35,7 +35,7 @@ class Channel
 		void	removeOperator(Client &chanOp);
 
 		/* message */
-		void	broadcastAllClients(std::string &msg);
+		void	broadcastToChannel(std::string prefix, std::string suffix);
 
 	private:
 		Channel();

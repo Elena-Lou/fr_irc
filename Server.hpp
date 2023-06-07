@@ -59,8 +59,8 @@ class Server
 		void	writeLoop();
 
 		/* messages */
-		void	broadcastAllClients(std::string &msg);
-		void	broadcastChannel(Channel& targetChan, std::string &msg);
+		void	broadcastAllClients(std::string prefix, std::string suffix);
+		void	broadcastChannel(Channel& targetChan, std::string pref, std::string suf);
 
 		/* COMMANDS */
 		void	JOIN(ACommand &placeholder);

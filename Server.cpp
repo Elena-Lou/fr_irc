@@ -371,7 +371,6 @@ void	Server::writeLoop()
 				else
 					it->second.writeBuffer.erase(it->second.writeBuffer.begin() + sendRet);
 				std::cout << sendRet << " bytes sent" << std::endl;
-				std::cout << "sent : " << it->second.writeBuffer << std::endl;
 			}
 		}
 		it++;
@@ -431,18 +430,18 @@ Channel	*Server::getChannelIfExist(std::string chanName)
 	return (NULL);
 }
 
-void	Server::broadcastAllClients(std::string &message)
+void	Server::broadcastAllClients(std::string prefix, std::string suffix)
 {
 	for (std::map<int, Client>::iterator it = this->_clients.begin();
 		it != this->_clients.end(); it++)
 	{
-		it->second.writeBuffer += message;
+		it->second.writeToClient(prefix, suffix);
 	}
 }
 
-void	Server::broadcastChannel(Channel& targetChannel, std::string &message)
+void	Server::broadcastChannel(Channel& targetChannel, std::string prefix, std::string suffix)
 {
-	targetChannel.broadcastAllClients(message);
+	targetChannel.broadcastToChannel(prefix, suffix);
 }
 
 bool Server::checkRawInput( std::string & rawInput ) const

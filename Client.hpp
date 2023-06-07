@@ -28,6 +28,9 @@ class Client
 		const std::set<Channel*> &getConnectedChannels() const;
 
 
+		/* writing */
+		void	writeToClient(std::string prefix, std::string suffix);
+
 		/* channel handlers */
 		int		isInChannel(Channel&) const;
 		void	joinChannel(Channel&);

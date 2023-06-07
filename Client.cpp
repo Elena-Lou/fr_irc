@@ -108,3 +108,10 @@ void	Client::quitChannel(Channel& channelToQuit)
 {
 	this->_connectedChannels.erase(&channelToQuit);
 }
+
+void	Client::writeToClient(std::string prefix, std::string suffix)
+{
+	this->writeBuffer += prefix;
+	this->writeBuffer += this->_nickname;
+	this->writeBuffer += suffix;
+}
