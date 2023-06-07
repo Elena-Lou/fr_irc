@@ -10,18 +10,18 @@ class Server;
 class Join : public ACommand
 {
 	public:
-		~Join();
-
-	protected:
 		Join(Server &server, Client &user, std::string rawInput);
 		Join(const Join &source);
 		Join &operator=(const Join &rhs);
+		~Join();
 
-		void	execute() const;
-		void	error(std::string) const;
-
+	protected:
 	private:
 		Join();
+		void	execute() const;
+		void	error(int) const;
+		void	confirm() const;
+
 };
 
 #endif

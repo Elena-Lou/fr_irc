@@ -13,7 +13,7 @@ Join::Join(Server &server, Client &user, std::string rawInput) : ACommand(server
 {
 }
 
-Join::Join(const Join &source)
+Join::Join(const Join &source) : ACommand(source)
 {
 	*this = source;
 }
@@ -21,7 +21,19 @@ Join::Join(const Join &source)
 Join &Join::operator=(const Join &rhs)
 {
 	this->_cmd = rhs._cmd;
-	this->_user = rhs._user;
+	this->_server = rhs._server;
+	this->_author = rhs._author;
 	return (*this);
 }
 
+void Join::execute() const
+{
+}
+
+void Join::error(int) const
+{
+}
+
+void Join::confirm() const
+{
+}
