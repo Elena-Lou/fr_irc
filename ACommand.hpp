@@ -21,6 +21,7 @@ class ACommand
 
 		virtual void	execute() const = 0;
 		virtual void	error(int errorCode) const = 0;
+		virtual void	confirm() const = 0;
 
 		//TODO: create a bool for the target to be used in derived classes
 		//bool	targetIsUserOrChannel;

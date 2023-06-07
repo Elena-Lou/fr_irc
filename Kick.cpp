@@ -4,7 +4,7 @@ Kick::Kick() : ACommand()
 {
 }
 
-Kick::Kick( Kick const & src )
+Kick::Kick( Kick const & src ) : ACommand(src)
 {
 	*this = src;
 }
@@ -70,6 +70,10 @@ void Kick::execute() const
 	}
 	if (foundChannel->removeUserFromChannel(*foundClient) == 0)
 		this->_server->destroyChannel(*foundChannel);
+}
+
+void	Kick::confirm() const
+{
 }
 
 void Kick::error( int errorCode ) const

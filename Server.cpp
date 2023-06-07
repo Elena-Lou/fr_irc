@@ -45,7 +45,6 @@ Server::Server(const char *portNumber)
 				focus->ai_protocol);
 		if (this->_socketFD < 0)
 		{
-			std::cerr << "error 1 " << std::endl;
 			errorCode |= ERRSOCKFD;
 			continue;
 		}
@@ -55,7 +54,6 @@ Server::Server(const char *portNumber)
 		if (setsockopt(this->_socketFD, SOL_SOCKET,
 				SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)) < 0)
 		{
-			std::cerr << "error 2 " << std::endl;
 			errorCode |= ERRSOCKOPT;
 			continue;
 		}
@@ -64,7 +62,6 @@ Server::Server(const char *portNumber)
 		int flag = fcntl(this->_socketFD, F_GETFL, 0);
 		if (fcntl(this->_socketFD, F_SETFL, flag | O_NONBLOCK) < 0)
 		{
-			std::cerr << "error 3 " << std::endl;
 			errorCode |= ERRSOCKNOBLOCK;
 			continue;
 		}
@@ -72,14 +69,12 @@ Server::Server(const char *portNumber)
 		/* binds the socket descriptor to the port passed to getaddrinfo() */
 		if (bind(this->_socketFD, focus->ai_addr, focus->ai_addrlen) < 0)
 		{
-			std::cerr << "error 4 " << std::endl;
 			errorCode |= ERRSOCKBIND;
 			continue;
 		}
 		/* listens to the port bound to the socket descriptor for incoming connections */
 		if (listen(this->_socketFD, MYIRC_ALLOWED_PENDING_CONNECTIONS) < 0)
 		{
-			std::cerr << "error 5 " << std::endl;
 			errorCode |= ERRSOCKLISTEN;
 			continue;
 		}
@@ -180,12 +175,12 @@ std::deque<Channel> & Server::getChannels( void )
 	return this->_channels;
 }
 
-bool	Server::isUserConnected(std::string userName) const
+bool	Server::isUserConnected(std::string nickname) const
 {
 	for (std::map<int, Client>::const_iterator it = this->_clients.begin();
 		it != this->_clients.end(); it++)
 	{
-		if (userName == it->second.getNickname())
+		if (nickname == it->second.getNickname())
 		{
 			return true;
 		}
@@ -193,12 +188,12 @@ bool	Server::isUserConnected(std::string userName) const
 	return false;
 }
 
-Client	*Server::getUserIfConnected(std::string userName)
+Client	*Server::getUserIfConnected(std::string nickname)
 {
 	for (std::map<int, Client>::iterator it = this->_clients.begin();
 		it != this->_clients.end(); it++)
 	{
-		if (userName == it->second.getUsername())
+		if (nickname == it->second.getNickname())
 		{
 			return (&(it->second));
 		}

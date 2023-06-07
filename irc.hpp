@@ -70,7 +70,7 @@
 # define ERR_BADCHANMASK_MSG "Bad Channel Mask"
 # define ERR_CHANOPRIVSNEEDED_MSG "You're not channel operator"
 
-# define CRLF "\n\r"
+# define CRLF "\r\n"
 
 
 

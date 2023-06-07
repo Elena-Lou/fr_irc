@@ -16,7 +16,7 @@ Nick::Nick(Server &server, Client &author, std::string rawInput) : ACommand(serv
 	this->execute();
 }
 
-Nick::Nick(const Nick &source)
+Nick::Nick(const Nick &source) : ACommand(source)
 {
 	*this = source;
 }

@@ -19,8 +19,9 @@ class Kick : public ACommand
 		Kick & operator=( Kick const & rhs );
 		~Kick();
 
-		void execute( void ) const;
-		void error( int errorCode ) const;
+		void	execute( void ) const;
+		void	error( int errorCode ) const;
+		void	confirm() const;
 };
 
 #endif
