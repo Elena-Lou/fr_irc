@@ -1,6 +1,7 @@
 # include "ACommand.hpp"
 # include "Nick.hpp"
 # include "Client.hpp"
+# include "Server.hpp"
 
 Nick::Nick() : ACommand()
 {
@@ -36,8 +37,8 @@ void Nick::execute()
 		error(ERR_NONICKNAMEGIVEN);
 		return ;
 	}
-	std::string newName = this->_cmd[1];
-	for (unsigned int i = 0; i < newName.size(); i++)
+	this->newName = this->_cmd[1];
+	for (unsigned int i = 0; i < this->newName.size(); i++)
 	{
 		if (!isalpha(newName[i]))
 		{
@@ -45,49 +46,50 @@ void Nick::execute()
 			return ;
 		}
 	}
-	if (this->_author->getNickname() == newName)
+	if (this->_author->getNickname() == this->newName)
 		return ;
-	if (this->_server->isUserConnected(newName) && this->_author->getNickname() != "")
+	while (this->_server->nicknameAlreadyInUse(*this->_author, this->newName))
 	{
+		if (this->_author->getUsername() == "")
+		{
+			this->newName += '_';
+			continue;
+		}
 		error(ERR_NICKNAMEINUSE);
 		return ;
 	}
-
 	//No condition for ERR_NICKCOLLISION not required by subject
-	if (this->_author->getNickname() != "")
-		this->confirm();
-	this->_author->setNickname(newName);
+	this->confirm();
 }
 
 void Nick::error(int errorCode) const
 {
-	std::stringstream prefix;
-	prefix << ":" << this->_server->getHostname() << " " << errorCode << " ";
-	std::stringstream suffix;
+	std::stringstream msgBuilder;
+	msgBuilder << ":" << this->_server->getHostname() << " " << errorCode << " ";
 	switch (errorCode)
 	{
 		case ERR_NONICKNAMEGIVEN:
-			suffix << " :" << ERR_NONICKNAMEGIVEN_MSG << CRLF;
+			msgBuilder << ":" << ERR_NONICKNAMEGIVEN_MSG;
 			break;
 		case ERR_ERRONEUSNICKNAME:
-			suffix << this->_cmd[1] << " :" << ERR_ERRONEUSNICKNAME_MSG << CRLF;
+			msgBuilder << this->_cmd[1] << " :" << ERR_ERRONEUSNICKNAME_MSG;
 			break;
 		case ERR_NICKNAMEINUSE:
-			suffix << " " << this->_cmd[1] << " :" << ERR_NICKNAMEINUSE_MSG << CRLF;
+			msgBuilder << this->_cmd[1] << " :" << ERR_NICKNAMEINUSE_MSG;
 			break;
 		default:
 			std::cerr << "Error: Unrecognised error code." << std::endl;
 			break;
 	}
-	this->_author->writeToClient(prefix.str(), suffix.str());
+	this->_author->writeToClient(msgBuilder.str());
 }
 
 void	Nick::confirm() const
 {
-	std::stringstream prefix;
-	std::stringstream suffix;
-	prefix << ":" << this->_author->getFullName() << " " << this->_cmd[0] << " ";
-	suffix << " :"  << this->_cmd[1] << CRLF;
-	this->_author->setNickname(this->_cmd[1]);
-	this->_server->broadcastAllClients(prefix.str(), suffix.str());
+	std::stringstream msgBuilder;
+	if (this->_author->getNickname() == "")
+		this->_author->setNickname("*");
+	msgBuilder << ":" << this->_author->getFullName() << " NICK " << this->newName;
+	this->_author->setNickname(this->newName);
+	this->_server->broadcastAllClients(msgBuilder.str());
 }

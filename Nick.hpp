@@ -21,6 +21,8 @@ class Nick : public ACommand
 		void	execute();
 		void	confirm() const;
 		void	error(int errorCode) const;
+
+		std::string	newName;
 };
 
 #endif
