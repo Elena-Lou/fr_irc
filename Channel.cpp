@@ -71,13 +71,15 @@ bool		Channel::isUserConnected(Client& user)
 	return (NOT_CONNECTED);
 }
 
-bool	isCaseInsensitiveEqual(std::string str1, std::string str2)
+static bool	isCaseInsensitiveEqual(std::string str1, std::string str2)
 {
 	if (str1.size() != str2.size())
 		return (false);
 	for (unsigned int i = 0; i < str1.size(); i++)
-	if (tolower(str1[i]) != tolower(str2[i]))
-		return (false);
+	{
+		if (tolower(str1[i]) != tolower(str2[i]))
+			return (false);
+	}
 	return (true);
 }
 

@@ -46,6 +46,7 @@ class Server
 		void	checkNewConnections();
 		bool	isUserConnected(std::string) const;
 		Client	*getUserIfConnected(std::string nickName);
+		bool	nicknameAlreadyInUse(const Client &user, std::string nickname) const;
 
 		/* Channel handlers */
 		void	createChannel(std::string, Client&);

@@ -184,17 +184,29 @@ std::deque<Channel> & Server::getChannels( void )
 	return this->_channels;
 }
 
+static bool	isCaseInsensitiveEqual(std::string str1, std::string str2)
+{
+	if (str1.size() != str2.size())
+		return (false);
+	for (unsigned int i = 0; i < str1.size(); i++)
+	{
+		if (tolower(str1[i]) != tolower(str2[i]))
+			return (false);
+	}
+	return (true);
+}
+
 bool	Server::isUserConnected(std::string nickname) const
 {
 	for (std::map<int, Client>::const_iterator it = this->_clients.begin();
 		it != this->_clients.end(); it++)
 	{
-		if (nickname == it->second.getNickname())
+		if (isCaseInsensitiveEqual(nickname, it->second.getNickname()))
 		{
-			return true;
+			return (true);
 		}
 	}
-	return false;
+	return (false);
 }
 
 Client	*Server::getUserIfConnected(std::string nickname)
@@ -210,6 +222,22 @@ Client	*Server::getUserIfConnected(std::string nickname)
 	return (NULL);
 }
 
+bool	Server::nicknameAlreadyInUse(const Client &user, std::string nickname) const
+{
+	for (std::map<int, Client>::const_iterator it = this->_clients.begin();
+		it != this->_clients.end(); it++)
+	{
+		if (it->second.getSocketFD() == user.getSocketFD())
+			continue;
+		if (isCaseInsensitiveEqual(nickname, it->second.getNickname()))
+		{
+			return (true);
+		}
+	}
+	return (false);
+
+}
+
 void	Server::connectUser(const int socketFD)
 {
 	this->_clients.insert(std::make_pair(socketFD, Client(socketFD)));
@@ -217,7 +245,8 @@ void	Server::connectUser(const int socketFD)
 
 void	Server::disconnectUser(int socketFD)
 {
-	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	for (std::map<int, Client>::iterator it = this->_clients.begin();
+		it != this->_clients.end(); it++)
 	{
 		if (it->first == socketFD)
 		{
