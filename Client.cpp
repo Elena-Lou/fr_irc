@@ -122,3 +122,11 @@ void	Client::writeRPLToClient(Server *server, std::string RPL, std::string messa
 		<< RPL << " " << this->_nickname << " :" << message << CRLF;
 	this->writeBuffer += replyMessageBuilder.str();
 }
+
+void	Client::writeRPLToClient(Server *server, std::string RPL, std::string additionalSource, std::string message)
+{
+	std::stringstream replyMessageBuilder;
+	replyMessageBuilder << ":" << server->getHostname() << " "
+		<< RPL << " " << this->_nickname << " " << additionalSource << " :" << message << CRLF;
+	this->writeBuffer += replyMessageBuilder.str();
+}

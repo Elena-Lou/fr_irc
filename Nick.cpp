@@ -64,24 +64,30 @@ void Nick::execute()
 
 void Nick::error(int errorCode) const
 {
-	std::stringstream msgBuilder;
-	msgBuilder << ":" << this->_server->getHostname() << " " << errorCode << " ";
 	switch (errorCode)
 	{
 		case ERR_NONICKNAMEGIVEN:
-			msgBuilder << ":" << ERR_NONICKNAMEGIVEN_MSG;
-			break;
+		{
+			this->_author->writeRPLToClient(this->_server,
+					ERR_NONICKNAMEGIVEN_S, ERR_NONICKNAMEGIVEN_MSG);
+			return;
+		}
 		case ERR_ERRONEUSNICKNAME:
-			msgBuilder << this->_cmd[1] << " :" << ERR_ERRONEUSNICKNAME_MSG;
-			break;
+		{
+			this->_author->writeRPLToClient(this->_server, ERR_ERRONEUSNICKNAME_S,
+					this->_cmd[1], ERR_ERRONEUSNICKNAME_MSG);
+			return;
+		}
 		case ERR_NICKNAMEINUSE:
-			msgBuilder << this->_cmd[1] << " :" << ERR_NICKNAMEINUSE_MSG;
+		{
+			this->_author->writeRPLToClient(this->_server, ERR_NICKNAMEINUSE_S,
+					this->_cmd[1], ERR_NICKNAMEINUSE_MSG);
 			break;
+		}
 		default:
 			std::cerr << "Error: Unrecognised error code." << std::endl;
 			break;
 	}
-	this->_author->writeToClient(msgBuilder.str());
 }
 
 void	Nick::confirm() const
