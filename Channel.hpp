@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 
+class Server;
 class Client;
 class Channel
 {
@@ -35,7 +36,7 @@ class Channel
 		void	removeOperator(Client &chanOp);
 
 		/* message */
-		void	broadcastToChannel(std::string prefix, std::string suffix);
+		void	broadcastToChannel(std::string message);
 
 	private:
 		Channel();

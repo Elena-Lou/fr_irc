@@ -1,4 +1,5 @@
 #include "Client.hpp"
+#include "Server.hpp"
 
 Client::Client()
 {
@@ -109,9 +110,15 @@ void	Client::quitChannel(Channel& channelToQuit)
 	this->_connectedChannels.erase(&channelToQuit);
 }
 
-void	Client::writeToClient(std::string prefix, std::string suffix)
+void	Client::writeToClient(std::string message)
 {
-	this->writeBuffer += prefix;
-	this->writeBuffer += this->_nickname;
-	this->writeBuffer += suffix;
+	this->writeBuffer += message + CRLF;
+}
+
+void	Client::writeRPLToClient(Server *server, std::string RPL, std::string message)
+{
+	std::stringstream replyMessageBuilder;
+	replyMessageBuilder << ":" << server->getHostname() << " "
+		<< RPL << " " << this->_nickname << " :" << message << CRLF;
+	this->writeBuffer += replyMessageBuilder.str();
 }

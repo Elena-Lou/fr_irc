@@ -4,6 +4,7 @@
 
 #include "irc.hpp"
 
+class Server;
 class Channel;
 class Client
 {
@@ -29,7 +30,8 @@ class Client
 
 
 		/* writing */
-		void	writeToClient(std::string prefix, std::string suffix);
+		void	writeToClient(std::string message);
+		void	writeRPLToClient(Server *server, std::string RPL, std::string message);
 
 		/* channel handlers */
 		int		isInChannel(Channel&) const;

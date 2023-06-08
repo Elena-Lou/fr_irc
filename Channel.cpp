@@ -1,5 +1,6 @@
 #include "Channel.hpp"
 #include "irc.hpp"
+#include "Server.hpp"
 
 Channel::Channel()
 {
@@ -152,11 +153,11 @@ void	Channel::removeOperator(Client &chanOp)
 }
 
 
-void	Channel::broadcastToChannel(std::string prefix, std::string suffix)
+void	Channel::broadcastToChannel(std::string message)
 {
 	for (std::map<int, Client*>::iterator it = this->_connectedClients.begin();
 		it != this->_connectedClients.end(); it++)
 	{
-		it->second->writeToClient(prefix, suffix);
+		it->second->writeToClient(message);
 	}
 }

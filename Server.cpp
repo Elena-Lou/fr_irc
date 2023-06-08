@@ -459,18 +459,18 @@ Channel	*Server::getChannelIfExist(std::string chanName)
 	return (NULL);
 }
 
-void	Server::broadcastAllClients(std::string prefix, std::string suffix)
+void	Server::broadcastAllClients(std::string message)
 {
 	for (std::map<int, Client>::iterator it = this->_clients.begin();
 		it != this->_clients.end(); it++)
 	{
-		it->second.writeToClient(prefix, suffix);
+		it->second.writeToClient(message);
 	}
 }
 
-void	Server::broadcastChannel(Channel& targetChannel, std::string prefix, std::string suffix)
+void	Server::broadcastChannel(Channel& targetChannel, std::string message)
 {
-	targetChannel.broadcastToChannel(prefix, suffix);
+	targetChannel.broadcastToChannel(message);
 }
 
 bool Server::checkRawInput( std::string & rawInput ) const
