@@ -19,7 +19,7 @@ class User : public ACommand
 
 	private:
 		User();
-		void	execute() const;
+		void	execute();
 		void	confirm() const;
 		void	error(int errorCode) const;
 

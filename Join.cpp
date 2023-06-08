@@ -26,7 +26,7 @@ Join &Join::operator=(const Join &rhs)
 	return (*this);
 }
 
-void Join::execute() const
+void Join::execute()
 {
 }
 

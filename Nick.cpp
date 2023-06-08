@@ -29,7 +29,7 @@ Nick &Nick::operator=(const Nick &rhs)
 	return (*this);
 }
 
-void Nick::execute() const
+void Nick::execute()
 {
 	if (this->_cmd.size() != 2)
 	{

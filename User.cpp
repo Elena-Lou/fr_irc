@@ -31,7 +31,7 @@ User &User::operator=(const User &rhs)
 	return (*this);
 }
 
-void User::execute() const
+void User::execute()
 {
 	if (this->_author->getUsername() != "")
 	{

@@ -18,7 +18,7 @@ class Join : public ACommand
 	protected:
 	private:
 		Join();
-		void	execute() const;
+		void	execute();
 		void	error(int) const;
 		void	confirm() const;
 

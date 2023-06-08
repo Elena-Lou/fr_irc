@@ -19,7 +19,7 @@ class ACommand
 		ACommand &operator=(const ACommand &rhs);
 
 
-		virtual void	execute() const = 0;
+		virtual void	execute() = 0;
 		virtual void	error(int errorCode) const = 0;
 		virtual void	confirm() const = 0;
 
