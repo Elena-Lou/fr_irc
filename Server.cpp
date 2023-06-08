@@ -234,6 +234,12 @@ bool	Server::nicknameAlreadyInUse(const Client &user, std::string nickname) cons
 			return (true);
 		}
 	}
+	for (std::deque<Channel>::const_iterator it = this->_channels.begin();
+			it != this->_channels.end(); it++)
+	{
+		if (isCaseInsensitiveEqual(nickname, it->getName()))
+			return (true);
+	}
 	return (false);
 
 }
