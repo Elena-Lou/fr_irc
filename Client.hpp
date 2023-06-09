@@ -20,6 +20,7 @@ class Client
 		void	setHostname(std::string name);
 		void	setRealname(std::string name);
 		void	confirmRegistration();
+		void	validatePassword();
 
 		/* Getters */
 		int	getSocketFD() const;
@@ -27,6 +28,7 @@ class Client
 		std::string	getUsername() const;
 		std::string getFullName() const;
 		const std::set<Channel*> &getConnectedChannels() const;
+		bool	isPasswordOk() const;
 
 
 		/* writing */
@@ -53,6 +55,7 @@ class Client
 		std::string	_realname;
 
 		bool	_registered;
+		bool	_passwordOK;
 
 		std::set<Channel*> _connectedChannels;
 	protected:

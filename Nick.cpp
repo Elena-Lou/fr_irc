@@ -27,11 +27,22 @@ Nick &Nick::operator=(const Nick &rhs)
 	this->_cmd = rhs._cmd;
 	this->_server = rhs._server;
 	this->_author = rhs._author;
+	this->newName = rhs.newName;
 	return (*this);
 }
 
 void Nick::execute()
 {
+	if (this->_server->isPasswordProtected())
+	{
+		if (!this->_author->isPasswordOk())
+		{
+			this->_server->disconnectUser(this->_author->getSocketFD());
+			return;
+		}
+	}
+	else
+		this->_author->validatePassword();
 	if (this->_cmd.size() != 2)
 	{
 		error(ERR_NONICKNAMEGIVEN);

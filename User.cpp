@@ -28,11 +28,22 @@ User &User::operator=(const User &rhs)
 {
 	this->_cmd = rhs._cmd;
 	this->_author = rhs._author;
+	this->_server = rhs._server;
 	return (*this);
 }
 
 void User::execute()
 {
+	if (this->_server->isPasswordProtected())
+	{
+		if (!this->_author->isPasswordOk())
+		{
+			this->_server->disconnectUser(this->_author->getSocketFD());
+			return ;
+		}
+	}
+	else
+		this->_author->validatePassword();
 	if (this->_author->getUsername() != "")
 	{
 		error(ERR_ALREADYREGISTERED);
@@ -48,9 +59,6 @@ void User::execute()
 
 void User::error(int errorCode) const
 {
-	std::stringstream errorMessage;
-	errorMessage << ":" << this->_server->getHostname() << " " << errorCode << " "
-	<< this->_author->getNickname();
 	switch (errorCode)
 	{
 		case ERR_NEEDMOREPARAMS:
