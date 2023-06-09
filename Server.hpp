@@ -23,7 +23,7 @@ class Server
 	public:
 		Server();
 		~Server();
-		Server(const char *portNumber, const char *password = "");
+		Server(const char *portNumber, std::string password = "");
 		Server(const Server &source);
 		Server& operator=(const Server &rhs);
 
