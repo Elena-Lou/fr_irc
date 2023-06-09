@@ -38,7 +38,7 @@ void User::execute()
 	{
 		if (!this->_author->isPasswordOk())
 		{
-			this->_server->disconnectUser(this->_author->getSocketFD());
+			//this->_server->disconnectUser(this->_author->getSocketFD());
 			return ;
 		}
 	}
