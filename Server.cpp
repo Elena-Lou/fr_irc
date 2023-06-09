@@ -15,7 +15,7 @@ Server::~Server()
 	close(this->_socketFD);
 }
 
-Server::Server(const char *portNumber)
+Server::Server(const char *portNumber, const char *password)
 {
 #if SHOW_CONSTRUCTOR
 	std::cout << "Server char* char* constructor" << std::endl;
@@ -25,6 +25,13 @@ Server::Server(const char *portNumber)
 	struct addrinfo hints;
 	struct addrinfo	*servinfo;
 
+	if (strlen(password))
+		this->_restricted = false;
+	else
+	{
+		this->_restricted = true;
+		this->_password = password;
+	}
 	this->_hostname = "mismatched_sock(et)s_irc";
 	this->_fdMax = 0;
 	memset(&hints, 0, sizeof(hints));
@@ -101,6 +108,8 @@ Server::Server(const char *portNumber)
 	if (this->_socketFD > this->_fdMax)
 		this->_fdMax = this->_socketFD;
 	this->_pendingAddrSize = sizeof(this->_pendingAddr);
+	time_t timeStamp = time(NULL);
+	this->_startTime = localtime(&timeStamp);
 }
 
 Server::Server(const Server &source)
@@ -175,17 +184,29 @@ std::deque<Channel> & Server::getChannels( void )
 	return this->_channels;
 }
 
+static bool	isCaseInsensitiveEqual(std::string str1, std::string str2)
+{
+	if (str1.size() != str2.size())
+		return (false);
+	for (unsigned int i = 0; i < str1.size(); i++)
+	{
+		if (tolower(str1[i]) != tolower(str2[i]))
+			return (false);
+	}
+	return (true);
+}
+
 bool	Server::isUserConnected(std::string nickname) const
 {
 	for (std::map<int, Client>::const_iterator it = this->_clients.begin();
 		it != this->_clients.end(); it++)
 	{
-		if (nickname == it->second.getNickname())
+		if (isCaseInsensitiveEqual(nickname, it->second.getNickname()))
 		{
-			return true;
+			return (true);
 		}
 	}
-	return false;
+	return (false);
 }
 
 Client	*Server::getUserIfConnected(std::string nickname)
@@ -201,6 +222,28 @@ Client	*Server::getUserIfConnected(std::string nickname)
 	return (NULL);
 }
 
+bool	Server::nicknameAlreadyInUse(const Client &user, std::string nickname) const
+{
+	for (std::map<int, Client>::const_iterator it = this->_clients.begin();
+		it != this->_clients.end(); it++)
+	{
+		if (it->second.getSocketFD() == user.getSocketFD())
+			continue;
+		if (isCaseInsensitiveEqual(nickname, it->second.getNickname()))
+		{
+			return (true);
+		}
+	}
+	for (std::deque<Channel>::const_iterator it = this->_channels.begin();
+			it != this->_channels.end(); it++)
+	{
+		if (isCaseInsensitiveEqual(nickname, it->getName()))
+			return (true);
+	}
+	return (false);
+
+}
+
 void	Server::connectUser(const int socketFD)
 {
 	this->_clients.insert(std::make_pair(socketFD, Client(socketFD)));
@@ -208,7 +251,8 @@ void	Server::connectUser(const int socketFD)
 
 void	Server::disconnectUser(int socketFD)
 {
-	for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+	for (std::map<int, Client>::iterator it = this->_clients.begin();
+		it != this->_clients.end(); it++)
 	{
 		if (it->first == socketFD)
 		{
@@ -228,6 +272,11 @@ void	Server::disconnectUser(std::map<int, Client>::iterator clientIterator)
 	}
 	close(clientIterator->second.getSocketFD());
 	this->_clients.erase(clientIterator);
+}
+
+std::string	Server::getStartTime() const
+{
+	return (asctime(this->_startTime));
 }
 
 int		Server::fillSets()
@@ -306,11 +355,23 @@ void	Server::readLoop()
 				it->second.readBuffer.append(this->buffer);
 				if (this->checkRawInput(it->second.readBuffer))
 				{
-					std::cout << "buffer sent to parsing : " << it->second.readBuffer << std::endl;
-					this->parsingCommand(it->second.readBuffer, it->second);
+					std::cout << "entered condition !" << std::endl;
+					for (;;)
+					{
+						std::cout << "full buffer before: ["
+							<< it->second.readBuffer << "]" << std::endl;
+						std::string cmd = extractCmd(it->second.readBuffer);
+						if (cmd == "")
+							break;
+						else
+						{
+							std::cout << "buffer sent to parsing : " << cmd << std::endl;
+							this->parsingCommand(cmd, it->second);
+						}
+						std::cout << "full buffer after: ["
+							<< it->second.readBuffer << "]" << std::endl;
+					}
 				}
-				std::cout << "buffer after parsing : " << it->second.readBuffer << std::endl;
-
 			}
 		}
 		it++;
@@ -345,7 +406,6 @@ void	Server::writeLoop()
 				else
 					it->second.writeBuffer.erase(it->second.writeBuffer.begin() + sendRet);
 				std::cout << sendRet << " bytes sent" << std::endl;
-				std::cout << "sent : " << it->second.writeBuffer << std::endl;
 			}
 		}
 		it++;
@@ -405,29 +465,42 @@ Channel	*Server::getChannelIfExist(std::string chanName)
 	return (NULL);
 }
 
-void	Server::broadcastAllClients(std::string &message)
+void	Server::broadcastAllClients(std::string message)
 {
 	for (std::map<int, Client>::iterator it = this->_clients.begin();
 		it != this->_clients.end(); it++)
 	{
-		it->second.writeBuffer += message;
+		it->second.writeToClient(message);
 	}
 }
 
-void	Server::broadcastChannel(Channel& targetChannel, std::string &message)
+void	Server::broadcastChannel(Channel& targetChannel, std::string message)
 {
-	targetChannel.broadcastAllClients(message);
+	targetChannel.broadcastToChannel(message);
 }
 
-bool Server::checkRawInput( std::string & rawInput )
+bool Server::checkRawInput( std::string & rawInput ) const
 {
-	std::size_t it = rawInput.find("\r\n");
-	if (it != std::string::npos)
+	std::size_t pos = rawInput.find(CRLF);
+	if (pos != std::string::npos)
 	{
-		rawInput.erase(rawInput.begin() + it, rawInput.end());
-		return true;
+		return (true);
 	}
-	return false;
+	return (false);
+}
+
+std::string	Server::extractCmd(std::string &rawInput)
+{
+	std::size_t pos = rawInput.find(CRLF);
+	if (pos != std::string::npos)
+	{
+		std::string cmd(rawInput, 0, pos);
+		std::cout << "cmd: [" << cmd << "]" << std::endl;
+		rawInput.erase(0, pos + 2);
+		std::cout << "new first letter: [" << rawInput[0] << "]" << std::endl;
+		return (cmd);
+	}
+	return ("");
 }
 
 void Server::parsingCommand( std::string & rawInput, Client & user )
@@ -455,83 +528,77 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 								"NICK",
 								"TOPIC",
 								"MODE",
-								"PRIVMSG"
+								"PRIVMSG",
+								"CAP"
 							};
 
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < 10; i++)
 	{
-		std::cout << "commands[i] : " << commands[i] << std::endl;
 		if (commands[i] == rawCommand)
 		{
-			std::cout << "index = " << index << std::endl;
 			index = i;
-			std::cout << "index = " << index << std::endl;
+			std::cout << "found a " << commands[i] << " comparing with ["
+				<< rawCommand << "]" << std::endl;
 			break ;
 		}
 	}
 	switch (index)
 	{
-	case 0 :
-	{
-		Kick newKick(*this, user, rawInput);
-		break;
-	}
-
-	case 1 :
-	{
-		std::cout << "need to create JOIN command" << std::endl;
-		break;
-	}
-
-	case 2 :
-	{
-		std::cout << "need to create INVITE command" << std::endl;
-		break;
-	}
-
-	case 3 :
-	{
-		std::cout << "need to create USER command" << std::endl;
-		break;
-	}
-
-	case 4 :
-	{
-		std::cout << "need to create OPER command" << std::endl;
-		break;
-	}
-
-	case 5 :
-	{
-		std::cout << "need to create NICK command" << std::endl;
-		break;
-	}
-
-	case 6 :
-	{
-		std::cout << "need to create TOPIC command" << std::endl;
-		break;
-	}
-
-	case 7 :
-	{
-		std::cout << "need to create MODE command" << std::endl;
-		break;
-	}
-
-	case 8 :
-	{
-		std::cout << "need to create PRIVMSG command" << std::endl;
-		break;
-	}
-
-	default:
-	{
-		std::cerr << "invalid command" << std::endl;
-		break;
-	}
+		case 0 :
+		{
+			Kick(*this, user, rawInput);
+			break;
+		}
+		case 1 :
+		{
+			Join(*this, user, rawInput);
+			break;
+		}
+		case 2 :
+		{
+			std::cout << "need to create INVITE command" << std::endl;
+			break;
+		}
+		case 3 :
+		{
+			User(*this, user, rawInput);
+			break;
+		}
+		case 4 :
+		{
+			std::cout << "need to create OPER command" << std::endl;
+			break;
+		}
+		case 5 :
+		{
+			Nick(*this, user, rawInput);
+			break;
+		}
+		case 6 :
+		{
+			std::cout << "need to create TOPIC command" << std::endl;
+			break;
+		}
+		case 7 :
+		{
+			std::cout << "need to create MODE command" << std::endl;
+			break;
+		}
+		case 8 :
+		{
+			std::cout << "need to create PRIVMSG command" << std::endl;
+			break;
+		}
+		case 9 :
+		{
+			std::cout << "CAP recognised, continuing" << std::endl;
+			break;
+		}
+		default:
+		{
+			std::cerr << "invalid command" << std::endl;
+			break;
+		}
 	}
 	rawInput.clear();
-
-
 }

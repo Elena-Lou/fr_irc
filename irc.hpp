@@ -36,7 +36,16 @@
 # include "Client.hpp"
 # include "Channel.hpp"
 # include "Kick.hpp"
+# include "Join.hpp"
+# include "User.hpp"
+# include "Nick.hpp"
+# include <ctime>
 
+# define RPL_WELCOME "001"
+# define RPL_YOURHOST "002"
+# define RPL_CREATED "003"
+# define RPL_INFO "004"
+# define RPL_ISUPPORT "005"
 # define RPL_TOPIC 332
 # define ERR_NOSUCHCHANNEL 403
 # define ERR_TOOMANYCHANNELS 405
@@ -47,12 +56,31 @@
 # define ERR_USERNOTINCHANNEL 441
 # define ERR_NOTONCHANNEL 442
 # define ERR_NEEDMOREPARAMS 461
+# define ERR_ALREADYREGISTERED 462
 # define ERR_CHANNELISFULL 471
 # define ERR_INVITEONLYCHAN 473
 # define ERR_BANNEDFROMCHAN 474
 # define ERR_BADCHANNELKEY 475
 # define ERR_BADCHANMASK 476
 # define ERR_CHANOPRIVSNEEDED 482
+
+# define ERR_NOSUCHCHANNEL_S "403"
+# define ERR_TOOMANYCHANNELS_S "405"
+# define ERR_NONICKNAMEGIVEN_S "431"
+# define ERR_ERRONEUSNICKNAME_S "432"
+# define ERR_NICKNAMEINUSE_S "433"
+# define ERR_NICKCOLLISION_S "436"
+# define ERR_USERNOTINCHANNEL_S "441"
+# define ERR_NOTONCHANNEL_S "442"
+# define ERR_NEEDMOREPARAMS_S "461"
+# define ERR_ALREADYREGISTERED_S "462"
+# define ERR_CHANNELISFULL_S "471"
+# define ERR_INVITEONLYCHAN_S "473"
+# define ERR_BANNEDFROMCHAN_S "474"
+# define ERR_BADCHANNELKEY_S "475"
+# define ERR_BADCHANMASK_S "476"
+# define ERR_CHANOPRIVSNEEDED_S "482"
+
 
 # define ERR_NOSUCHCHANNEL_MSG "No such channel"
 # define ERR_TOOMANYCHANNELS_MSG "You have joined too many channels"
@@ -63,6 +91,7 @@
 # define ERR_USERNOTINCHANNEL_MSG "They aren't on that channel"
 # define ERR_NOTONCHANNEL_MSG "You're not on that channel"
 # define ERR_NEEDMOREPARAMS_MSG "Not enough parameters"
+# define ERR_ALREADYREGISTERED_MSG "You may not reregister"
 # define ERR_CHANNELISFULL_MSG "Cannot join channel (+l)"
 # define ERR_INVITEONLYCHAN_MSG "Cannot join channel (+i)"
 # define ERR_BANNEDFROMCHAN_MSG "Cannot join channel (+b)"

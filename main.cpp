@@ -23,7 +23,7 @@ void sigIntHandler(int signal)
 
 int main( int ac, char** av ) {
 
-	if (ac != 2)
+	if (ac < 2 || ac > 3)
 	{
 		std::cerr << "usage: ./ircserv port_to_use" << std::endl;
 		return (1);
@@ -33,13 +33,19 @@ int main( int ac, char** av ) {
 	{
 		std::signal(SIGINT, sigIntHandler);
 
-		Server	myIrc(av[1]);
+		std::string password;
+		if (ac == 3)
+			password = av[2];
+		Server	myIrc(av[1], password.c_str());
 		std::cout << "entering the while loop" << std::endl;
 		/* WAITING FOR CONNECTIONS LOOP */
 		while(1)
 		{
 			if (myIrc.fillSets())
+			{
+				std::cerr << "Error building the sets" << std::endl;
 				break;
+			}
 			/* Check socket for new connections */
 			// std::cout << "Waiting for connections..." << std::endl;
 			myIrc.checkNewConnections();

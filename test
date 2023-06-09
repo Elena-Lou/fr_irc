@@ -1,0 +1,105 @@
+<< CAP LS
+<< NICK event
+<< USER event event irc.freenode.net :dell
+>> :*.freenode.net NOTICE * :*** Looking up your ident...
+>> :*.freenode.net NOTICE * :*** Looking up your hostname...
+>> :*.freenode.net CAP * LS :account-notify account-tag away-notify batch cap-notify chghost draft/relaymsg echo-message extended-join inspircd.org/poison inspircd.org/standard-replies invite-notify labeled-response message-tags multi-prefix sasl server-time setname userhost-in-names 
+<< CAP REQ :multi-prefix
+>> PING :~yufRZvTHW
+<< PONG :~yufRZvTHW
+>> :*.freenode.net CAP event ACK :multi-prefix
+<< CAP END
+>> :*.freenode.net NOTICE event :*** Your hostname does not match up with your IP address; using your IP address (62.210.35.9) instead.
+>> :*.freenode.net NOTICE event :*** Ident lookup timed out, using ~event instead.
+>> :*.freenode.net 001 event :Welcome to the freenode IRC Network event!~event@62.210.35.9
+<< MODE event +i
+>> :*.freenode.net 002 event :Your host is *.freenode.net, running version InspIRCd-3
+>> :*.freenode.net 003 event :This server was created 23:06:04 Apr 20 2022
+>> :*.freenode.net 004 event *.freenode.net InspIRCd-3 BDHILRSTWcdghikorswxz ABCDEFIJKLMNOPQRSTUWXYZbcdefhijklmnoprstuvwz :BEFIJLWXYZbdefhjklovw
+>> :*.freenode.net 005 event ACCEPT=30 AWAYLEN=200 BOT=B CALLERID=g CASEMAPPING=ascii CHANLIMIT=#:20 CHANMODES=IXZbew,k,BEFJLWdfjl,ACDKMNOPQRSTUcimnprstuz CHANNELLEN=64 CHANTYPES=# ELIST=CMNTU ESILENCE=CcdiNnPpTtx EXCEPTS=e :are supported by this server
+>> :*.freenode.net 005 event EXTBAN=,ACNOQRSTUacjmnpruwz HOSTLEN=64 INVEX=I KEYLEN=32 KICKLEN=255 LINELEN=512 MAXLIST=I:100,X:100,b:100,e:100,w:100 MAXTARGETS=20 MODES=20 MONITOR=30 NAMELEN=128 NAMESX NETWORK=freenode :are supported by this server
+>> :*.freenode.net 005 event NICKLEN=30 PREFIX=(Yohv)!@%+ REMOVE SAFELIST SECURELIST=60 SILENCE=32 STATUSMSG=!@%+ TOPICLEN=390 UHNAMES USERIP USERLEN=10 USERMODES=,,s,BDHILRSTWcdghikorwxz VBANLIST :are supported by this server
+>> :*.freenode.net 005 event VLIST=b WATCH=32 WHOX :are supported by this server
+>> :*.freenode.net 251 event :There are 18 users and 8413 invisible on 9 servers
+>> :*.freenode.net 252 event 7 :operator(s) online
+>> :*.freenode.net 253 event 18 :unknown connections
+>> :*.freenode.net 254 event 12046 :channels formed
+>> :*.freenode.net 255 event :I have 3376 clients and 1 servers
+>> :*.freenode.net 265 event :Current local users: 3376  Max: 4987
+>> :*.freenode.net 266 event :Current global users: 8431  Max: 10916
+>> :*.freenode.net 375 event :*.freenode.net message of the day
+>> :*.freenode.net 372 event :  Hello, World!
+>> :*.freenode.net 372 event : 
+>> :*.freenode.net 372 event :  Welcome to the
+>> :*.freenode.net 372 event :          __                               _
+>> :*.freenode.net 372 event :         / _|_ __ ___  ___ _ __   ___   __| | ___
+>> :*.freenode.net 372 event :        | |_| '__/ _ \/ _ \ '_ \ / _ \ / _` |/ _ \
+>> :*.freenode.net 372 event :        |  _| | |  __/  __/ | | | (_) | (_| |  __/
+>> :*.freenode.net 372 event :        |_| |_|  \___|\___|_| |_|\___/ \__,_|\___|
+>> :*.freenode.net 372 event :                                   AUTONOMOUS ZONE
+>> :*.freenode.net 372 event : 
+>> :*.freenode.net 372 event :  Connect to us on:
+>> :*.freenode.net 372 event : 
+>> :*.freenode.net 372 event :  Hostname: irc.freenode.net / chat.freenode.net
+>> :*.freenode.net 372 event :  Plaintext: 6660-6669
+>> :*.freenode.net 372 event :  TLS/SSL: 6697,7000,7070
+>> :*.freenode.net 372 event :  Webchat: https://webchat.freenode.net
+>> :*.freenode.net 372 event : 
+>> :*.freenode.net 372 event :  By connecting to freenode you indicate that you have read and accept our
+>> :*.freenode.net 372 event :  policies and guidelines as set out on https://freenode.net and agree to
+>> :*.freenode.net 372 event :  be scanned for an open proxy.
+>> :*.freenode.net 372 event : 
+>> :*.freenode.net 372 event :  If you are looking for assistance, please try:
+>> :*.freenode.net 372 event : 
+>> :*.freenode.net 372 event :  #help                    - Help with general IRC and Services.
+>> :*.freenode.net 372 event :  #chanhelp                - Help with channels and channel services.
+>> :*.freenode.net 372 event :  #IRC                     - Help with the IRC.com by freenode app.
+>> :*.freenode.net 372 event : 
+>> :*.freenode.net 372 event :  Checkout some of our communities and services:
+>> :*.freenode.net 372 event : 
+>> :*.freenode.net 372 event :  #freenode-bbs            - BBS [https://bbs.freenode.net/]
+>> :*.freenode.net 372 event :  #freenode-bbs-discussion - BBS Discussion
+>> :*.freenode.net 372 event :  #freenode-jobs           - Jobs [https://jobs.freenode.net/]
+>> :*.freenode.net 372 event :  #freenode                - Chat about freenode.
+>> :*.freenode.net 372 event :  #anonchan                - Chat anonymously.
+>> :*.freenode.net 372 event : 
+>> :*.freenode.net 372 event :  Type /join #<channel>
+>> :*.freenode.net 372 event : 
+>> :*.freenode.net 372 event :  Thank you for using freenode!
+>> :*.freenode.net 376 event :End of message of the day.
+>> :*.freenode.net 396 event freenode-2n8.unl.6vib9m.IP :is now your displayed host
+>> :event!~event@freenode-2n8.unl.6vib9m.IP MODE event :+wRix
+<< PING *.freenode.net
+>> :*.freenode.net PONG *.freenode.net :*.freenode.net
+--> lag pong
+<< JOIN #test
+>> :event!~event@freenode-2n8.unl.6vib9m.IP JOIN :#test
+>> :*.freenode.net 353 event = #test :darkphoenix ynhuser|11189 yhpark_talk______ event unsigned antoine49 memleak_bot Mobius
+>> :*.freenode.net 366 event #test :End of /NAMES list.
+<< MODE #test
+>> :*.freenode.net 324 event #test :+nt
+--> chanquery mode
+<< WHO #test
+>> :*.freenode.net 329 event #test :1675618005
+--> event 329
+>> :*.freenode.net 352 event #test darkphnx freenode-jo8546.7t3s.ckrk.8fsqam.IP *.freenode.net darkphoenix Hs :0 Jonas B
+--> silent event who
+>> :*.freenode.net 352 event #test ~thelounge freenode-bcv.4ng.41oisr.IP *.freenode.net ynhuser|11189 Hs :0 The Lounge User
+--> silent event who
+>> :*.freenode.net 352 event #test ~a9908de0 freenode-p1r.qpm.caplvp.IP *.freenode.net yhpark_talk______ Hs :0 yhpark
+--> silent event who
+>> :*.freenode.net 352 event #test ~event freenode-2n8.unl.6vib9m.IP *.freenode.net event H :0 dell
+--> silent event who
+>> :*.freenode.net 352 event #test ~unsigned freenode/user/unsigned *.freenode.net unsigned G :0 Unsigned.to.the.nth
+--> silent event who
+>> :*.freenode.net 352 event #test ~antoine freenode-nda.1d0.9166ff.IP *.freenode.net antoine49 Hs :0 Antoine
+--> silent event who
+>> :*.freenode.net 352 event #test ~matrixbot freenode-b9i.v8b.i66cub.IP *.freenode.net memleak_bot Hs :0 matrixbot
+--> silent event who
+>> :*.freenode.net 352 event #test ~Mobius freenode-bgod7p.6ouc.no50.q4asrn.IP *.freenode.net Mobius Gs :0 Mobius
+--> silent event who
+>> :*.freenode.net 315 event #test :End of /WHO list.
+--> chanquery who end
+<< MODE #test b
+>> :*.freenode.net 368 event #test :End of channel ban list
+--> chanquery ban end

@@ -5,7 +5,9 @@ SRCS =	main.cpp\
 		Client.cpp\
 		Channel.cpp\
 		ACommand.cpp\
-		Nick.cpp \
+		Nick.cpp\
+		User.cpp\
+		Join.cpp\
 		Kick.cpp
 
 CXX = c++

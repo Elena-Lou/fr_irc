@@ -18,9 +18,11 @@ class Nick : public ACommand
 
 	private:
 		Nick();
-		void	execute() const;
+		void	execute();
 		void	confirm() const;
 		void	error(int errorCode) const;
+
+		std::string	newName;
 };
 
 #endif

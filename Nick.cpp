@@ -1,6 +1,7 @@
 # include "ACommand.hpp"
 # include "Nick.hpp"
 # include "Client.hpp"
+# include "Server.hpp"
 
 Nick::Nick() : ACommand()
 {
@@ -24,19 +25,20 @@ Nick::Nick(const Nick &source) : ACommand(source)
 Nick &Nick::operator=(const Nick &rhs)
 {
 	this->_cmd = rhs._cmd;
+	this->_server = rhs._server;
 	this->_author = rhs._author;
 	return (*this);
 }
 
-void Nick::execute() const
+void Nick::execute()
 {
 	if (this->_cmd.size() != 2)
 	{
 		error(ERR_NONICKNAMEGIVEN);
 		return ;
 	}
-	std::string newName = this->_cmd[1];
-	for (unsigned int i = 0; i < newName.size(); i++)
+	this->newName = this->_cmd[1];
+	for (unsigned int i = 0; i < this->newName.size(); i++)
 	{
 		if (!isalpha(newName[i]))
 		{
@@ -44,46 +46,56 @@ void Nick::execute() const
 			return ;
 		}
 	}
-
-	if (!this->_server->isUserConnected(newName))
+	if (this->_author->getNickname() == this->newName)
+		return ;
+	while (this->_server->nicknameAlreadyInUse(*this->_author, this->newName))
 	{
+		if (this->_author->getUsername() == "")
+		{
+			this->newName += '_';
+			continue;
+		}
 		error(ERR_NICKNAMEINUSE);
 		return ;
 	}
-
 	//No condition for ERR_NICKCOLLISION not required by subject
-	std::string message;
-	message += this->_author->getNickname() + " changed his nickname to " + newName + ".\r\n";
 	this->confirm();
 }
 
 void Nick::error(int errorCode) const
 {
-	std::stringstream errorMessage;
-	errorMessage << ":" << this->_server->getHostname() << " " << errorCode << " "
-	<< this->_author->getNickname();
 	switch (errorCode)
 	{
 		case ERR_NONICKNAMEGIVEN:
-			errorMessage << " :" << ERR_NONICKNAMEGIVEN_MSG << CRLF;
-			break;
+		{
+			this->_author->writeRPLToClient(this->_server,
+					ERR_NONICKNAMEGIVEN_S, ERR_NONICKNAMEGIVEN_MSG);
+			return;
+		}
 		case ERR_ERRONEUSNICKNAME:
-			errorMessage << this->_cmd[1] << " :" << ERR_ERRONEUSNICKNAME_MSG << CRLF;
-			break;
+		{
+			this->_author->writeRPLToClient(this->_server, ERR_ERRONEUSNICKNAME_S,
+					this->_cmd[1], ERR_ERRONEUSNICKNAME_MSG);
+			return;
+		}
 		case ERR_NICKNAMEINUSE:
-			errorMessage << this->_cmd[1] << " :" << ERR_NICKNAMEINUSE_MSG << CRLF;
+		{
+			this->_author->writeRPLToClient(this->_server, ERR_NICKNAMEINUSE_S,
+					this->_cmd[1], ERR_NICKNAMEINUSE_MSG);
 			break;
+		}
 		default:
 			std::cerr << "Error: Unrecognised error code." << std::endl;
 			break;
 	}
-	this->_author->writeBuffer += errorMessage.str();
 }
 
 void	Nick::confirm() const
 {
-	std::stringstream replyMessageBuilder;
-	replyMessageBuilder << ":" << this->_author->getFullName() << this->_cmd[0] << " "  << this->_cmd[1];
-	std::string replyMessage = replyMessageBuilder.str();
-	this->_server->broadcastAllClients(replyMessage);
+	std::stringstream msgBuilder;
+	if (this->_author->getNickname() == "")
+		this->_author->setNickname("*");
+	msgBuilder << ":" << this->_author->getFullName() << " NICK " << this->newName;
+	this->_author->setNickname(this->newName);
+	this->_server->broadcastAllClients(msgBuilder.str());
 }

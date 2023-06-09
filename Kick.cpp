@@ -32,7 +32,7 @@ Kick::~Kick()
 	std::cout << "KICK destructor" << std::endl;
 }
 
-void Kick::execute() const
+void Kick::execute()
 {
 	if (this->_cmd.size() < 3)
 	{

@@ -23,7 +23,7 @@ class Server
 	public:
 		Server();
 		~Server();
-		Server(const char *portNumber);
+		Server(const char *portNumber, const char *password = "");
 		Server(const Server &source);
 		Server& operator=(const Server &rhs);
 
@@ -35,6 +35,9 @@ class Server
 		const std::string		&getHostname() const;
 		std::map<int, Client>	&getClients();
 		std::deque<Channel>		&getChannels();
+		bool	isPasswordProtected() const { return (this->_restricted);};
+		std::string	getStartTime() const;
+
 
 		/* Client handlers */
 		void	connectUser(int);
@@ -43,6 +46,7 @@ class Server
 		void	checkNewConnections();
 		bool	isUserConnected(std::string) const;
 		Client	*getUserIfConnected(std::string nickName);
+		bool	nicknameAlreadyInUse(const Client &user, std::string nickname) const;
 
 		/* Channel handlers */
 		void	createChannel(std::string, Client&);
@@ -56,14 +60,16 @@ class Server
 		void	writeLoop();
 
 		/* messages */
-		void	broadcastAllClients(std::string &msg);
-		void	broadcastChannel(Channel& targetChan, std::string &msg);
+		void	broadcastAllClients(std::string message);
+		void	broadcastChannel(Channel& targetChan, std::string message);
 
 		/* COMMANDS */
 		void	JOIN(ACommand &placeholder);
+
 		/* parsing commands */
-		bool	checkRawInput(std::string & rawInput);
-		void	parsingCommand(std::string & rawInput, Client & user);
+		bool		checkRawInput(std::string & rawInput) const;
+		std::string	extractCmd(std::string &rawInput);
+		void		parsingCommand(std::string & rawInput, Client & user);
 
 		/* exceptions */
 		class CannotRetrieveAddrinfoException : public std::exception
@@ -85,9 +91,12 @@ class Server
 		};
 
 	private:
+		bool			_restricted;
+		std::string		_password;
 		int				_socketFD;
 		int				_fdMax;
 		std::string	_hostname;
+		struct tm	*_startTime;
 		fd_set		_masterSet;
 		fd_set		_readingSet;
 		fd_set		_writingSet;
