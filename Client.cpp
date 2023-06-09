@@ -134,8 +134,10 @@ void	Client::writeRPLToClient(Server *server, int RPL, std::string message)
 {
 	std::stringstream replyMessageBuilder;
 	replyMessageBuilder << ":" << server->getHostname() << " " <<
-		std::setw(3) << std::setfill('0') << RPL
-		<< " " << this->_nickname << " :" << message << CRLF;
+		std::setw(3) << std::setfill('0') << RPL;
+	if (this->_nickname != "")
+		replyMessageBuilder << " " << this->_nickname;
+	replyMessageBuilder << " :" << message << CRLF;
 	this->writeBuffer += replyMessageBuilder.str();
 }
 
@@ -143,7 +145,9 @@ void	Client::writeRPLToClient(Server *server, int RPL, std::string additionalSou
 {
 	std::stringstream replyMessageBuilder;
 	replyMessageBuilder << ":" << server->getHostname() << " " <<
-		std::setw(3) << std::setfill('0') << RPL
-		<< " " << this->_nickname << " " << additionalSource << " :" << message << CRLF;
+		std::setw(3) << std::setfill('0') << RPL;
+	if (this->_nickname != "")
+		replyMessageBuilder << " " << this->_nickname;
+	replyMessageBuilder << " " << additionalSource << " :" << message << CRLF;
 	this->writeBuffer += replyMessageBuilder.str();
 }
