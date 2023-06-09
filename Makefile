@@ -45,6 +45,9 @@ re: clean
 test: $(NAME)
 		./$(NAME) 3490
 
+testp: $(NAME)
+		./$(NAME) 3490 password
+
 vtest:	$(NAME)
 		valgrind --leak-check=full --track-fds=yes ./$(NAME)
 
