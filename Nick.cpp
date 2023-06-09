@@ -69,19 +69,19 @@ void Nick::error(int errorCode) const
 		case ERR_NONICKNAMEGIVEN:
 		{
 			this->_author->writeRPLToClient(this->_server,
-					ERR_NONICKNAMEGIVEN_S, ERR_NONICKNAMEGIVEN_MSG);
+					ERR_NONICKNAMEGIVEN, MSG_NONICKNAMEGIVEN);
 			return;
 		}
 		case ERR_ERRONEUSNICKNAME:
 		{
-			this->_author->writeRPLToClient(this->_server, ERR_ERRONEUSNICKNAME_S,
-					this->_cmd[1], ERR_ERRONEUSNICKNAME_MSG);
+			this->_author->writeRPLToClient(this->_server, ERR_ERRONEUSNICKNAME,
+					this->_cmd[1], MSG_ERRONEUSNICKNAME);
 			return;
 		}
 		case ERR_NICKNAMEINUSE:
 		{
-			this->_author->writeRPLToClient(this->_server, ERR_NICKNAMEINUSE_S,
-					this->_cmd[1], ERR_NICKNAMEINUSE_MSG);
+			this->_author->writeRPLToClient(this->_server, ERR_NICKNAMEINUSE,
+					this->_cmd[1], MSG_NICKNAMEINUSE);
 			break;
 		}
 		default:

@@ -279,6 +279,11 @@ std::string	Server::getStartTime() const
 	return (asctime(this->_startTime));
 }
 
+std::string	Server::getPassword() const
+{
+	return (this->_password);
+}
+
 int		Server::fillSets()
 {
 	/* inits timeval struct to shut down after MYIRC_TIMEOUT seconds of inactivity */
@@ -529,10 +534,11 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 								"TOPIC",
 								"MODE",
 								"PRIVMSG",
-								"CAP"
+								"CAP",
+								"PASS"
 							};
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 11; i++)
 	{
 		if (commands[i] == rawCommand)
 		{
@@ -592,6 +598,11 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 		case 9 :
 		{
 			std::cout << "CAP recognised, continuing" << std::endl;
+			break;
+		}
+		case 10 :
+		{
+			Pass(*this, user, rawInput);
 			break;
 		}
 		default:

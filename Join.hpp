@@ -1,8 +1,7 @@
 #ifndef JOIN_HPP
 # define JOIN_HPP
 
-# include <list>
-# include <string>
+# include "irc.hpp"
 # include "ACommand.hpp"
 
 class Client;

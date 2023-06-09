@@ -54,16 +54,21 @@ void User::error(int errorCode) const
 	switch (errorCode)
 	{
 		case ERR_NEEDMOREPARAMS:
-			errorMessage << this->_cmd[1] << " :" << ERR_NEEDMOREPARAMS_MSG << CRLF;
+		{
+			this->_author->writeRPLToClient(this->_server, ERR_NEEDMOREPARAMS,
+				this->_cmd[1],  MSG_NEEDMOREPARAMS);
 			break;
+		}
 		case ERR_ALREADYREGISTERED:
-			errorMessage << " :" << ERR_ERRONEUSNICKNAME_MSG << CRLF;
+		{
+			this->_author->writeRPLToClient(this->_server, ERR_ALREADYREGISTERED,
+				MSG_ALREADYREGISTERED);
 			break;
+		}
 		default:
 			std::cerr << "Error: Unrecognised error code." << std::endl;
 			break;
 	}
-	this->_author->writeBuffer += errorMessage.str();
 }
 
 void	User::confirm() const
@@ -90,15 +95,10 @@ void	User::confirm() const
 		this->_author->setRealname(this->_cmd[1]);
 
 	this->_author->confirmRegistration();
-
-
-	//broadcast all
-	// RPL_WELCOME
 	this->sendRPLWELCOME();
 	this->sendRPLYOURHOST();
 	this->sendRPLCREATED();
 	this->sendRPLISUPPORT();
-	//this->_server->broadcastAllClients(replyMessage);
 }
 
 void	User::sendRPLWELCOME() const

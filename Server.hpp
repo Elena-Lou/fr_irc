@@ -36,7 +36,8 @@ class Server
 		std::map<int, Client>	&getClients();
 		std::deque<Channel>		&getChannels();
 		bool	isPasswordProtected() const { return (this->_restricted);};
-		std::string	getStartTime() const;
+		std::string				getStartTime() const;
+		std::string				getPassword() const;
 
 
 		/* Client handlers */

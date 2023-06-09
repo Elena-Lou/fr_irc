@@ -31,8 +31,8 @@ class Client
 
 		/* writing */
 		void	writeToClient(std::string message);
-		void	writeRPLToClient(Server *server, std::string RPL, std::string message);
-		void	writeRPLToClient(Server *server, std::string RPL, std::string additionalSource, std::string message);
+		void	writeRPLToClient(Server *server, int RPL, std::string message);
+		void	writeRPLToClient(Server *server, int RPL, std::string additionalSource, std::string message);
 
 		/* channel handlers */
 		int		isInChannel(Channel&) const;

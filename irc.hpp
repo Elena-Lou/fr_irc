@@ -39,13 +39,14 @@
 # include "Join.hpp"
 # include "User.hpp"
 # include "Nick.hpp"
+# include "Pass.hpp"
 # include <ctime>
 
-# define RPL_WELCOME "001"
-# define RPL_YOURHOST "002"
-# define RPL_CREATED "003"
-# define RPL_INFO "004"
-# define RPL_ISUPPORT "005"
+# define RPL_WELCOME 1
+# define RPL_YOURHOST 2
+# define RPL_CREATED 3
+# define RPL_INFO 4
+# define RPL_ISUPPORT 5
 # define RPL_TOPIC 332
 # define ERR_NOSUCHCHANNEL 403
 # define ERR_TOOMANYCHANNELS 405
@@ -57,6 +58,7 @@
 # define ERR_NOTONCHANNEL 442
 # define ERR_NEEDMOREPARAMS 461
 # define ERR_ALREADYREGISTERED 462
+# define ERR_PASSWDMISMATCH 464
 # define ERR_CHANNELISFULL 471
 # define ERR_INVITEONLYCHAN 473
 # define ERR_BANNEDFROMCHAN 474
@@ -64,40 +66,23 @@
 # define ERR_BADCHANMASK 476
 # define ERR_CHANOPRIVSNEEDED 482
 
-# define ERR_NOSUCHCHANNEL_S "403"
-# define ERR_TOOMANYCHANNELS_S "405"
-# define ERR_NONICKNAMEGIVEN_S "431"
-# define ERR_ERRONEUSNICKNAME_S "432"
-# define ERR_NICKNAMEINUSE_S "433"
-# define ERR_NICKCOLLISION_S "436"
-# define ERR_USERNOTINCHANNEL_S "441"
-# define ERR_NOTONCHANNEL_S "442"
-# define ERR_NEEDMOREPARAMS_S "461"
-# define ERR_ALREADYREGISTERED_S "462"
-# define ERR_CHANNELISFULL_S "471"
-# define ERR_INVITEONLYCHAN_S "473"
-# define ERR_BANNEDFROMCHAN_S "474"
-# define ERR_BADCHANNELKEY_S "475"
-# define ERR_BADCHANMASK_S "476"
-# define ERR_CHANOPRIVSNEEDED_S "482"
-
-
-# define ERR_NOSUCHCHANNEL_MSG "No such channel"
-# define ERR_TOOMANYCHANNELS_MSG "You have joined too many channels"
-# define ERR_NONICKNAMEGIVEN_MSG "No nickname given"
-# define ERR_ERRONEUSNICKNAME_MSG "Erroneus nickname"
-# define ERR_NICKNAMEINUSE_MSG "Nickname is already in use"
-# define ERR_NICKCOLLISION_MSG "Nickname collision KILL from "
-# define ERR_USERNOTINCHANNEL_MSG "They aren't on that channel"
-# define ERR_NOTONCHANNEL_MSG "You're not on that channel"
-# define ERR_NEEDMOREPARAMS_MSG "Not enough parameters"
-# define ERR_ALREADYREGISTERED_MSG "You may not reregister"
-# define ERR_CHANNELISFULL_MSG "Cannot join channel (+l)"
-# define ERR_INVITEONLYCHAN_MSG "Cannot join channel (+i)"
-# define ERR_BANNEDFROMCHAN_MSG "Cannot join channel (+b)"
-# define ERR_BADCHANNELKEY_MSG "Cannot join channel (+k)"
-# define ERR_BADCHANMASK_MSG "Bad Channel Mask"
-# define ERR_CHANOPRIVSNEEDED_MSG "You're not channel operator"
+# define MSG_NOSUCHCHANNEL "No such channel"
+# define MSG_TOOMANYCHANNELS "You have joined too many channels"
+# define MSG_NONICKNAMEGIVEN "No nickname given"
+# define MSG_ERRONEUSNICKNAME "Erroneus nickname"
+# define MSG_NICKNAMEINUSE "Nickname is already in use"
+# define MSG_NICKCOLLISION "Nickname collision KILL from "
+# define MSG_USERNOTINCHANNEL "They aren't on that channel"
+# define MSG_NOTONCHANNEL "You're not on that channel"
+# define MSG_NEEDMOREPARAMS "Not enough parameters"
+# define MSG_ALREADYREGISTERED "You may not reregister"
+# define MSG_PASSWDMISMATCH "Password incorrect"
+# define MSG_CHANNELISFULL "Cannot join channel (+l)"
+# define MSG_INVITEONLYCHAN "Cannot join channel (+i)"
+# define MSG_BANNEDFROMCHAN "Cannot join channel (+b)"
+# define MSG_BADCHANNELKEY "Cannot join channel (+k)"
+# define MSG_BADCHANMASK "Bad Channel Mask"
+# define MSG_CHANOPRIVSNEEDED "You're not channel operator"
 
 # define CRLF "\r\n"
 
