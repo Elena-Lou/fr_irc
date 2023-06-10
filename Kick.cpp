@@ -6,13 +6,19 @@ Kick::Kick() : ACommand()
 
 Kick::Kick( Kick const & src ) : ACommand(src)
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "KICK copy constructor" << std::endl;
+#endif
 	*this = src;
 }
 
 Kick::Kick(Server &server, Client &user, std::string rawInput) : ACommand(server, user, rawInput)
 {
+#if SHOW_CONSTRUCTOR
 	std::cout << "KICK overloaded constructor" << std::endl;
 	std::cout << "client socketFD : " << this->_author->getSocketFD() << std::endl;
+#endif
+	this->_foundChannel = NULL;
 	this->execute();
 }
 
@@ -23,13 +29,16 @@ Kick & Kick::operator=( Kick const & rhs )
 		this->_cmd = rhs._cmd;
 		this->_server = rhs._server;
 		this->_author = rhs._author;
+		this->_foundChannel = rhs._foundChannel;
 	}
 	return *this;
 }
 
 Kick::~Kick()
 {
+#if SHOW_CONSTRUCTOR
 	std::cout << "KICK destructor" << std::endl;
+#endif
 }
 
 void Kick::execute()
@@ -43,39 +52,42 @@ void Kick::execute()
 	}
 
 	/* Does the channel exist ? */
-	Channel *foundChannel;
-	if ((foundChannel = this->_server->getChannelIfExist(this->_cmd[1])) == NULL)
+	if ((this->_foundChannel = this->_server->getChannelIfExist(this->_cmd[1])) == NULL)
 	{
 		error(ERR_NOSUCHCHANNEL);
 		return ;
 	}
 
 	/* Is the user connected to that channel ? */
-	if (!foundChannel->isUserConnected(*(this->_author)))
+	if (!this->_foundChannel->isUserConnected(*(this->_author)))
 	{
 		error(ERR_NOTONCHANNEL);
 		return ;
 	}
 
 	/* Is the user a Channel Operator ? */
-	if (!foundChannel->isChannelOperator(*(this->_author)))
+	if (!this->_foundChannel->isChannelOperator(*(this->_author)))
 	{
 		error(ERR_CHANOPRIVSNEEDED);
 		return ;
 	}
 	/* Is the target_user the author wants to kick conected to that channel ?*/
 	Client *foundClient;
-	if ((foundClient = foundChannel->getUserIfConnected(this->_cmd[2])) == NULL)
+	if ((foundClient = this->_foundChannel->getUserIfConnected(this->_cmd[2])) == NULL)
 	{
 		error(ERR_NOTONCHANNEL);
 		return ;
 	}
-	if (foundChannel->removeUserFromChannel(*foundClient) == 0)
-		this->_server->destroyChannel(*foundChannel);
+	this->confirm();
+	if (this->_foundChannel->removeUserFromChannel(*foundClient) == 0)
+		this->_server->destroyChannel(*this->_foundChannel);
 }
 
 void	Kick::confirm() const
 {
+	std::stringstream msgBuilder;
+	msgBuilder << ":" << this->_author->getFullName() << " KICK" << this->_cmd[1] << " " << this->_cmd[2] << " :" << this->_author->getNickname();
+	this->_server->broadcastChannel(*this->_foundChannel, msgBuilder.str());
 }
 
 void Kick::error( int errorCode ) const
@@ -85,7 +97,7 @@ void Kick::error( int errorCode ) const
 		case ERR_NEEDMOREPARAMS:
 		{
 			this->_author->writeRPLToClient(this->_server,
-					ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS);
+					ERR_NEEDMOREPARAMS, this->_cmd[0], MSG_NEEDMOREPARAMS);
 			return;
 		}
 		case ERR_NOSUCHCHANNEL:
