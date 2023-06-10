@@ -72,6 +72,7 @@ void Kick::execute()
 		error(ERR_NOTONCHANNEL);
 		return ;
 	}
+	this->confirm();
 	if (this->_foundChannel->removeUserFromChannel(*foundClient) == 0)
 		this->_server->destroyChannel(*this->_foundChannel);
 }
