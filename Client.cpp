@@ -108,6 +108,11 @@ bool	Client::isPasswordOk() const
 	return (this->_passwordOK);
 }
 
+bool	Client::isRegistered() const
+{
+	return (this->_registered);
+}
+
 int	Client::isInChannel(Channel& toFind) const
 {
 	if (this->_connectedChannels.find(&toFind) != this->_connectedChannels.end())
@@ -150,4 +155,9 @@ void	Client::writeRPLToClient(Server *server, int RPL, std::string additionalSou
 		replyMessageBuilder << " " << this->_nickname;
 	replyMessageBuilder << " " << additionalSource << " :" << message << CRLF;
 	this->writeBuffer += replyMessageBuilder.str();
+}
+
+void	Client::writePrivmsg(std::string source, std::string dest, std::string msg)
+{
+	this->writeBuffer += ":" + source + " PRIVMSG " + dest + " :" + msg + CRLF;
 }

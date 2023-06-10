@@ -29,12 +29,14 @@ class Client
 		std::string getFullName() const;
 		const std::set<Channel*> &getConnectedChannels() const;
 		bool	isPasswordOk() const;
+		bool	isRegistered() const;
 
 
 		/* writing */
 		void	writeToClient(std::string message);
 		void	writeRPLToClient(Server *server, int RPL, std::string message);
 		void	writeRPLToClient(Server *server, int RPL, std::string additionalSource, std::string message);
+		void	writePrivmsg(std::string source, std::string dest, std::string msg);
 
 		/* channel handlers */
 		int		isInChannel(Channel&) const;

@@ -401,8 +401,8 @@ void	Server::writeLoop()
 	for (std::map<int, Client>::iterator it = this->_clients.begin();
 			it != this->_clients.end();)
 	{
-		/* Reading loop */
-		if (FD_ISSET(it->first, &(this->_readingSet))
+		/* Writing loop */
+		if (FD_ISSET(it->first, &(this->_writingSet))
 			&& it->second.writeBuffer.size())
 		{
 			//bzero((*it)->buffer, sizeof(char) * IRC_BUFFER_SIZE);
@@ -602,7 +602,7 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 		}
 		case 8 :
 		{
-			std::cout << "need to create PRIVMSG command" << std::endl;
+			Privmsg(*this, user, rawInput);
 			break;
 		}
 		case 9 :

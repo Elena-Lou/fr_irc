@@ -31,7 +31,7 @@
 # include <map>
 # include <exception>
 # include <csignal>
-#include <algorithm>
+# include <algorithm>
 # include "Server.hpp"
 # include "Client.hpp"
 # include "Channel.hpp"
@@ -40,6 +40,7 @@
 # include "User.hpp"
 # include "Nick.hpp"
 # include "Pass.hpp"
+# include "Privmsg.hpp"
 # include <ctime>
 
 # define RPL_WELCOME 1
@@ -48,8 +49,12 @@
 # define RPL_INFO 4
 # define RPL_ISUPPORT 5
 # define RPL_TOPIC 332
+# define ERR_NOSUCHNICK 401
 # define ERR_NOSUCHCHANNEL 403
+# define ERR_CANNOTSENDTOCHAN 404
 # define ERR_TOOMANYCHANNELS 405
+# define ERR_NORECIPIENT 411
+# define ERR_NOTEXTTOSEND 412
 # define ERR_NONICKNAMEGIVEN 431
 # define ERR_ERRONEUSNICKNAME 432
 # define ERR_NICKNAMEINUSE 433
@@ -66,8 +71,12 @@
 # define ERR_BADCHANMASK 476
 # define ERR_CHANOPRIVSNEEDED 482
 
+# define MSG_NOSUCHNICK "No such nick/channel"
+# define MSG_CANNOTSENDTOCHAN "Cannot send to channel"
 # define MSG_NOSUCHCHANNEL "No such channel"
 # define MSG_TOOMANYCHANNELS "You have joined too many channels"
+# define MSG_NORECIPIENT "No recipient given"
+# define MSG_NOTEXTTOSEND "No text to send"
 # define MSG_NONICKNAMEGIVEN "No nickname given"
 # define MSG_ERRONEUSNICKNAME "Erroneus nickname"
 # define MSG_NICKNAMEINUSE "Nickname is already in use"
