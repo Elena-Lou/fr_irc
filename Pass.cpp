@@ -59,7 +59,7 @@ void Pass::error(int errorCode) const
 	{
 		case ERR_NEEDMOREPARAMS:
 			this->_author->writeRPLToClient(this->_server,
-					ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS);
+					ERR_NEEDMOREPARAMS, this->_cmd[0], MSG_NEEDMOREPARAMS);
 			break;
 		case ERR_ALREADYREGISTERED:
 			this->_author->writeRPLToClient(this->_server,

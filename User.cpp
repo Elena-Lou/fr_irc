@@ -64,7 +64,7 @@ void User::error(int errorCode) const
 		case ERR_NEEDMOREPARAMS:
 		{
 			this->_author->writeRPLToClient(this->_server, ERR_NEEDMOREPARAMS,
-				this->_cmd[1],  MSG_NEEDMOREPARAMS);
+				this->_cmd[0],  MSG_NEEDMOREPARAMS);
 			break;
 		}
 		case ERR_ALREADYREGISTERED:
