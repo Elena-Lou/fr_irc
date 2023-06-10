@@ -28,6 +28,8 @@ Join &Join::operator=(const Join &rhs)
 
 void Join::execute()
 {
+	if (!this->_author->isRegistered())
+		return ;
 }
 
 void Join::error(int errorCode) const

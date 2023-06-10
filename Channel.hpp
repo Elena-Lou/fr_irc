@@ -37,6 +37,7 @@ class Channel
 
 		/* message */
 		void	broadcastToChannel(std::string message);
+		void	writePrivmsg(std::string source, std::string dest, std::string msg);
 
 	private:
 		Channel();

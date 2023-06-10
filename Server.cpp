@@ -602,7 +602,7 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 		}
 		case 8 :
 		{
-			std::cout << "need to create PRIVMSG command" << std::endl;
+			Privmsg(*this, user, rawInput);
 			break;
 		}
 		case 9 :
