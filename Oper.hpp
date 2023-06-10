@@ -16,8 +16,9 @@ class Oper : public ACommand
 		Oper(Oper const & src);
 		Oper &operator=(Oper const & rhs);
 
-		void	execute() const;
+		void	execute();
 		void	error(int) const;
+		void	confirm() const;
 
 	private:
 		Oper();
