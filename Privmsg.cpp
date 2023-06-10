@@ -15,7 +15,6 @@ Privmsg::~Privmsg()
 
 Privmsg::Privmsg(Server &server, Client &author, std::string rawInput) : ACommand(server, author, rawInput)
 {
-	std::cout << "built  a Privmsg class" << std::endl;
 	if (this->_cmd.size() >= 3)
 	{
 		int offset = rawInput.find(this->_cmd[2]);

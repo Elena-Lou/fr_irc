@@ -159,5 +159,5 @@ void	Client::writeRPLToClient(Server *server, int RPL, std::string additionalSou
 
 void	Client::writePrivmsg(std::string source, std::string dest, std::string msg)
 {
-	this->writeBuffer += ":" + source + " PRIVMSG " + dest + ":" + msg + CRLF;
+	this->writeBuffer += ":" + source + " PRIVMSG " + dest + " :" + msg + CRLF;
 }
