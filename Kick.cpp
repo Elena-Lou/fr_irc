@@ -6,14 +6,18 @@ Kick::Kick() : ACommand()
 
 Kick::Kick( Kick const & src ) : ACommand(src)
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "KICK copy constructor" << std::endl;
+#endif
 	*this = src;
 }
 
 Kick::Kick(Server &server, Client &user, std::string rawInput) : ACommand(server, user, rawInput)
 {
-
+#if SHOW_CONSTRUCTOR
 	std::cout << "KICK overloaded constructor" << std::endl;
 	std::cout << "client socketFD : " << this->_author->getSocketFD() << std::endl;
+#endif
 	this->_foundChannel = NULL;
 	this->execute();
 }
@@ -32,7 +36,9 @@ Kick & Kick::operator=( Kick const & rhs )
 
 Kick::~Kick()
 {
+#if SHOW_CONSTRUCTOR
 	std::cout << "KICK destructor" << std::endl;
+#endif
 }
 
 void Kick::execute()
@@ -91,7 +97,7 @@ void Kick::error( int errorCode ) const
 		case ERR_NEEDMOREPARAMS:
 		{
 			this->_author->writeRPLToClient(this->_server,
-					ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS);
+					ERR_NEEDMOREPARAMS, this->_cmd[0], MSG_NEEDMOREPARAMS);
 			return;
 		}
 		case ERR_NOSUCHCHANNEL:
