@@ -10,6 +10,7 @@ class Kick : public ACommand
 {
 	private:
 		Kick();
+		Channel* _foundChannel;
 
 	protected:
 	public:
