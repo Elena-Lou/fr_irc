@@ -15,7 +15,7 @@ Server::~Server()
 	close(this->_socketFD);
 }
 
-Server::Server(const char *portNumber, const char *password)
+Server::Server(const char *portNumber, std::string password)
 {
 #if SHOW_CONSTRUCTOR
 	std::cout << "Server char* char* constructor" << std::endl;
@@ -25,7 +25,7 @@ Server::Server(const char *portNumber, const char *password)
 	struct addrinfo hints;
 	struct addrinfo	*servinfo;
 
-	if (strlen(password))
+	if (password == "")
 		this->_restricted = false;
 	else
 	{
@@ -125,8 +125,21 @@ Server& Server::operator=(const Server &rhs)
 #if SHOW_CONSTRUCTOR
 	std::cout << "Server = overload" << std::endl;
 #endif
+	this->_restricted = rhs._restricted;
+	this->_password = rhs._password;
 	this->_socketFD = rhs._socketFD;
 	this->_fdMax = rhs._fdMax;
+	this->_hostname = rhs._hostname;
+	this->_startTime = rhs._startTime;
+	this->_masterSet = rhs._masterSet;
+	this->_readingSet = rhs._readingSet;
+	this->_writingSet = rhs._writingSet;
+	this->_pendingAddr = rhs._pendingAddr;
+	this->_pendingAddrSize = rhs._pendingAddrSize;
+	for (unsigned int i = 0; i < IRC_BUFFER_SIZE; i++)
+		this->buffer[i] = rhs.buffer[i];
+	this->_clients = rhs._clients;
+	this->_channels = rhs._channels;
 	return (*this);
 }
 
@@ -277,6 +290,11 @@ void	Server::disconnectUser(std::map<int, Client>::iterator clientIterator)
 std::string	Server::getStartTime() const
 {
 	return (asctime(this->_startTime));
+}
+
+std::string	Server::getPassword() const
+{
+	return (this->_password);
 }
 
 int		Server::fillSets()
@@ -495,9 +513,7 @@ std::string	Server::extractCmd(std::string &rawInput)
 	if (pos != std::string::npos)
 	{
 		std::string cmd(rawInput, 0, pos);
-		std::cout << "cmd: [" << cmd << "]" << std::endl;
 		rawInput.erase(0, pos + 2);
-		std::cout << "new first letter: [" << rawInput[0] << "]" << std::endl;
 		return (cmd);
 	}
 	return ("");
@@ -507,7 +523,7 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 {
 	std::cout << "parsingCommand - rawInput : [" << rawInput << "]" << std::endl;
 
-	int index = 9;
+	int index = -1;
 	std::string rawCommand;
 
 	for (size_t i = 0; i < rawInput.size(); i++)
@@ -518,8 +534,9 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 			break;
 		}
 	}
+	if (rawCommand == "")
+		rawCommand = rawInput;
 
-	std::cout << "rawCommand : " << rawCommand << std::endl;
 	std::string commands[] = { "KICK",
 								"JOIN",
 								"INVITE",
@@ -529,16 +546,15 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 								"TOPIC",
 								"MODE",
 								"PRIVMSG",
-								"CAP"
+								"CAP",
+								"PASS"
 							};
 
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 11; i++)
 	{
 		if (commands[i] == rawCommand)
 		{
 			index = i;
-			std::cout << "found a " << commands[i] << " comparing with ["
-				<< rawCommand << "]" << std::endl;
 			break ;
 		}
 	}
@@ -592,6 +608,11 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 		case 9 :
 		{
 			std::cout << "CAP recognised, continuing" << std::endl;
+			break;
+		}
+		case 10 :
+		{
+			Pass(*this, user, rawInput);
 			break;
 		}
 		default:

@@ -8,7 +8,8 @@ SRCS =	main.cpp\
 		Nick.cpp\
 		User.cpp\
 		Join.cpp\
-		Kick.cpp
+		Kick.cpp\
+		Pass.cpp
 
 CXX = c++
 
@@ -43,6 +44,9 @@ re: clean
 
 test: $(NAME)
 		./$(NAME) 3490
+
+testp: $(NAME)
+		./$(NAME) 3490 password
 
 vtest:	$(NAME)
 		valgrind --leak-check=full --track-fds=yes ./$(NAME)

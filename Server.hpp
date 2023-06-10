@@ -23,7 +23,7 @@ class Server
 	public:
 		Server();
 		~Server();
-		Server(const char *portNumber, const char *password = "");
+		Server(const char *portNumber, std::string password = "");
 		Server(const Server &source);
 		Server& operator=(const Server &rhs);
 
@@ -35,8 +35,9 @@ class Server
 		const std::string		&getHostname() const;
 		std::map<int, Client>	&getClients();
 		std::deque<Channel>		&getChannels();
-		bool	isPasswordProtected() const { return (this->_restricted);};
-		std::string	getStartTime() const;
+		bool					isPasswordProtected() const { return (this->_restricted);};
+		std::string				getStartTime() const;
+		std::string				getPassword() const;
 
 
 		/* Client handlers */

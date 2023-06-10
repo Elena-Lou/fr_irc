@@ -28,11 +28,22 @@ User &User::operator=(const User &rhs)
 {
 	this->_cmd = rhs._cmd;
 	this->_author = rhs._author;
+	this->_server = rhs._server;
 	return (*this);
 }
 
 void User::execute()
 {
+	if (this->_server->isPasswordProtected())
+	{
+		if (!this->_author->isPasswordOk())
+		{
+			//this->_server->disconnectUser(this->_author->getSocketFD());
+			return ;
+		}
+	}
+	else
+		this->_author->validatePassword();
 	if (this->_author->getUsername() != "")
 	{
 		error(ERR_ALREADYREGISTERED);
@@ -48,22 +59,24 @@ void User::execute()
 
 void User::error(int errorCode) const
 {
-	std::stringstream errorMessage;
-	errorMessage << ":" << this->_server->getHostname() << " " << errorCode << " "
-	<< this->_author->getNickname();
 	switch (errorCode)
 	{
 		case ERR_NEEDMOREPARAMS:
-			errorMessage << this->_cmd[1] << " :" << ERR_NEEDMOREPARAMS_MSG << CRLF;
+		{
+			this->_author->writeRPLToClient(this->_server, ERR_NEEDMOREPARAMS,
+				this->_cmd[1],  MSG_NEEDMOREPARAMS);
 			break;
+		}
 		case ERR_ALREADYREGISTERED:
-			errorMessage << " :" << ERR_ERRONEUSNICKNAME_MSG << CRLF;
+		{
+			this->_author->writeRPLToClient(this->_server, ERR_ALREADYREGISTERED,
+				MSG_ALREADYREGISTERED);
 			break;
+		}
 		default:
 			std::cerr << "Error: Unrecognised error code." << std::endl;
 			break;
 	}
-	this->_author->writeBuffer += errorMessage.str();
 }
 
 void	User::confirm() const
@@ -90,15 +103,10 @@ void	User::confirm() const
 		this->_author->setRealname(this->_cmd[1]);
 
 	this->_author->confirmRegistration();
-
-
-	//broadcast all
-	// RPL_WELCOME
 	this->sendRPLWELCOME();
 	this->sendRPLYOURHOST();
 	this->sendRPLCREATED();
 	this->sendRPLISUPPORT();
-	//this->_server->broadcastAllClients(replyMessage);
 }
 
 void	User::sendRPLWELCOME() const

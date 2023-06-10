@@ -27,11 +27,22 @@ Nick &Nick::operator=(const Nick &rhs)
 	this->_cmd = rhs._cmd;
 	this->_server = rhs._server;
 	this->_author = rhs._author;
+	this->newName = rhs.newName;
 	return (*this);
 }
 
 void Nick::execute()
 {
+	if (this->_server->isPasswordProtected())
+	{
+		if (!this->_author->isPasswordOk())
+		{
+			//this->_server->disconnectUser(this->_author->getSocketFD());
+			return;
+		}
+	}
+	else
+		this->_author->validatePassword();
 	if (this->_cmd.size() != 2)
 	{
 		error(ERR_NONICKNAMEGIVEN);
@@ -69,19 +80,19 @@ void Nick::error(int errorCode) const
 		case ERR_NONICKNAMEGIVEN:
 		{
 			this->_author->writeRPLToClient(this->_server,
-					ERR_NONICKNAMEGIVEN_S, ERR_NONICKNAMEGIVEN_MSG);
+					ERR_NONICKNAMEGIVEN, MSG_NONICKNAMEGIVEN);
 			return;
 		}
 		case ERR_ERRONEUSNICKNAME:
 		{
-			this->_author->writeRPLToClient(this->_server, ERR_ERRONEUSNICKNAME_S,
-					this->_cmd[1], ERR_ERRONEUSNICKNAME_MSG);
+			this->_author->writeRPLToClient(this->_server, ERR_ERRONEUSNICKNAME,
+					this->_cmd[1], MSG_ERRONEUSNICKNAME);
 			return;
 		}
 		case ERR_NICKNAMEINUSE:
 		{
-			this->_author->writeRPLToClient(this->_server, ERR_NICKNAMEINUSE_S,
-					this->_cmd[1], ERR_NICKNAMEINUSE_MSG);
+			this->_author->writeRPLToClient(this->_server, ERR_NICKNAMEINUSE,
+					this->_cmd[1], MSG_NICKNAMEINUSE);
 			break;
 		}
 		default:

@@ -20,6 +20,7 @@ class Client
 		void	setHostname(std::string name);
 		void	setRealname(std::string name);
 		void	confirmRegistration();
+		void	validatePassword();
 
 		/* Getters */
 		int	getSocketFD() const;
@@ -27,12 +28,13 @@ class Client
 		std::string	getUsername() const;
 		std::string getFullName() const;
 		const std::set<Channel*> &getConnectedChannels() const;
+		bool	isPasswordOk() const;
 
 
 		/* writing */
 		void	writeToClient(std::string message);
-		void	writeRPLToClient(Server *server, std::string RPL, std::string message);
-		void	writeRPLToClient(Server *server, std::string RPL, std::string additionalSource, std::string message);
+		void	writeRPLToClient(Server *server, int RPL, std::string message);
+		void	writeRPLToClient(Server *server, int RPL, std::string additionalSource, std::string message);
 
 		/* channel handlers */
 		int		isInChannel(Channel&) const;
@@ -53,6 +55,7 @@ class Client
 		std::string	_realname;
 
 		bool	_registered;
+		bool	_passwordOK;
 
 		std::set<Channel*> _connectedChannels;
 	protected:

@@ -1,9 +1,11 @@
 #include "Client.hpp"
 #include "Server.hpp"
+#include <iomanip>
 
 Client::Client()
 {
 	this->_registered = false;
+	this->_passwordOK = false;
 #if SHOW_CONSTRUCTOR
 	std::cout << "Client default constructor" << std::endl;
 #endif
@@ -20,6 +22,7 @@ Client::~Client()
 Client::Client(int socketFD) : _socketFD(socketFD)
 {
 	this->_registered = 0;
+	this->_passwordOK = false;
 #if SHOW_CONSTRUCTOR
 	std::cout << "Client socketFD constructor" << std::endl;
 #endif
@@ -40,6 +43,8 @@ Client& Client::operator=(const Client &rhs)
 #endif
 	this->_socketFD = rhs._socketFD;
 	this->_nickname = rhs._nickname;
+	this->_registered = rhs._registered;
+	this->_passwordOK = rhs._passwordOK;
 	return (*this);
 }
 
@@ -61,6 +66,11 @@ void	Client::setHostname(std::string name)
 void	Client::setRealname(std::string name)
 {
 	this->_realname = name;
+}
+
+void	Client::validatePassword()
+{
+	this->_passwordOK = true;
 }
 
 void	Client::confirmRegistration()
@@ -93,6 +103,11 @@ const std::set<Channel*> &Client::getConnectedChannels() const
 	return (this->_connectedChannels);
 }
 
+bool	Client::isPasswordOk() const
+{
+	return (this->_passwordOK);
+}
+
 int	Client::isInChannel(Channel& toFind) const
 {
 	if (this->_connectedChannels.find(&toFind) != this->_connectedChannels.end())
@@ -115,18 +130,24 @@ void	Client::writeToClient(std::string message)
 	this->writeBuffer += message + CRLF;
 }
 
-void	Client::writeRPLToClient(Server *server, std::string RPL, std::string message)
+void	Client::writeRPLToClient(Server *server, int RPL, std::string message)
 {
 	std::stringstream replyMessageBuilder;
-	replyMessageBuilder << ":" << server->getHostname() << " "
-		<< RPL << " " << this->_nickname << " :" << message << CRLF;
+	replyMessageBuilder << ":" << server->getHostname() << " " <<
+		std::setw(3) << std::setfill('0') << RPL;
+	if (this->_nickname != "")
+		replyMessageBuilder << " " << this->_nickname;
+	replyMessageBuilder << " :" << message << CRLF;
 	this->writeBuffer += replyMessageBuilder.str();
 }
 
-void	Client::writeRPLToClient(Server *server, std::string RPL, std::string additionalSource, std::string message)
+void	Client::writeRPLToClient(Server *server, int RPL, std::string additionalSource, std::string message)
 {
 	std::stringstream replyMessageBuilder;
-	replyMessageBuilder << ":" << server->getHostname() << " "
-		<< RPL << " " << this->_nickname << " " << additionalSource << " :" << message << CRLF;
+	replyMessageBuilder << ":" << server->getHostname() << " " <<
+		std::setw(3) << std::setfill('0') << RPL;
+	if (this->_nickname != "")
+		replyMessageBuilder << " " << this->_nickname;
+	replyMessageBuilder << " " << additionalSource << " :" << message << CRLF;
 	this->writeBuffer += replyMessageBuilder.str();
 }
