@@ -442,6 +442,7 @@ void	Server::createChannel(std::string newChannelName, Client& owner)
 	if (channelAlreadyExists == 0)
 	{
 		this->_channels.push_front(Channel(newChannelName, owner));
+		this->_channels.front().addUserToChannel(owner);
 	}
 }
 

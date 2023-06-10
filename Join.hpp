@@ -21,6 +21,8 @@ class Join : public ACommand
 		void	error(int) const;
 		void	confirm() const;
 
+		bool	verifyChannelName();
+		Channel *_target;
 };
 
 #endif
