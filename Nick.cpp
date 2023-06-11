@@ -10,10 +10,16 @@ Nick::Nick() : ACommand()
 
 Nick::~Nick()
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Nick destructor" << std::endl;
+#endif
 }
 
 Nick::Nick(Server &server, Client &author, std::string rawInput) : ACommand(server, author, rawInput)
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Nick full constructor" << std::endl;
+#endif
 	this->execute();
 }
 
