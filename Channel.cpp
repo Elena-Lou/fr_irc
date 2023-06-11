@@ -181,6 +181,8 @@ void	Channel::writePrivmsg(std::string source, std::string dest, std::string msg
 	for (std::map<int, Client*>::iterator it = this->_connectedClients.begin();
 		it != this->_connectedClients.end(); it++)
 	{
+		if (source != dest && it->second->getNickname() == source)
+			continue;
 		it->second->writePrivmsg(source, dest, msg);
 	}
 }
