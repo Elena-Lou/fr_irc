@@ -49,6 +49,7 @@
 # define RPL_CREATED 3
 # define RPL_INFO 4
 # define RPL_ISUPPORT 5
+# define RPL_NOTOPIC 331
 # define RPL_TOPIC 332
 # define RPL_NAMREPLY 353
 # define RPL_ENDOFNAMES 366
@@ -74,6 +75,7 @@
 # define ERR_BADCHANMASK 476
 # define ERR_CHANOPRIVSNEEDED 482
 
+# define MSG_NOTOPIC "No topic is set"
 # define MSG_ENDOFNAMES "End of /NAMES list"
 # define MSG_NOSUCHNICK "No such nick/channel"
 # define MSG_CANNOTSENDTOCHAN "Cannot send to channel"

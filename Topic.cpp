@@ -112,17 +112,17 @@ void Topic::confirm() const
 {
 	if (this->_cmd.size() == 2)
 	{
-		this->_author->writeRPLToClient(this->_server, RPL_TOPIC,
-			this->_cmd[1], this->_target->getTopic());
+		std::string topic = this->_target->getTopic();
+		if (topic == "")
+			this->_author->writeRPLToClient(this->_server, RPL_NOTOPIC,
+				this->_cmd[1], MSG_NOTOPIC);
+		else
+			this->_author->writeRPLToClient(this->_server, RPL_TOPIC,
+				this->_cmd[1], topic);
 	}
 	else if (this->_cmd[2] == ":")
-	{
 		this->_target->updateTopic(*this->_author, "");
-	}
 	else
-	{
 		this->_target->updateTopic(*this->_author, this->_message);
-
-	}
 }
 

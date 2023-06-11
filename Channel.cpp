@@ -229,6 +229,7 @@ void	Channel::updateTopic(Client &author, std::string topic)
 {
 	this->_topic = topic;
 	std::stringstream fullMessage;
-	fullMessage << ":" << author.getFullName() << " TOPIC " << topic;
+	fullMessage << ":" << author.getFullName() << " TOPIC " << this->_name
+		<< " :" << topic;
 	this->broadcastToChannel(fullMessage.str());
 }
