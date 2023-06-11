@@ -7,10 +7,16 @@ Join::Join() : ACommand()
 
 Join::~Join()
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Join destructor" << std::endl;
+#endif
 }
 
 Join::Join(Server &server, Client &user, std::string rawInput) : ACommand(server, user, rawInput)
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Join full constructor" << std::endl;
+#endif
 	this->execute();
 }
 
