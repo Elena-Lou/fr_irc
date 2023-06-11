@@ -1,4 +1,5 @@
 #include "Join.hpp"
+#include <vector>
 
 Join::Join() : ACommand()
 {
@@ -17,7 +18,16 @@ Join::Join(Server &server, Client &user, std::string rawInput) : ACommand(server
 #if SHOW_CONSTRUCTOR
 	std::cout << "Join full constructor" << std::endl;
 #endif
-	this->execute();
+	this->inputToList();
+	for (std::map<std::string, std::string>::iterator it = this->_chanList.begin();
+		it != this->_chanList.end(); it++)
+	{
+		this->_chanName = it->first;
+		this->_password = it->second;
+		this->execute();
+	}
+	if (!this->_chanList.size())
+		this->execute();
 }
 
 Join::Join(const Join &source) : ACommand(source)
@@ -45,7 +55,7 @@ void Join::execute()
 		error(ERR_NEEDMOREPARAMS);
 		return;
 	}
-	if (this->_cmd[1] == "0" && this->_cmd.size() == 2)
+	if (this->_chanName == "0" && this->_cmd.size() == 2)
 	{
 		/* quit all channels */
 		std::cout << "quitting all channels" << std::endl;
@@ -64,8 +74,8 @@ void Join::execute()
 		}
 		return ;
 	}
-	if ((this->_target = this->_server->getChannelIfExist(this->_cmd[1])) == NULL
-			&& this->_server->isUserConnected(this->_cmd[1]))
+	if ((this->_target = this->_server->getChannelIfExist(this->_chanName)) == NULL
+			&& this->_server->isUserConnected(this->_chanName))
 	{
 		error(ERR_NOSUCHCHANNEL);
 		return;
@@ -81,13 +91,13 @@ void Join::execute()
 		error(ERR_TOOMANYCHANNELS);
 		return;
 	}
-	if (!verifyChannelName())
+	if (!verifyChannelName(this->_chanName))
 	{
 		error(ERR_BADCHANMASK);
 		return;
 	}
 	if (this->_target && ((this->_target->isProtected())
-		&& (this->_cmd.size() < 3 || !this->_target->tryPassword(this->_cmd[2]))))
+		&& (this->_cmd.size() < 3 || !this->_target->tryPassword(this->_password))))
 	{
 			error(ERR_BADCHANNELKEY);
 			return ;
@@ -170,7 +180,7 @@ void Join::error(int errorCode) const
 
 void Join::confirm() const
 {
-	Channel *toJoin = this->_server->getChannelIfExist(this->_cmd[1]);
+	Channel *toJoin = this->_server->getChannelIfExist(this->_chanName);
 	std::string topic;
 	if (toJoin)
 	{
@@ -179,36 +189,81 @@ void Join::confirm() const
 	}
 	else
 	{
-		this->_server->createChannel(this->_cmd[1], *this->_author);
-		toJoin = this->_server->getChannelIfExist(this->_cmd[1]);
+		this->_server->createChannel(this->_chanName, *this->_author);
+		toJoin = this->_server->getChannelIfExist(this->_chanName);
 	}
 	/* confirm JOIN message */
-	toJoin->broadcastToChannel(this->_author->getNickname() + " JOIN " + this->_cmd[1]);
+	toJoin->broadcastToChannel(this->_author->getNickname() + " JOIN " + this->_chanName);
 	/* Send topic if set */
 	if (topic != "")
 		this->_author->writeRPLToClient(this->_server, RPL_TOPIC,
-			this->_cmd[1], topic);
+			this->_chanName, topic);
 	/* list of all users currently in the channel */
 	toJoin->sendAllNamesToUser(*this->_server, *this->_author);
 	/* END OF NAMES */
 	this->_author->writeRPLToClient(this->_server, RPL_ENDOFNAMES,
-			this->_cmd[1], MSG_ENDOFNAMES);
+			this->_chanName, MSG_ENDOFNAMES);
 }
 
-bool	Join::verifyChannelName()
+bool	Join::verifyChannelName(std::string name)
 {
 
 	if (this->_cmd.size() < 2)
-	{
 		return (false);
-	}
-	if (this->_cmd[1][0] != '#' || this->_cmd[1].size() < 2)
+	if (name[0] != '#' || name.size() < 2)
 		return (false);
-	for (unsigned int i = 1; i < this->_cmd[1].size(); i++)
+	for (unsigned int i = 1; i < name.size(); i++)
 	{
-		if (!std::isalnum(this->_cmd[1][i]))
+		if (!std::isalnum(name[i]))
 			return (false);
 	}
 	return (true);
 
+}
+
+void	Join::inputToList()
+{
+	std::vector<std::string> names;
+	std::vector<std::string> passwords;
+
+	std::string::iterator start = this->_cmd[1].begin();
+	std::string::iterator it = start;
+	while (start != this->_cmd[1].end()) //raw input not over
+	{
+		if (*it == ',' || it == this->_cmd[1].end())
+		{
+			names.push_back(std::string(start, it));
+			start = it + 1;
+		}
+		if (it == this->_cmd[1].end())
+			start = this->_cmd[1].end();
+		it++;
+	}
+	if (this->_cmd.size() >= 3)
+	{
+		start = this->_cmd[2].begin();
+		std::string::iterator it = start;
+		while (start != this->_cmd[2].end()) //raw input not over
+		{
+			if (*it == ',' || it == this->_cmd[2].end())
+			{
+				passwords.push_back(std::string(start, it));
+				start = it + 1;
+			}
+			if (it == this->_cmd[2].end())
+				start = this->_cmd[2].end();
+			it++;
+		}
+	}
+	for (unsigned int i = 0; i < names.size(); i++)
+	{
+		if (i < passwords.size())
+		{
+			this->_chanList.insert(std::make_pair(names[i], passwords[i]));
+		}
+		else
+		{
+			this->_chanList.insert(std::make_pair(names[i], ""));
+		}
+	}
 }

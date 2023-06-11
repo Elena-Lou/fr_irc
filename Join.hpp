@@ -21,8 +21,13 @@ class Join : public ACommand
 		void	error(int) const;
 		void	confirm() const;
 
-		bool	verifyChannelName();
+		void	inputToList();
+
+		bool	verifyChannelName(std::string potentialName);
 		Channel *_target;
+		std::string _chanName;
+		std::string _password;
+		std::map<std::string, std::string> _chanList;
 };
 
 #endif
