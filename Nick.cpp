@@ -49,13 +49,10 @@ void Nick::execute()
 		return ;
 	}
 	this->newName = this->_cmd[1];
-	for (unsigned int i = 0; i < this->newName.size(); i++)
+	if (!this->isValidNickname(newName))
 	{
-		if (!isalpha(newName[i]))
-		{
-			error(ERR_ERRONEUSNICKNAME);
-			return ;
-		}
+		error(ERR_ERRONEUSNICKNAME);
+		return ;
 	}
 	if (this->_author->getNickname() == this->newName)
 		return ;
@@ -109,4 +106,18 @@ void	Nick::confirm() const
 	msgBuilder << ":" << this->_author->getFullName() << " NICK " << this->newName;
 	this->_author->setNickname(this->newName);
 	this->_server->broadcastAllClients(msgBuilder.str());
+}
+
+bool	Nick::isValidNickname(std::string name)
+{
+	for (unsigned int i = 0; i < name.size(); i++)
+	{
+		if (!isalnum(name[i]) && name[i] != '[' && name[i] != ']'
+			&& name[i] != '{' && name[i] != '}'
+			&& name[i] != '\\' && name[i] != '|')
+		{
+			return (false);
+		}
+	}
+	return (true);
 }

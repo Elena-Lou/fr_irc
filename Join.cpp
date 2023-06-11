@@ -205,7 +205,7 @@ bool	Join::verifyChannelName()
 		return (false);
 	for (unsigned int i = 1; i < this->_cmd[1].size(); i++)
 	{
-		if (!std::isalpha(this->_cmd[1][i]))
+		if (!std::isalnum(this->_cmd[1][i]))
 			return (false);
 	}
 	return (true);
