@@ -269,22 +269,28 @@ void	Server::disconnectUser(int socketFD)
 	{
 		if (it->first == socketFD)
 		{
-			this->disconnectUser(it);
+			this->disconnectUser(it->second);
 			break;
 		}
 	}
 }
 
-void	Server::disconnectUser(std::map<int, Client>::iterator clientIterator)
+void	Server::disconnectUser(Client &client)
 {
 	for (std::deque<Channel>::iterator channelIterator = this->_channels.begin();
-		channelIterator != this->_channels.end(); channelIterator++)
+		this->_channels.size() && channelIterator != this->_channels.end(); )
 	{
-		if (channelIterator->removeUserFromChannel(clientIterator->second) == 0)
-			this->_channels.erase(channelIterator);
+		if (channelIterator->removeUserFromChannel(client) == 0)
+		{
+			std::deque<Channel>::iterator channelToDelete = channelIterator;
+			channelIterator++;
+			this->_channels.erase(channelToDelete);
+			continue;
+		}
+		channelIterator++;
 	}
-	close(clientIterator->second.getSocketFD());
-	this->_clients.erase(clientIterator);
+	close(client.getSocketFD());
+	this->_clients.erase(client.getSocketFD());
 }
 
 std::string	Server::getStartTime() const
@@ -354,40 +360,30 @@ void	Server::readLoop()
 				std::cerr << "recv() failed : " << std::strerror(errno) << "fd = " << it->first << std::endl;
 				std::map<int, Client>::iterator disconnectedClient = it;
 				it++;
-				this->disconnectUser(disconnectedClient);
-				break;
+				this->disconnectUser(disconnectedClient->second);
+				continue;
 			}
 			else if ( recvRet == 0)
 			{
 				std::map<int, Client>::iterator disconnectedClient = it;
-				std::cerr << "connection closed by the client. Bye Bye" << std::endl;
+				std::cerr << "connection closed by the client read loop. Bye Bye" << std::endl;
 				FD_CLR(it->second.getSocketFD(), &(this->_masterSet));
 				it++;
-				this->disconnectUser(disconnectedClient);
+				this->disconnectUser(disconnectedClient->second);
 				continue ;
 			}
 			else
 			{
-				std::cout << recvRet << " bytes received" << std::endl;
-				std::cout << "received : " << this->buffer << std::endl;
 				it->second.readBuffer.append(this->buffer);
 				if (this->checkRawInput(it->second.readBuffer))
 				{
-					std::cout << "entered condition !" << std::endl;
 					for (;;)
 					{
-						std::cout << "full buffer before: ["
-							<< it->second.readBuffer << "]" << std::endl;
 						std::string cmd = extractCmd(it->second.readBuffer);
 						if (cmd == "")
 							break;
 						else
-						{
-							std::cout << "buffer sent to parsing : " << cmd << std::endl;
 							this->parsingCommand(cmd, it->second);
-						}
-						std::cout << "full buffer after: ["
-							<< it->second.readBuffer << "]" << std::endl;
 					}
 				}
 			}
@@ -410,12 +406,13 @@ void	Server::writeLoop()
 				sizeof(char) * it->second.writeBuffer.size(), MSG_NOSIGNAL);
 			if (sendRet < 0)
 			{
-				std::map<int, Client>::iterator tmp = it;
+				std::map<int, Client>::iterator disconnectedClient = it;
+				it++;
 				std::cerr << "send() failed : " << std::strerror(errno) << "fd = "
 					<< it->first << std::endl;
 				FD_CLR(it->first, &(this->_masterSet));
-				this->_clients.erase(tmp);
-				break;
+				this->disconnectUser(disconnectedClient->second);
+				continue;
 			}
 			else
 			{
@@ -423,7 +420,6 @@ void	Server::writeLoop()
 					it->second.writeBuffer.erase();
 				else
 					it->second.writeBuffer.erase(it->second.writeBuffer.begin() + sendRet);
-				std::cout << sendRet << " bytes sent" << std::endl;
 			}
 		}
 		it++;

@@ -43,7 +43,7 @@ class Server
 		/* Client handlers */
 		void	connectUser(int);
 		void	disconnectUser(int);
-		void	disconnectUser(std::map<int, Client>::iterator clientIterator);
+		void	disconnectUser(Client &client);
 		void	checkNewConnections();
 		bool	isUserConnected(std::string) const;
 		Client	*getUserIfConnected(std::string nickName);
