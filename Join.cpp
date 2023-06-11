@@ -29,7 +29,6 @@ Join &Join::operator=(const Join &rhs)
 
 void Join::execute()
 {
-	std::cout << "** ENTERED JOIN EXECUTE **" << std::endl;
 	if (!this->_author->isRegistered())
 	{
 		std::cout << "User is not registered" << std::endl;
@@ -165,19 +164,15 @@ void Join::error(int errorCode) const
 
 void Join::confirm() const
 {
-	std::cout << "ENTERED JOIN CONFIRM" << std::endl;
 	Channel *toJoin = this->_server->getChannelIfExist(this->_cmd[1]);
 	std::string topic;
 	if (toJoin)
 	{
-		std::cout << "**JOINING AN EXISTING CHANNEL**" << std::endl;
 		toJoin->addUserToChannel(*this->_author);
-		//connect to an existing channel
 		toJoin->getTopic();
 	}
-	else //create channel
+	else
 	{
-		std::cout << "**CREATING A NE CHANNEL**" << std::endl;
 		this->_server->createChannel(this->_cmd[1], *this->_author);
 		toJoin = this->_server->getChannelIfExist(this->_cmd[1]);
 	}
