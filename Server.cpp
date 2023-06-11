@@ -589,7 +589,7 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 		}
 		case 6 :
 		{
-			std::cout << "need to create TOPIC command" << std::endl;
+			Topic(*this, user, rawInput);
 			break;
 		}
 		case 7 :

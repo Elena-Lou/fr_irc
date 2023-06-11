@@ -41,6 +41,7 @@
 # include "Nick.hpp"
 # include "Pass.hpp"
 # include "Privmsg.hpp"
+# include "Topic.hpp"
 # include <ctime>
 
 # define RPL_WELCOME 1
