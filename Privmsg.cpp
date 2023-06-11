@@ -21,7 +21,6 @@ Privmsg::Privmsg(Server &server, Client &author, std::string rawInput) : AComman
 		if (offset < rawInput.size())
 			offset++;
 		this->_message = std::string(rawInput, offset);
-		std::cout << "PRIVMSG msg: [" << this->_message << "]" << std::endl;
 	}
 	this->execute();
 }
