@@ -10,11 +10,16 @@ Pass::Pass() : ACommand()
 
 Pass::~Pass()
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Pass destructor" << std::endl;
+#endif
 }
 
 Pass::Pass(Server &server, Client &author, std::string rawInput) : ACommand(server, author, rawInput)
 {
-	std::cout << "built  a Pass class" << std::endl;
+#if SHOW_CONSTRUCTOR
+	std::cout << "Pass full constructor" << std::endl;
+#endif
 	this->execute();
 }
 
@@ -59,7 +64,7 @@ void Pass::error(int errorCode) const
 	{
 		case ERR_NEEDMOREPARAMS:
 			this->_author->writeRPLToClient(this->_server,
-					ERR_NEEDMOREPARAMS, MSG_NEEDMOREPARAMS);
+					ERR_NEEDMOREPARAMS, this->_cmd[0], MSG_NEEDMOREPARAMS);
 			break;
 		case ERR_ALREADYREGISTERED:
 			this->_author->writeRPLToClient(this->_server,

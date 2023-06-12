@@ -11,11 +11,16 @@ User::User() : ACommand()
 
 User::~User()
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "User destructor" << std::endl;
+#endif
 }
 
 User::User(Server &server, Client &author, std::string rawInput) : ACommand(server, author, rawInput)
 {
-	std::cout << "built  a User class" << std::endl;
+#if SHOW_CONSTRUCTOR
+	std::cout << "User constructor" << std::endl;
+#endif
 	this->execute();
 }
 
@@ -64,7 +69,7 @@ void User::error(int errorCode) const
 		case ERR_NEEDMOREPARAMS:
 		{
 			this->_author->writeRPLToClient(this->_server, ERR_NEEDMOREPARAMS,
-				this->_cmd[1],  MSG_NEEDMOREPARAMS);
+				this->_cmd[0],  MSG_NEEDMOREPARAMS);
 			break;
 		}
 		case ERR_ALREADYREGISTERED:

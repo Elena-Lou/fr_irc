@@ -22,6 +22,7 @@ class Nick : public ACommand
 		void	confirm() const;
 		void	error(int errorCode) const;
 
+		bool	isValidNickname(std::string name);
 		std::string	newName;
 };
 

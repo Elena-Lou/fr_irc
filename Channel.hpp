@@ -22,6 +22,8 @@ class Channel
 
 		/* getters */
 		std::string getName() const;
+		std::string getTopic() const;
+		bool	isProtected() const;
 
 		/* users handler */
 		bool	isUserConnected(Client& user);
@@ -38,14 +40,22 @@ class Channel
 		/* message */
 		void	broadcastToChannel(std::string message);
 		void	writePrivmsg(std::string source, std::string dest, std::string msg);
+		void	sendAllNamesToUser(Server &server, Client &user);
+		void	sendTopicToUser(Server &server, Client &user);
 
+		/* mods */
+		void	changePassword(std::string password);
+		bool	tryPassword(std::string password);
+	protected:
 	private:
 		Channel();
 		int					_nbOfClients;
 		std::string			_name;
 		std::map<int, Client*>	_chanOps;
 		std::map<int, Client*>	_connectedClients;
-	protected:
+		bool		_protected;
+		std::string _password;
+		std::string _topic;
 };
 
 #endif

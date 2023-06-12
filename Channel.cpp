@@ -20,6 +20,7 @@ Channel::~Channel()
 Channel::Channel(std::string name, Client& owner) :  _nbOfClients(0), _name(name)
 {
 	this->setOperator(owner);
+	this->_protected = false;
 #if SHOW_CONSTRUCTOR
 	std::cout << "Channel string Client constructor" << std::endl;
 #endif
@@ -41,6 +42,9 @@ Channel &Channel::operator=(const Channel &rhs)
 	this->_chanOps = rhs._chanOps;
 	this->_nbOfClients = rhs._nbOfClients;
 	this->_name = rhs._name;
+	this->_protected = rhs._protected;
+	this->_password = rhs._password;
+	this->_topic = rhs._topic;
 	return (*this);
 }
 
@@ -57,6 +61,11 @@ bool Channel::operator==(const Channel &rhs) const
 std::string	Channel::getName() const
 {
 	return (this->_name);
+}
+
+std::string Channel::getTopic() const
+{
+	return (this->_topic);
 }
 
 void	Channel::updateChannelName(std::string name)
@@ -95,6 +104,11 @@ bool Channel::isUserConnected(std::string nickName)
 			return true;
 	}
 	return false;
+}
+
+bool	Channel::isProtected() const
+{
+	return (this->_protected);
 }
 
 Client	*Channel::getUserIfConnected(std::string nickname)
@@ -167,6 +181,40 @@ void	Channel::writePrivmsg(std::string source, std::string dest, std::string msg
 	for (std::map<int, Client*>::iterator it = this->_connectedClients.begin();
 		it != this->_connectedClients.end(); it++)
 	{
+		if (source != dest && it->second->getNickname() == source)
+			continue;
 		it->second->writePrivmsg(source, dest, msg);
 	}
 }
+
+void	Channel::changePassword(std::string password)
+{
+	this->_protected = true;
+	this->_password = password;
+}
+
+bool	Channel::tryPassword(std::string password)
+{
+	return (this->_password == password);
+}
+
+void	Channel::sendAllNamesToUser(Server &server, Client &user)
+{
+	std::string symbol("= ");
+	//symbol can be:
+	//	"= " for public
+	//	"@ " for secret
+	//	"* " for private
+
+	for (std::map<int, Client*>::iterator it = this->_connectedClients.begin();
+		it != this->_connectedClients.end(); it++)
+	{
+		std::string prefix;
+		if (this->_chanOps.find(it->first) != this->_chanOps.end())
+			prefix = "@ ";
+		std::string name = prefix + it->second->getNickname();
+		user.writeRPLToClient(&server, RPL_NAMREPLY,
+			symbol + this->_name, prefix + it->second->getNickname());
+	}
+}
+
