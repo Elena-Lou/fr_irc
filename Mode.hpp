@@ -9,7 +9,7 @@ class Server;
 class Mode : public ACommand
 {
 	public:
-		Mode(Server &server, Client &user, std::string rawInput);
+		Mode(Server &server, Client & author, std::string rawInput);
 		Mode(const Mode &source);
 		Mode &operator=(const Mode &rhs);
 		~Mode();
@@ -22,6 +22,14 @@ class Mode : public ACommand
 		void	confirm() const;
 
 		bool	isAPossibleChannelName(std::string name);
+		void	checkValidCmd();
+
+		void	invite();
+		void	topic();
+		void	channelKey();
+		void	channelOp();
+		void	channelLimit();
+
 		Channel *_targetChannel;
 		Client	*_targetClient;
 };

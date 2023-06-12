@@ -38,7 +38,7 @@ Mode::~Mode()
 #endif
 }
 
-Mode::Mode(Server &server, Client &user, std::string rawInput) : ACommand(server, user, rawInput)
+Mode::Mode(Server &server, Client & author, std::string rawInput) : ACommand(server, author, rawInput)
 {
 #if SHOW_CONSTRUCTOR
 	std::cout << "Mode full constructor" << std::endl;
@@ -62,49 +62,38 @@ Mode &Mode::operator=(const Mode &rhs)
 	return (*this);
 }
 
-void Mode::execute()
-{
-	if (!this->_author->isRegistered())
-		return ;
-	if (this->_cmd.size() < 2)
-	{
-		error(ERR_NEEDMOREPARAMS);
-		return;
-	}
-	if (this->isAPossibleChannelName(this->_cmd[1]) && this->_targetChannel == NULL)
-	{
-		error(ERR_NOSUCHCHANNEL);
-		return;
-	}
-	if (0 && !this->_targetChannel->isChannelOperator(*this->_author)) //TODO replace 0 by is channel is invite only
-	{
-		error(ERR_CHANOPRIVSNEEDED);
-		return;
-	}
-	if (!this->isAPossibleChannelName(this->_cmd[1]) && this->_server->getUserIfConnected(this->_cmd[1]) == NULL)
-	{
-		error(ERR_NOSUCHNICK);
-		return;
-	}
-	if (!this->isAPossibleChannelName(this->_cmd[1]) && this->_cmd[1] != this->_author->getNickname())
-	{
-		error(ERR_USERSDONTMATCH);
-		return;
-	}
-	this->confirm();
-}
+// void Mode::execute()
+// {
+// 	if (!this->_author->isRegistered())
+// 		return ;
+// 	if (this->_cmd.size() < 2)
+// 	{
+// 		error(ERR_NEEDMOREPARAMS);
+// 		return;
+// 	}
+// 	if (this->isAPossibleChannelName(this->_cmd[1]) && this->_targetChannel == NULL)
+// 	{
+// 		error(ERR_NOSUCHCHANNEL);
+// 		return;
+// 	}
+// 	if (0 && !this->_targetChannel->isChannelOperator(*this->_author)) //TODO replace 0 by is channel is invite only
+// 	{
+// 		error(ERR_CHANOPRIVSNEEDED);
+// 		return;
+// 	}
+// 	if (!this->isAPossibleChannelName(this->_cmd[1]) && this->_server->getUserIfConnected(this->_cmd[1]) == NULL)
+// 	{
+// 		error(ERR_NOSUCHNICK);
+// 		return;
+// 	}
+// 	if (!this->isAPossibleChannelName(this->_cmd[1]) && this->_cmd[1] != this->_author->getNickname())
+// 	{
+// 		error(ERR_USERSDONTMATCH);
+// 		return;
+// 	}
+// 	this->confirm();
+// }
 
-void Mode::error(int errorCode) const
-{
-	switch (errorCode)
-	{
-		case ERR_NEEDMOREPARAMS: /* not in the rfc but why not ? */
-		{
-			this->_author->writeRPLToClient(this->_server,
-				ERR_NEEDMOREPARAMS, this->_cmd[0], MSG_NEEDMOREPARAMS);
-	std::cout << "MODE destructor" << std::endl;
-#endif
-}
 
 void Mode::execute()
 {
@@ -116,72 +105,28 @@ void Mode::execute()
         return ;
     }
     /* check channel exists */
-	if ((this->_foundChannel = this->_server->getChannelIfExist(this->_cmd[1])) == NULL)
+	this->_targetChannel = this->_server->getChannelIfExist(this->_cmd[1]);
+	if (this->isAPossibleChannelName(this->_cmd[1]) && this->_targetChannel == NULL)
 	{
 		error(ERR_NOSUCHCHANNEL);
 		return ;
 	}
 
 	/* Is the user connected to that channel ? */
-	if (!this->_foundChannel->isUserConnected(*(this->_author)))
+	if (!this->_targetChannel->isUserConnected(*(this->_author)))
 	{
 		error(ERR_NOTONCHANNEL);
 		return ;
 	}
 
     /* need to check if author has priviledges before checking the rest of the command */
-    if (!this->_foundChannel->isChannelOperator(*(this->_author)))
+    if (!this->_targetChannel->isChannelOperator(*(this->_author)))
 	{
 		error(ERR_CHANOPRIVSNEEDED);
 		return ;
 	}
-
-    /* check the command is valid */
-    if (this->_cmd.size() < 5)
-    {
-        if (this->_cmd[2].size() != 2 || this->_cmd[2][0] != '-' || this->_cmd[2][0] != '+')
-        {
-            std::cout << "this->_cmd[2] : " << this->_cmd[2] << std::endl; 
-            std::cout << "this->_cmd[2].size() : " << this->_cmd[2].size() << std::endl; 
-            std::cerr << "Invalid input" << std::endl;
-            return ;
-        }
-        if (this->_cmd.size() == 3)
-        {
-            if (this->_cmd[2][1] == 't')
-            {
-                std::cout << "Topic must be set" << std::endl;
-            }
-            else if (this->_cmd[2][1] == 'i')
-            {
-                std::cout << "Invite must be set" << std::endl;
-            }
-            else
-            {
-                std::cout << "Invalid mode" << std::endl;
-                return ;
-            }
-        }
-        else if (this->_cmd.size() == 4)
-        {
-            if (this->_cmd[2][1] == 'o')
-            {
-                std::cout << "OP must be set" << std::endl;
-            }
-            else if (this->_cmd[2][1] == 'l')
-            {
-                std::cout << "user limit must be set" << std::endl;
-            }
-            else if (this->_cmd[2][1] == 'k')
-            {
-                std::cout << "channel password must be set" << std::endl;
-            }
-            else
-            {
-                std::cout << "invalid mode" << std::endl;
-            }
-        }
-    }
+	
+	this->checkValidCmd();  
 
 }
 
@@ -224,7 +169,160 @@ void Mode::error( int errorCode ) const
 					ERR_NOSUCHNICK, this->_cmd[4], MSG_NOSUCHNICK);
 			break;
 		}
+		case ERR_USERSDONTMATCH:
+		{
+			this->_author->writeRPLToClient(this->_server, ERR_USERSDONTMATCH,
+				MSG_USERSDONTMATCH);
+			break;
+		}
+		case ERR_UMODEUNKNOWNFLAG:
+		{
+			this->_author->writeRPLToClient(this->_server, ERR_UMODEUNKNOWNFLAG,
+					MSG_UMODEUNKOWNFLAG);
+			break;
+		}
 		default:
-			std::cerr << "Error: Unrecognised error code." << std::endl;
+			std::cerr << "Error: unrecognised error code in Mode." << std::endl;
 	}
+}
+
+bool	Mode::isAPossibleChannelName(std::string name)
+{
+	if (this->_cmd.size() < 2)
+		return (false);
+	if (name[0] != '#' || name.size() < 2)
+		return (false);
+	for (unsigned int i = 1; i < name.size(); i++)
+	{
+		if (!std::isalnum(name[i]))
+			return (false);
+	}
+	return (true);
+}
+
+void Mode::checkValidCmd()
+{
+/* check the command is valid */
+    if (this->_cmd.size() < 5)
+    {
+		if (this->_cmd[2][0] != '-' || this->_cmd[2][0] != '+')
+		{
+			std::cerr << "Invalid sign" << std::endl;
+			return ;
+		}
+
+		switch (this->_cmd[2][1])
+		{
+		case ('i'):
+			std::cout << "Invite must be set" << std::endl;
+			this->invite();
+			break;
+		case ('t'):
+			std::cout << "Topic must be set" << std::endl;
+			this->topic();
+			break;
+		case ('k'):
+			std::cout << "Password must be set" << std::endl;
+			this->channelKey();
+			break;
+		case ('o'):
+			std::cout << "ChanOp must be set" << std::endl;
+			this->channelOp();
+			break;
+		case ('l'):
+			std::cout << "Chan Limit must be set" << std::endl;
+			this->channelLimit();
+			break;
+		default:
+			error(ERR_UMODEUNKNOWNFLAG);
+			break;
+		}
+        
+    }
+}
+
+void	Mode::topic( )
+{
+	/* check the topic command is valid */
+	if (this->_cmd[2][0] == '+')
+	{
+		this->_targetChannel->_modeFlagsField |= TOPIC_MODE;
+		this->_targetChannel->changeTopicProtection(true);
+	}
+	else if (this->_cmd[2][0] == '-')
+	{
+		this->_targetChannel->_modeFlagsField &= ~TOPIC_MODE;
+		this->_targetChannel->changeTopicProtection(false);
+	}
+}
+
+void	Mode::invite()
+{
+	/* check the invite command is valid */
+	if (this->_cmd[2][0] == '+')
+	{
+		// set invite flag
+	}
+	else if (this->_cmd[2][0] == '-')
+	{
+		// unset topic flag
+	}
+
+}
+
+void	Mode::channelKey()
+{
+	/* check the channel password command is valid && has enough arguments */
+	if (this->_cmd.size() != 4)
+	{
+		std::cerr << "not enough arguments" << std::endl;
+		return ;
+	}
+	if (this->_cmd[2][0] == '+')
+	{
+		// set topic flag
+	}
+	else if (this->_cmd[2][0] == '-')
+	{
+		// unset topic flag
+	}
+
+}
+
+void	Mode::channelOp( )
+{
+	/* check the channel Ope command is valid && has enough arguments */
+	if (this->_cmd.size() != 4)
+	{
+		std::cerr << "not enough arguments" << std::endl;
+		return ;
+	}
+	if (this->_cmd[2][0] == '+')
+	{
+		// set topic flag
+	}
+	else if (this->_cmd[2][0] == '-')
+	{
+		// unset topic flag
+	}
+
+}
+
+void	Mode::channelLimit( )
+{
+	/* check the channel limit command is valid && has enough arguments */
+	if (this->_cmd.size() != 4)
+	{
+		std::cerr << "not enough arguments" << std::endl;
+		return ;
+	}
+	if (this->_cmd[2][0] == '+')
+	{
+		// set topic flag
+	}
+	else if (this->_cmd[2][0] == '-')
+	{
+		// unset topic flag
+	}
+
 }
