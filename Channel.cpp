@@ -232,4 +232,16 @@ void	Channel::updateTopic(Client &author, std::string topic)
 	fullMessage << ":" << author.getFullName() << " TOPIC " << this->_name
 		<< " :" << topic;
 	this->broadcastToChannel(fullMessage.str());
+	this->_topicUpdateTimestamp = time(NULL);
+	this->_topicUpdater = author.getNickname();
+}
+
+void	Channel::sendTOPICWHOTIME(Server &server, Client &author)
+{
+	std::stringstream msgBuilder;
+		msgBuilder << ":" << server.getHostname() << " " <<
+		std::setw(3) << std::setfill('0') << RPL_TOPICWHOTIME
+		<< " " << author.getNickname() << " " << this->_name << " "
+		<< this->_topicUpdater << " " << this->_topicUpdateTimestamp;
+	author.writeToClient(msgBuilder.str());
 }

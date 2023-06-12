@@ -44,6 +44,7 @@ class Channel
 		void	sendAllNamesToUser(Server &server, Client &user);
 		void	sendTopicToUser(Server &server, Client &user);
 		void	updateTopic(Client &author, std::string message);
+		void	sendTOPICWHOTIME(Server &server, Client &author);
 
 		/* mods */
 		void	changePassword(std::string password);
@@ -57,6 +58,9 @@ class Channel
 		std::map<int, Client*>	_connectedClients;
 		bool		_protected;
 		bool		_topicProtected;
+		time_t _topicUpdateTimestamp;
+		std::string	_topicUpdater;
+
 		std::string _password;
 		std::string _topic;
 };

@@ -117,8 +117,11 @@ void Topic::confirm() const
 			this->_author->writeRPLToClient(this->_server, RPL_NOTOPIC,
 				this->_cmd[1], MSG_NOTOPIC);
 		else
+		{
 			this->_author->writeRPLToClient(this->_server, RPL_TOPIC,
 				this->_cmd[1], topic);
+			this->_target->sendTOPICWHOTIME(*this->_server, *this->_author);
+		}
 	}
 	else if (this->_cmd[2] == ":")
 		this->_target->updateTopic(*this->_author, "");

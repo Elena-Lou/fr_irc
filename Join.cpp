@@ -196,8 +196,11 @@ void Join::confirm() const
 	toJoin->broadcastToChannel(this->_author->getNickname() + " JOIN " + this->_chanName);
 	/* Send topic if set */
 	if (topic != "")
+	{
 		this->_author->writeRPLToClient(this->_server, RPL_TOPIC,
 			this->_chanName, topic);
+		toJoin->sendTOPICWHOTIME(*this->_server, *this->_author);
+	}
 	/* list of all users currently in the channel */
 	toJoin->sendAllNamesToUser(*this->_server, *this->_author);
 	/* END OF NAMES */
