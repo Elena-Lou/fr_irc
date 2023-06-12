@@ -13,7 +13,8 @@ SRCS =	main.cpp\
 		Privmsg.cpp\
 		Topic.cpp\
 		Invite.cpp\
-		Mode.cpp
+		Mode.cpp\
+		Ping.cpp
 
 CXX = c++
 
