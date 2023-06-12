@@ -1,8 +1,8 @@
-#ifndef INVITE_HPP
-# define INVITE_HPP
+#ifndef MODE_HPP
+# define MODE_HPP
 
-# include "irc.hpp"
 # include "ACommand.hpp"
+# include "irc.hpp"
 
 class Client;
 class Server;
