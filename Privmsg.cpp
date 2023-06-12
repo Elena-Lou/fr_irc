@@ -11,17 +11,22 @@ Privmsg::Privmsg() : ACommand()
 
 Privmsg::~Privmsg()
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Privmsg destructor" << std::endl;
+#endif
 }
 
 Privmsg::Privmsg(Server &server, Client &author, std::string rawInput) : ACommand(server, author, rawInput)
 {
+#if SHOW_CONSTRUCTOR
+	std::cout << "Privmsg full constructor" << std::endl;
+#endif
 	if (this->_cmd.size() >= 3)
 	{
 		unsigned int offset = rawInput.find(":");
 		if (offset < rawInput.size())
 			offset++;
 		this->_message = std::string(rawInput, offset);
-		std::cout << "PRIVMSG msg: [" << this->_message << "]" << std::endl;
 	}
 	this->execute();
 }

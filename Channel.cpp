@@ -21,6 +21,7 @@ Channel::Channel(std::string name, Client& owner) :  _nbOfClients(0), _name(name
 {
 	this->setOperator(owner);
 	this->_protected = false;
+	this->_topicProtected = false;
 #if SHOW_CONSTRUCTOR
 	std::cout << "Channel string Client constructor" << std::endl;
 #endif
@@ -45,6 +46,7 @@ Channel &Channel::operator=(const Channel &rhs)
 	this->_protected = rhs._protected;
 	this->_password = rhs._password;
 	this->_topic = rhs._topic;
+	this->_topicProtected = rhs._topicProtected;
 	return (*this);
 }
 
@@ -198,6 +200,11 @@ bool	Channel::tryPassword(std::string password)
 	return (this->_password == password);
 }
 
+bool	Channel::isTopicProtected()
+{
+	return (this->_topicProtected);
+}
+
 void	Channel::sendAllNamesToUser(Server &server, Client &user)
 {
 	std::string symbol("= ");
@@ -218,3 +225,23 @@ void	Channel::sendAllNamesToUser(Server &server, Client &user)
 	}
 }
 
+void	Channel::updateTopic(Client &author, std::string topic)
+{
+	this->_topic = topic;
+	std::stringstream fullMessage;
+	fullMessage << ":" << author.getFullName() << " TOPIC " << this->_name
+		<< " :" << topic;
+	this->broadcastToChannel(fullMessage.str());
+	this->_topicUpdateTimestamp = time(NULL);
+	this->_topicUpdater = author.getNickname();
+}
+
+void	Channel::sendTOPICWHOTIME(Server &server, Client &author)
+{
+	std::stringstream msgBuilder;
+		msgBuilder << ":" << server.getHostname() << " " <<
+		std::setw(3) << std::setfill('0') << RPL_TOPICWHOTIME
+		<< " " << author.getNickname() << " " << this->_name << " "
+		<< this->_topicUpdater << " " << this->_topicUpdateTimestamp;
+	author.writeToClient(msgBuilder.str());
+}

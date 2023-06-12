@@ -46,10 +46,7 @@ Join &Join::operator=(const Join &rhs)
 void Join::execute()
 {
 	if (!this->_author->isRegistered())
-	{
-		std::cout << "User is not registered" << std::endl;
 		return ;
-	}
 	if (this->_cmd.size() < 2)
 	{
 		error(ERR_NEEDMOREPARAMS);
@@ -57,8 +54,6 @@ void Join::execute()
 	}
 	if (this->_chanName == "0" && this->_cmd.size() == 2)
 	{
-		/* quit all channels */
-		std::cout << "quitting all channels" << std::endl;
 		std::set<Channel*> connectedChans = this->_author->getConnectedChannels();
 		for (std::set<Channel*>::iterator it = connectedChans.begin();
 			it != connectedChans.end();)
@@ -81,11 +76,7 @@ void Join::execute()
 		return;
 	}
 	if (this->_target && this->_target->isUserConnected(*this->_author))
-	{
-		std::cout << "Client is already connected to the channel" << std::endl;
-		//client is already connected to the channel
 		return;
-	}
 	if (0) //TODO maximum channel per user
 	{
 		error(ERR_TOOMANYCHANNELS);
@@ -99,8 +90,8 @@ void Join::execute()
 	if (this->_target && ((this->_target->isProtected())
 		&& (this->_cmd.size() < 3 || !this->_target->tryPassword(this->_password))))
 	{
-			error(ERR_BADCHANNELKEY);
-			return ;
+		error(ERR_BADCHANNELKEY);
+		return ;
 	}
 	if (0) // TODO banned from chan (not asked by current subject)
 	{
@@ -128,13 +119,13 @@ void Join::error(int errorCode) const
 		{
 			this->_author->writeRPLToClient(this->_server,
 					ERR_NEEDMOREPARAMS, this->_cmd[0], MSG_NEEDMOREPARAMS);
-			return;
+			break;
 		}
 		case ERR_NOSUCHCHANNEL:
 		{
 			this->_author->writeRPLToClient(this->_server, ERR_NOSUCHCHANNEL,
 					this->_cmd[1], MSG_NOSUCHCHANNEL);
-			return;
+			break;
 		}
 		case ERR_TOOMANYCHANNELS:
 		{
@@ -174,7 +165,6 @@ void Join::error(int errorCode) const
 		}
 		default:
 			std::cerr << "Error: unrecognised error code in JOIN." << std::endl;
-			break;
 	}
 }
 
@@ -196,13 +186,16 @@ void Join::confirm() const
 	toJoin->broadcastToChannel(this->_author->getNickname() + " JOIN " + this->_chanName);
 	/* Send topic if set */
 	if (topic != "")
+	{
 		this->_author->writeRPLToClient(this->_server, RPL_TOPIC,
 			this->_chanName, topic);
+		toJoin->sendTOPICWHOTIME(*this->_server, *this->_author);
+	}
 	/* list of all users currently in the channel */
 	toJoin->sendAllNamesToUser(*this->_server, *this->_author);
 	/* END OF NAMES */
 	this->_author->writeRPLToClient(this->_server, RPL_ENDOFNAMES,
-			this->_chanName, MSG_ENDOFNAMES);
+		this->_chanName, MSG_ENDOFNAMES);
 }
 
 bool	Join::verifyChannelName(std::string name)
@@ -247,7 +240,10 @@ void	Join::inputToList()
 		{
 			if (*it == ',' || it == this->_cmd[2].end())
 			{
-				passwords.push_back(std::string(start, it));
+				if (it == start)
+					passwords.push_back("");
+				else
+					passwords.push_back(std::string(start, it));
 				start = it + 1;
 			}
 			if (it == this->_cmd[2].end())
@@ -258,12 +254,8 @@ void	Join::inputToList()
 	for (unsigned int i = 0; i < names.size(); i++)
 	{
 		if (i < passwords.size())
-		{
 			this->_chanList.insert(std::make_pair(names[i], passwords[i]));
-		}
 		else
-		{
 			this->_chanList.insert(std::make_pair(names[i], ""));
-		}
 	}
 }

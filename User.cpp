@@ -80,7 +80,6 @@ void User::error(int errorCode) const
 		}
 		default:
 			std::cerr << "Error: Unrecognised error code." << std::endl;
-			break;
 	}
 }
 
