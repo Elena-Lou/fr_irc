@@ -30,12 +30,12 @@ Oper::Oper(Oper const & src)
 
 Oper & Oper::operator=(Oper const & rhs)
 {
-    if (this != &rhs)
-    {
+	if (this != &rhs)
+	{
 		this->_cmd = rhs._cmd;
 		this->_author = rhs._author;
-    	this->_server = rhs._server;
-    }
+		this->_server = rhs._server;
+	}
 	return *this;
 }
 
@@ -44,7 +44,7 @@ void Oper::execute()
 	/* is the author registered ?*/
 	if (!this->_author->isRegistered())
 		return ;
-	
+
 	/* are there three params : command, user, pwd ? */
 	if (this->_cmd.size() != 3)
 	{
@@ -94,7 +94,6 @@ void Oper::error( int errorCode ) const
 
 void Oper::confirm() const
 {
-	
 	this->_author->writeRPLToClient(this->_server,
-		RPL_YOUROPER, MSG_YOUROPER);
+		RPL_YOUREOPER, MSG_YOUREOPER);
 }
