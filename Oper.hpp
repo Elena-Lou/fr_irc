@@ -12,7 +12,7 @@ class Oper : public ACommand
 		~Oper();
 
 	protected:
-		Oper(Server & server, Client & user, std::string rawInput);
+		Oper(Server & server, Client & author, std::string rawInput);
 		Oper(Oper const & src);
 		Oper &operator=(Oper const & rhs);
 

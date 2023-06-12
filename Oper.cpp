@@ -12,7 +12,7 @@ Oper::~Oper()
 #endif
 }
 
-Oper::Oper(Server & server, Client & user, std::string rawInput) : ACommand(server, user, rawInput)
+Oper::Oper(Server & server, Client & author, std::string rawInput) : ACommand(server, author, rawInput)
 {
 #if SHOW_CONSTRUCTOR
 	std::cout << "OPER overloaded constructor" << std::endl;

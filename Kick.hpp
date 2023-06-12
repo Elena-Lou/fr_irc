@@ -15,7 +15,7 @@ class Kick : public ACommand
 	protected:
 	public:
 
-		Kick(Server &server, Client &user, std::string rawInput);
+		Kick(Server &server, Client &author, std::string rawInput);
 		Kick( Kick const & src );
 		Kick & operator=( Kick const & rhs );
 		~Kick();
