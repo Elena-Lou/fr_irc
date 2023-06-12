@@ -363,15 +363,6 @@ void	Server::readLoop()
 				this->disconnectUser(disconnectedClient->second);
 				continue;
 			}
-			else if ( recvRet == 0)
-			{
-				std::map<int, Client>::iterator disconnectedClient = it;
-				std::cerr << "connection closed by the client read loop. Bye Bye" << std::endl;
-				FD_CLR(it->second.getSocketFD(), &(this->_masterSet));
-				it++;
-				this->disconnectUser(disconnectedClient->second);
-				continue ;
-			}
 			else
 			{
 				it->second.readBuffer.append(this->buffer);
