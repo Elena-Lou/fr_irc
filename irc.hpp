@@ -43,6 +43,7 @@
 # include "Pass.hpp"
 # include "Privmsg.hpp"
 # include "Topic.hpp"
+# include "Invite.hpp"
 # include <ctime>
 
 # define RPL_WELCOME 1
@@ -67,6 +68,7 @@
 # define ERR_NICKCOLLISION 436
 # define ERR_USERNOTINCHANNEL 441
 # define ERR_NOTONCHANNEL 442
+# define ERR_USERONCHANNEL 443
 # define ERR_NEEDMOREPARAMS 461
 # define ERR_ALREADYREGISTERED 462
 # define ERR_PASSWDMISMATCH 464
@@ -93,6 +95,7 @@
 # define MSG_NICKCOLLISION "Nickname collision KILL from "
 # define MSG_USERNOTINCHANNEL "They aren't on that channel"
 # define MSG_NOTONCHANNEL "You're not on that channel"
+# define MSG_USERONCHANNEL "is already on channel"
 # define MSG_NEEDMOREPARAMS "Not enough parameters"
 # define MSG_ALREADYREGISTERED "You may not reregister"
 # define MSG_PASSWDMISMATCH "Password incorrect"

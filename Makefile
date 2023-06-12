@@ -11,7 +11,8 @@ SRCS =	main.cpp\
 		Kick.cpp\
 		Pass.cpp\
 		Privmsg.cpp\
-		Topic.cpp
+		Topic.cpp\
+		Invite.cpp
 
 CXX = c++
 

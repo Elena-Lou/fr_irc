@@ -569,7 +569,7 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 		}
 		case 2 :
 		{
-			std::cout << "need to create INVITE command" << std::endl;
+			Invite(*this, user, rawInput);
 			break;
 		}
 		case 3 :
