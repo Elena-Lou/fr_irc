@@ -13,7 +13,7 @@ Join::~Join()
 #endif
 }
 
-Join::Join(Server &server, Client &user, std::string rawInput) : ACommand(server, user, rawInput)
+Join::Join(Server &server, Client &author, std::string rawInput) : ACommand(server, author, rawInput)
 {
 #if SHOW_CONSTRUCTOR
 	std::cout << "Join full constructor" << std::endl;

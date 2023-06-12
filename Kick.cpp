@@ -12,7 +12,7 @@ Kick::Kick( Kick const & src ) : ACommand(src)
 	*this = src;
 }
 
-Kick::Kick(Server &server, Client &user, std::string rawInput) : ACommand(server, user, rawInput)
+Kick::Kick(Server &server, Client &author, std::string rawInput) : ACommand(server, author, rawInput)
 {
 #if SHOW_CONSTRUCTOR
 	std::cout << "KICK overloaded constructor" << std::endl;

@@ -9,7 +9,7 @@ class Server;
 class Join : public ACommand
 {
 	public:
-		Join(Server &server, Client &user, std::string rawInput);
+		Join(Server &server, Client &author, std::string rawInput);
 		Join(const Join &source);
 		Join &operator=(const Join &rhs);
 		~Join();

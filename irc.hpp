@@ -76,6 +76,8 @@
 # define ERR_BADCHANNELKEY 475
 # define ERR_BADCHANMASK 476
 # define ERR_CHANOPRIVSNEEDED 482
+# define ERR_NOOPERHOST 491
+# define RPL_YOUROPER 381
 
 # define MSG_NOTOPIC "No topic is set"
 # define MSG_ENDOFNAMES "End of /NAMES list"
@@ -100,7 +102,8 @@
 # define MSG_BADCHANNELKEY "Cannot join channel (+k)"
 # define MSG_BADCHANMASK "Bad Channel Mask"
 # define MSG_CHANOPRIVSNEEDED "You're not channel operator"
-
+# define MSG_NOOPERHOST "No O-lines for your host"
+# define MSG_YOUROPER "You are now an IRC operator"
 # define CRLF "\r\n"
 
 
