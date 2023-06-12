@@ -4,6 +4,12 @@
 #include <string>
 #include <map>
 
+# define INVITE_MODE 0b1
+# define TOPIC_MODE 0b10
+# define PASSWORD_MODE 0b100
+# define CHANOP_MODE 0b1000
+# define CHANLIMIT_MODE 0b10000
+
 class Server;
 class Client;
 class Channel

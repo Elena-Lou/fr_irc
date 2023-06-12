@@ -44,6 +44,7 @@
 # include "Privmsg.hpp"
 # include "Topic.hpp"
 # include "Invite.hpp"
+# include "Mode.hpp"
 # include <ctime>
 
 # define RPL_WELCOME 1
