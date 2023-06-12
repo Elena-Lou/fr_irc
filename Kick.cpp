@@ -16,7 +16,6 @@ Kick::Kick(Server &server, Client &user, std::string rawInput) : ACommand(server
 {
 #if SHOW_CONSTRUCTOR
 	std::cout << "KICK overloaded constructor" << std::endl;
-	std::cout << "client socketFD : " << this->_author->getSocketFD() << std::endl;
 #endif
 	this->_foundChannel = NULL;
 	this->execute();
@@ -98,13 +97,13 @@ void Kick::error( int errorCode ) const
 		{
 			this->_author->writeRPLToClient(this->_server,
 					ERR_NEEDMOREPARAMS, this->_cmd[0], MSG_NEEDMOREPARAMS);
-			return;
+			break;
 		}
 		case ERR_NOSUCHCHANNEL:
 		{
 			this->_author->writeRPLToClient(this->_server, ERR_NOSUCHCHANNEL,
 					this->_cmd[1], MSG_NOSUCHCHANNEL);
-			return;
+			break;
 		}
 		case ERR_CHANOPRIVSNEEDED:
 		{
@@ -126,6 +125,5 @@ void Kick::error( int errorCode ) const
 		}
 		default:
 			std::cerr << "Error: Unrecognised error code." << std::endl;
-			break;
 	}
 }

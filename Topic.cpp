@@ -14,7 +14,7 @@ Topic::~Topic()
 #endif
 }
 
-Topic::Topic(Server &server, Client &user, std::string rawInput) : ACommand(server, user, rawInput)
+Topic::Topic(Server &server, Client &author, std::string rawInput) : ACommand(server, author, rawInput)
 {
 #if SHOW_CONSTRUCTOR
 	std::cout << "Topic full constructor" << std::endl;
@@ -47,10 +47,7 @@ Topic &Topic::operator=(const Topic &rhs)
 void Topic::execute()
 {
 	if (!this->_author->isRegistered())
-	{
-		std::cout << "User is not registered" << std::endl;
 		return ;
-	}
 	if (this->_cmd.size() < 2)
 	{
 		error(ERR_NEEDMOREPARAMS);
@@ -82,29 +79,28 @@ void Topic::error(int errorCode) const
 		{
 			this->_author->writeRPLToClient(this->_server,
 					ERR_NEEDMOREPARAMS, this->_cmd[0], MSG_NEEDMOREPARAMS);
-			return;
+			break;
 		}
 		case ERR_NOSUCHCHANNEL:
 		{
 			this->_author->writeRPLToClient(this->_server, ERR_NOSUCHCHANNEL,
 					this->_cmd[1], MSG_NOSUCHCHANNEL);
-			return;
+			break;
 		}
 		case ERR_NOTONCHANNEL:
 		{
 			this->_author->writeRPLToClient(this->_server, ERR_NOTONCHANNEL,
 					this->_cmd[1], MSG_NOTONCHANNEL);
-			return;
+			break;
 		}
 		case ERR_CHANOPRIVSNEEDED:
 		{
 			this->_author->writeRPLToClient(this->_server, ERR_CHANOPRIVSNEEDED,
 					this->_cmd[1], MSG_CHANOPRIVSNEEDED);
-			return;
+			break;
 		}
 		default:
 			std::cerr << "Error: unrecognised error code in JOIN." << std::endl;
-			break;
 	}
 }
 

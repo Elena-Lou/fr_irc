@@ -84,13 +84,13 @@ void Nick::error(int errorCode) const
 		{
 			this->_author->writeRPLToClient(this->_server,
 					ERR_NONICKNAMEGIVEN, MSG_NONICKNAMEGIVEN);
-			return;
+			break;
 		}
 		case ERR_ERRONEUSNICKNAME:
 		{
 			this->_author->writeRPLToClient(this->_server, ERR_ERRONEUSNICKNAME,
 					this->_cmd[1], MSG_ERRONEUSNICKNAME);
-			return;
+			break;
 		}
 		case ERR_NICKNAMEINUSE:
 		{
@@ -100,7 +100,6 @@ void Nick::error(int errorCode) const
 		}
 		default:
 			std::cerr << "Error: Unrecognised error code." << std::endl;
-			break;
 	}
 }
 

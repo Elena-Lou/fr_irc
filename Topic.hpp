@@ -10,7 +10,7 @@ class Server;
 class Topic : public ACommand
 {
 	public:
-		Topic(Server &server, Client &user, std::string rawInput);
+		Topic(Server &server, Client &author, std::string rawInput);
 		Topic(const Topic &source);
 		Topic &operator=(const Topic &rhs);
 		~Topic();
