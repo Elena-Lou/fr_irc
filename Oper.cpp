@@ -17,6 +17,7 @@ Oper::Oper(Server & server, Client & author, std::string rawInput) : ACommand(se
 #if SHOW_CONSTRUCTOR
 	std::cout << "OPER overloaded constructor" << std::endl;
 #endif
+	this->execute();
 }
 
 Oper::Oper(Oper const & src)
@@ -93,6 +94,7 @@ void Oper::error( int errorCode ) const
 
 void Oper::confirm() const
 {
+	
 	this->_author->writeRPLToClient(this->_server,
 		RPL_YOUROPER, MSG_YOUROPER);
 }
