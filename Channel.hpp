@@ -31,6 +31,7 @@ class Channel
 		std::string getTopic() const;
 		bool	isProtected() const;
 		bool	isTopicProtected();
+		void	changeTopicProtection(bool);
 
 		/* users handler */
 		bool	isUserConnected(Client& user);
@@ -55,6 +56,8 @@ class Channel
 		/* mods */
 		void	changePassword(std::string password);
 		bool	tryPassword(std::string password);
+		
+		char		_modeFlagsField;
 	protected:
 	private:
 		Channel();

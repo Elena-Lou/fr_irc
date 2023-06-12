@@ -17,7 +17,7 @@ Channel::~Channel()
 #endif
 }
 
-Channel::Channel(std::string name, Client& owner) :  _nbOfClients(0), _name(name)
+Channel::Channel(std::string name, Client& owner) :  _nbOfClients(0), _name(name), _modeFlagsField(0b00000000)
 {
 	this->setOperator(owner);
 	this->_protected = false;
@@ -47,6 +47,7 @@ Channel &Channel::operator=(const Channel &rhs)
 	this->_password = rhs._password;
 	this->_topic = rhs._topic;
 	this->_topicProtected = rhs._topicProtected;
+	this->_modeFlagsField = rhs._modeFlagsField;
 	return (*this);
 }
 
@@ -111,6 +112,11 @@ bool Channel::isUserConnected(std::string nickName)
 bool	Channel::isProtected() const
 {
 	return (this->_protected);
+}
+
+void	Channel::changeTopicProtection(bool flag)
+{
+	this->_topicProtected = flag;
 }
 
 Client	*Channel::getUserIfConnected(std::string nickname)
