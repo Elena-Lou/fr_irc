@@ -166,7 +166,7 @@ void Mode::error( int errorCode ) const
         case ERR_NOSUCHNICK:
 		{
 			this->_author->writeRPLToClient(this->_server,
-					ERR_NOSUCHNICK, this->_cmd[4], MSG_NOSUCHNICK);
+					ERR_NOSUCHNICK, this->_cmd[3], MSG_NOSUCHNICK);
 			break;
 		}
 		case ERR_USERSDONTMATCH:
