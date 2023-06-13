@@ -363,15 +363,6 @@ void	Server::readLoop()
 				this->disconnectUser(disconnectedClient->second);
 				continue;
 			}
-			else if ( recvRet == 0)
-			{
-				std::map<int, Client>::iterator disconnectedClient = it;
-				std::cerr << "connection closed by the client read loop. Bye Bye" << std::endl;
-				FD_CLR(it->second.getSocketFD(), &(this->_masterSet));
-				it++;
-				this->disconnectUser(disconnectedClient->second);
-				continue ;
-			}
 			else
 			{
 				it->second.readBuffer.append(this->buffer);
@@ -569,7 +560,7 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 		}
 		case 2 :
 		{
-			std::cout << "need to create INVITE command" << std::endl;
+			Invite(*this, user, rawInput);
 			break;
 		}
 		case 3 :
