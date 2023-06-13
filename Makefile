@@ -12,7 +12,8 @@ SRCS =	main.cpp\
 		Pass.cpp\
 		Privmsg.cpp\
 		Topic.cpp\
-		Invite.cpp
+		Invite.cpp\
+		Mode.cpp
 
 CXX = c++
 
@@ -52,7 +53,7 @@ testp: $(NAME)
 		./$(NAME) 3490 password
 
 vtest:	$(NAME)
-		valgrind --leak-check=full --track-fds=yes ./$(NAME)
+		valgrind --leak-check=full --track-fds=yes ./$(NAME) 3490
 
 -include $(DEPS)
 

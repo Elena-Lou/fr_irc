@@ -44,6 +44,7 @@
 # include "Privmsg.hpp"
 # include "Topic.hpp"
 # include "Invite.hpp"
+# include "Mode.hpp"
 # include <ctime>
 
 # define RPL_WELCOME 1
@@ -56,6 +57,7 @@
 # define RPL_TOPICWHOTIME 333
 # define RPL_NAMREPLY 353
 # define RPL_ENDOFNAMES 366
+# define RPL_YOUREOPER 381
 # define ERR_NOSUCHNICK 401
 # define ERR_NOSUCHCHANNEL 403
 # define ERR_CANNOTSENDTOCHAN 404
@@ -79,10 +81,14 @@
 # define ERR_BADCHANMASK 476
 # define ERR_CHANOPRIVSNEEDED 482
 # define ERR_NOOPERHOST 491
-# define RPL_YOUROPER 381
+# define ERR_UMODEUNKNOWNFLAG 501
+# define ERR_USERSDONTMATCH 502
+# define ERR_KEYSET 467
+# define RPL_CHANNELMODEIS 324
 
 # define MSG_NOTOPIC "No topic is set"
 # define MSG_ENDOFNAMES "End of /NAMES list"
+# define MSG_YOUREOPER "You are now an IRC operator"
 # define MSG_NOSUCHNICK "No such nick/channel"
 # define MSG_CANNOTSENDTOCHAN "Cannot send to channel"
 # define MSG_NOSUCHCHANNEL "No such channel"
@@ -106,7 +112,9 @@
 # define MSG_BADCHANMASK "Bad Channel Mask"
 # define MSG_CHANOPRIVSNEEDED "You're not channel operator"
 # define MSG_NOOPERHOST "No O-lines for your host"
-# define MSG_YOUROPER "You are now an IRC operator"
+# define MSG_UMODEUNKOWNFLAG "Unkown MODE flag"
+# define MSG_USERSDONTMATCH "Cant change mode for other users"
+# define MSG_KEYSET "Channel key already set"
 # define CRLF "\r\n"
 
 

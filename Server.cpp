@@ -585,7 +585,7 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 		}
 		case 7 :
 		{
-			std::cout << "need to create MODE command" << std::endl;
+			Mode(*this, user, rawInput);
 			break;
 		}
 		case 8 :

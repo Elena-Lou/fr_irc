@@ -4,6 +4,12 @@
 #include <string>
 #include <map>
 
+# define INVITE_MODE 0b1
+# define TOPIC_MODE 0b10
+# define PASSWORD_MODE 0b100
+# define CHANOP_MODE 0b1000
+# define CHANLIMIT_MODE 0b10000
+
 class Server;
 class Client;
 class Channel
@@ -24,7 +30,9 @@ class Channel
 		std::string getName() const;
 		std::string getTopic() const;
 		bool	isProtected() const;
+		void	changeChannelProtection(bool flag);
 		bool	isTopicProtected();
+		void	changeTopicProtection(bool);
 
 		/* users handler */
 		bool	isUserConnected(Client& user);
@@ -32,6 +40,7 @@ class Channel
 		Client	*getUserIfConnected(std::string userName);
 		int		removeUserFromChannel(Client& user);
 		void	addUserToChannel(Client&);
+		void	setMaxClients(int);
 
 		/* Operator handler */
 		bool	isChannelOperator(Client & user);
@@ -49,10 +58,17 @@ class Channel
 		/* mods */
 		void	changePassword(std::string password);
 		bool	tryPassword(std::string password);
+		void	setMode(char flag);
+		void	unsetMode(char flag);
+		bool	isMode(char flag);
+		int		getNbClients() const;
+		int		getMaxClients() const;
+		std::string	getModes();
+		
 	protected:
 	private:
 		Channel();
-		int					_nbOfClients;
+		int					_maxClients;
 		std::string			_name;
 		std::map<int, Client*>	_chanOps;
 		std::map<int, Client*>	_connectedClients;
@@ -63,6 +79,7 @@ class Channel
 
 		std::string _password;
 		std::string _topic;
+		char		_modeBitfield;
 };
 
 #endif

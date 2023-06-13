@@ -17,11 +17,13 @@ Channel::~Channel()
 #endif
 }
 
-Channel::Channel(std::string name, Client& owner) :  _nbOfClients(0), _name(name)
+Channel::Channel(std::string name, Client& owner) :  _name(name)
 {
 	this->setOperator(owner);
 	this->_protected = false;
 	this->_topicProtected = false;
+	this->_modeBitfield = 0;
+	this->_maxClients = 0;
 #if SHOW_CONSTRUCTOR
 	std::cout << "Channel string Client constructor" << std::endl;
 #endif
@@ -41,12 +43,13 @@ Channel &Channel::operator=(const Channel &rhs)
 	std::cout << "Channel = overload" << std::endl;
 #endif
 	this->_chanOps = rhs._chanOps;
-	this->_nbOfClients = rhs._nbOfClients;
 	this->_name = rhs._name;
 	this->_protected = rhs._protected;
 	this->_password = rhs._password;
 	this->_topic = rhs._topic;
 	this->_topicProtected = rhs._topicProtected;
+	this->_modeBitfield = rhs._modeBitfield;
+	this->_maxClients = rhs._maxClients;
 	return (*this);
 }
 
@@ -95,7 +98,6 @@ static bool	isCaseInsensitiveEqual(std::string str1, std::string str2)
 	return (true);
 }
 
-
 bool Channel::isUserConnected(std::string nickName)
 {
 	std::map<int, Client*>::iterator it;
@@ -111,6 +113,16 @@ bool Channel::isUserConnected(std::string nickName)
 bool	Channel::isProtected() const
 {
 	return (this->_protected);
+}
+
+void	Channel::changeTopicProtection(bool flag)
+{
+	this->_topicProtected = flag;
+}
+
+void	Channel::changeChannelProtection(bool flag)
+{
+	this->_protected = flag;
 }
 
 Client	*Channel::getUserIfConnected(std::string nickname)
@@ -129,9 +141,13 @@ void	Channel::addUserToChannel(Client& user)
 	if (this->isUserConnected(user) == NOT_CONNECTED)
 	{
 		this->_connectedClients.insert(std::make_pair(user.getSocketFD(), &user));
-		this->_nbOfClients++;
 		user.joinChannel(*this);
 	}
+}
+
+void	Channel::setMaxClients(int maxClients)
+{
+	this->_maxClients = maxClients;
 }
 
 /* returns the number of connected clients after the operation to delete chan if empty*/
@@ -139,14 +155,13 @@ int		Channel::removeUserFromChannel(Client& user)
 {
 	if (this->isUserConnected(user) == CONNECTED)
 	{
-		this->_nbOfClients--;
 		user.quitChannel(*this);
 
 		std::map<int, Client*>::iterator clientIterator = this->_connectedClients.find(user.getSocketFD());
 		if (clientIterator != this->_connectedClients.end())
 			this->_connectedClients.erase(clientIterator);
 	}
-	return (this->_nbOfClients);
+	return (this->_connectedClients.size());
 }
 
 bool Channel::isChannelOperator(Client & user)
@@ -167,7 +182,6 @@ void	Channel::removeOperator(Client &chanOp)
 {
 	this->_chanOps.erase(chanOp.getSocketFD());
 }
-
 
 void	Channel::broadcastToChannel(std::string message)
 {
@@ -244,4 +258,46 @@ void	Channel::sendTOPICWHOTIME(Server &server, Client &author)
 		<< " " << author.getNickname() << " " << this->_name << " "
 		<< this->_topicUpdater << " " << this->_topicUpdateTimestamp;
 	author.writeToClient(msgBuilder.str());
+}
+
+void	Channel::setMode(char flag)
+{
+	this->_modeBitfield |= flag;
+}
+
+void	Channel::unsetMode(char flag)
+{
+	this->_modeBitfield &= ~(flag);
+}
+
+bool	Channel::isMode(char flag)
+{
+	return ((this->_modeBitfield & flag) == flag);
+}
+
+int		Channel::getNbClients() const
+{
+	return this->_connectedClients.size();
+}
+
+int		Channel::getMaxClients() const
+{
+	return this->_maxClients;
+}
+
+std::string Channel::getModes()
+{
+	std::stringstream stringMode;
+	stringMode << "+";
+	if (this->isMode(INVITE_MODE))
+		stringMode << "i";
+	if (this->isMode(TOPIC_MODE))
+		stringMode << "t";
+	if (this->isMode(PASSWORD_MODE))
+		stringMode << "k";
+	if (this->isMode(CHANOP_MODE))
+		stringMode << "o";
+	if (this->isMode(CHANLIMIT_MODE))
+		stringMode << "l " << this->_maxClients; 
+	return stringMode.str();
 }
