@@ -272,7 +272,6 @@ void	Channel::unsetMode(char flag)
 
 bool	Channel::isMode(char flag)
 {
-	return ((this->_modeBitfield & flag) == flag);
 }
 
 int		Channel::getNbClients() const
@@ -283,4 +282,21 @@ int		Channel::getNbClients() const
 int		Channel::getMaxClients() const
 {
 	return this->_maxClients;
+}
+
+std::string Channel::getModes()
+{
+	std::stringstream stringMode;
+	stringMode << "+";
+	if (this->isMode(INVITE_MODE))
+		stringMode << "i";
+	if (this->isMode(TOPIC_MODE))
+		stringMode << "t";
+	if (this->isMode(PASSWORD_MODE))
+		stringMode << "k";
+	if (this->isMode(CHANOP_MODE))
+		stringMode << "o";
+	if (this->isMode(CHANLIMIT_MODE))
+		stringMode << "l " << this->_maxClients; 
+	return stringMode.str();
 }

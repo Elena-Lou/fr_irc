@@ -88,6 +88,9 @@ Mode::~Mode()
 
 void	Mode::confirm() const
 {
+	std::string modes;
+	modes = this->_targetChannel->getModes();
+	this->_author->writeRPLToClient(this->_server, RPL_CHANNELMODEIS, modes);
 
 }
 
@@ -123,6 +126,7 @@ void Mode::error( int errorCode ) const
 		{
 			this->_author->writeRPLToClient(this->_server, ERR_KEYSET,
 				this->_cmd[1], MSG_KEYSET);
+			break;
 		}
 		case ERR_NOSUCHNICK:
 		{
@@ -166,31 +170,29 @@ int Mode::checkValidCmd()
 /* check the command is valid */
 	if (this->_cmd.size() < 5)
 	{
-		if (this->_cmd[2][0] != '-' || this->_cmd[2][0] != '+')
+		if (this->_cmd[2][0] == '-' || this->_cmd[2][0] == '+')
 		{
-			std::cerr << "Invalid sign" << std::endl;
-			return ERROR;
-		}
-		switch (this->_cmd[2][1])
-		{
-		case ('i'):
-			std::cout << "Invite must be set" << std::endl;
-			return invite();
-		case ('t'):
-			std::cout << "Topic must be set" << std::endl;
-			return topic();
-		case ('k'):
-			std::cout << "Password must be set" << std::endl;
-			return channelKey();
-		case ('o'):
-			std::cout << "ChanOp must be set" << std::endl;
-			return channelOp();
-		case ('l'):
-			std::cout << "Chan Limit must be set" << std::endl;
-			return channelLimit();
-		default:
-			error(ERR_UMODEUNKNOWNFLAG);
-			break;
+			switch (this->_cmd[2][1])
+			{
+			case ('i'):
+				std::cout << "Invite must be set" << std::endl;
+				return invite();
+			case ('t'):
+				std::cout << "Topic must be set" << std::endl;
+				return topic();
+			case ('k'):
+				std::cout << "Password must be set" << std::endl;
+				return channelKey();
+			case ('o'):
+				std::cout << "ChanOp must be set" << std::endl;
+				return channelOp();
+			case ('l'):
+				std::cout << "Chan Limit must be set" << std::endl;
+				return channelLimit();
+			default:
+				error(ERR_UMODEUNKNOWNFLAG);
+				break;
+			}
 		}
 	}
 	return ERROR;

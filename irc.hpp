@@ -84,6 +84,7 @@
 # define ERR_UMODEUNKNOWNFLAG 501
 # define ERR_USERSDONTMATCH 502
 # define ERR_KEYSET 467
+# define RPL_CHANNELMODEIS 324
 
 # define MSG_NOTOPIC "No topic is set"
 # define MSG_ENDOFNAMES "End of /NAMES list"

@@ -63,6 +63,8 @@ class Channel
 		bool	isMode(char flag);
 		int		getNbClients() const;
 		int		getMaxClients() const;
+		std::string	getModes();
+		
 	protected:
 	private:
 		Channel();
