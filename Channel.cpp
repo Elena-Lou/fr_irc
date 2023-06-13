@@ -183,7 +183,6 @@ void	Channel::removeOperator(Client &chanOp)
 	this->_chanOps.erase(chanOp.getSocketFD());
 }
 
-
 void	Channel::broadcastToChannel(std::string message)
 {
 	for (std::map<int, Client*>::iterator it = this->_connectedClients.begin();
@@ -259,4 +258,19 @@ void	Channel::sendTOPICWHOTIME(Server &server, Client &author)
 		<< " " << author.getNickname() << " " << this->_name << " "
 		<< this->_topicUpdater << " " << this->_topicUpdateTimestamp;
 	author.writeToClient(msgBuilder.str());
+}
+
+void	Channel::setMode(char flag)
+{
+	this->_modeFlagsField |= flag;
+}
+
+void	Channel::unsetMode(char flag)
+{
+	this->_modeFlagsField &= ~(1 << flag);
+}
+
+bool	Channel::isMode(char flag)
+{
+	return (this->_modeFlagsField & flag == flag);
 }

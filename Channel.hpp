@@ -57,8 +57,9 @@ class Channel
 		/* mods */
 		void	changePassword(std::string password);
 		bool	tryPassword(std::string password);
-		
-		char		_modeFlagsField;
+		void	setMode(char flag);
+		void	unsetMode(char flag);
+		bool	isMode(char flag);
 	protected:
 	private:
 		Channel();
@@ -74,6 +75,7 @@ class Channel
 
 		std::string _password;
 		std::string _topic;
+		char		_modeFlagsField;
 };
 
 #endif
