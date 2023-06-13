@@ -40,7 +40,9 @@ class Channel
 		Client	*getUserIfConnected(std::string userName);
 		int		removeUserFromChannel(Client& user);
 		void	addUserToChannel(Client&);
+		void	addUserToInviteList(Client&);
 		void	setMaxClients(int);
+		void	removeUserFromInviteList(Client &user);
 
 		/* Operator handler */
 		bool	isChannelOperator(Client & user);
@@ -64,7 +66,7 @@ class Channel
 		int		getNbClients() const;
 		int		getMaxClients() const;
 		std::string	getModes();
-		
+
 	protected:
 	private:
 		Channel();
@@ -72,6 +74,7 @@ class Channel
 		std::string			_name;
 		std::map<int, Client*>	_chanOps;
 		std::map<int, Client*>	_connectedClients;
+		std::map<int, Client*>	_inviteList;
 		bool		_protected;
 		bool		_topicProtected;
 		time_t _topicUpdateTimestamp;

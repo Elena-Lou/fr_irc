@@ -280,6 +280,7 @@ void	Server::disconnectUser(Client &client)
 	for (std::deque<Channel>::iterator channelIterator = this->_channels.begin();
 		this->_channels.size() && channelIterator != this->_channels.end(); )
 	{
+		channelIterator->removeUserFromInviteList(client);
 		if (channelIterator->removeUserFromChannel(client) == 0)
 		{
 			std::deque<Channel>::iterator channelToDelete = channelIterator;

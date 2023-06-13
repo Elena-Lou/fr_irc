@@ -59,7 +59,8 @@ void Invite::execute()
 		error(ERR_NOTONCHANNEL);
 		return;
 	}
-	if (0 && !this->_targetChannel->isChannelOperator(*this->_author)) //TODO replace 0 by is channel is invite only
+	if (this->_targetChannel->isMode(INVITE_MODE)
+		&& !this->_targetChannel->isChannelOperator(*this->_author))
 	{
 		error(ERR_CHANOPRIVSNEEDED);
 		return;
@@ -115,9 +116,7 @@ void Invite::error(int errorCode) const
 
 void Invite::confirm() const
 {
-	//send invite confirmation to author
-	//send invite to targetClient
-	//add client to channel invitelist (set ?);
+	this->_targetChannel->addUserToInviteList(*this->_targetClient);
 	std::stringstream messageBuilderAuthor;
 	messageBuilderAuthor << ":" << this->_server->getHostname() << " INVITE :"
 		<< this->_cmd[1] << " " << this->_cmd[2];
