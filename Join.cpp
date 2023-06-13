@@ -98,13 +98,13 @@ void Join::execute()
 		error(ERR_BANNEDFROMCHAN);
 		return;
 	}
-	if (this->_target->isMode(CHANLIMIT_MODE)
+	if (this->_target && this->_target->isMode(CHANLIMIT_MODE)
 		&& this->_target->getNbClients() >= this->_target->getMaxClients()) //channel is full
 	{
 		error(ERR_CHANNELISFULL);
 		return;
 	}
-	if (this->_target->isMode(INVITE_MODE)) // invite only chan )
+	if (this->_target && this->_target->isMode(INVITE_MODE)) // invite only chan )
 	{
 		error(ERR_INVITEONLYCHAN);
 		return;
