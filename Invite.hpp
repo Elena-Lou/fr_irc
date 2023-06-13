@@ -9,7 +9,7 @@ class Server;
 class Invite : public ACommand
 {
 	public:
-		Invite(Server &server, Client &user, std::string rawInput);
+		Invite(Server &server, Client &author, std::string rawInput);
 		Invite(const Invite &source);
 		Invite &operator=(const Invite &rhs);
 		~Invite();

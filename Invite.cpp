@@ -13,7 +13,7 @@ Invite::~Invite()
 #endif
 }
 
-Invite::Invite(Server &server, Client &user, std::string rawInput) : ACommand(server, user, rawInput)
+Invite::Invite(Server &server, Client &author, std::string rawInput) : ACommand(server, user, rawInput)
 {
 #if SHOW_CONSTRUCTOR
 	std::cout << "Invite full constructor" << std::endl;
