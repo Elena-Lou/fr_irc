@@ -26,6 +26,7 @@ class Mode : public ACommand
 
 		bool	isAPossibleChannelName(std::string name);
 		int		checkValidCmd();
+		void 	sendRPLCHANNELMODEIS() const;
 
 		int		invite();
 		int		topic();

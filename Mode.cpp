@@ -86,12 +86,19 @@ Mode::~Mode()
 	this->confirm();
 }
 
+void 	Mode::sendRPLCHANNELMODEIS() const 
+{
+	std::stringstream modeString;
+
+	modeString << ":" << this->_server->getHostname() << " " << 
+	RPL_CHANNELMODEIS << " " << this->_author->getNickname() << " " << this->_cmd[1] << 
+	" " << this->_targetChannel->getModes();
+	this->_author->writeToClient(modeString.str());
+}
+
 void	Mode::confirm() const
 {
-	std::string modes;
-	modes = this->_targetChannel->getModes();
-	this->_author->writeRPLToClient(this->_server, RPL_CHANNELMODEIS, modes);
-
+	this->sendRPLCHANNELMODEIS();
 }
 
 void Mode::error( int errorCode ) const
@@ -168,7 +175,10 @@ bool	Mode::isAPossibleChannelName(std::string name)
 int Mode::checkValidCmd()
 {
 /* check the command is valid */
-	if (this->_cmd.size() < 5)
+	if (this->_cmd.size() == 2)
+		return SUCCESS;	
+		
+	if (this->_cmd.size() >= 3)
 	{
 		if (this->_cmd[2][0] == '-' || this->_cmd[2][0] == '+')
 		{

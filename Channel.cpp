@@ -272,6 +272,7 @@ void	Channel::unsetMode(char flag)
 
 bool	Channel::isMode(char flag)
 {
+	return ((this->_modeBitfield & flag) == flag);
 }
 
 int		Channel::getNbClients() const
