@@ -39,6 +39,7 @@ class Channel
 		Client	*getUserIfConnected(std::string userName);
 		int		removeUserFromChannel(Client& user);
 		void	addUserToChannel(Client&);
+		void	setMaxClients(int);
 
 		/* Operator handler */
 		bool	isChannelOperator(Client & user);
@@ -61,6 +62,7 @@ class Channel
 	protected:
 	private:
 		Channel();
+		int					_maxClients;
 		int					_nbOfClients;
 		std::string			_name;
 		std::map<int, Client*>	_chanOps;

@@ -200,7 +200,7 @@ bool	Mode::isAPossibleChannelName(std::string name)
 	return (true);
 }
 
-void Mode::checkValidCmd()
+int Mode::checkValidCmd()
 {
 /* check the command is valid */
     if (this->_cmd.size() < 5)
@@ -219,8 +219,7 @@ void Mode::checkValidCmd()
 			break;
 		case ('t'):
 			std::cout << "Topic must be set" << std::endl;
-			this->topic();
-			break;
+			return topic();
 		case ('k'):
 			std::cout << "Password must be set" << std::endl;
 			this->channelKey();
@@ -241,88 +240,104 @@ void Mode::checkValidCmd()
     }
 }
 
-void	Mode::topic( )
+int	Mode::topic( )
 {
 	/* check the topic command is valid */
 	if (this->_cmd[2][0] == '+')
 	{
 		this->_targetChannel->_modeFlagsField |= TOPIC_MODE;
 		this->_targetChannel->changeTopicProtection(true);
+		return true;
 	}
 	else if (this->_cmd[2][0] == '-')
 	{
 		this->_targetChannel->_modeFlagsField &= ~TOPIC_MODE;
 		this->_targetChannel->changeTopicProtection(false);
+		return true;
 	}
+	return false;
 }
 
-void	Mode::invite()
+int	Mode::invite()
 {
 	/* check the invite command is valid */
 	if (this->_cmd[2][0] == '+')
 	{
-		// set invite flag
+		this->_targetChannel->_modeFlagsField |= INVITE_MODE;
+		return true;
 	}
 	else if (this->_cmd[2][0] == '-')
 	{
-		// unset topic flag
+		this->_targetChannel->_modeFlagsField &= ~INVITE_MODE;
+		return true;
 	}
-
+	return false;
 }
 
-void	Mode::channelKey()
+int	Mode::channelKey()
 {
 	/* check the channel password command is valid && has enough arguments */
 	if (this->_cmd.size() != 4)
 	{
-		std::cerr << "not enough arguments" << std::endl;
-		return ;
+		return ERR_NEEDMOREPARAMS;
 	}
 	if (this->_cmd[2][0] == '+')
 	{
-		// set topic flag
+		this->_targetChannel->_modeFlagsField |= PASSWORD_MODE;
+		return true;
+
 	}
 	else if (this->_cmd[2][0] == '-')
 	{
-		// unset topic flag
+		this->_targetChannel->_modeFlagsField &= ~PASSWORD_MODE;
+		return true;
 	}
 
 }
 
-void	Mode::channelOp( )
+int	Mode::channelOp( )
 {
 	/* check the channel Ope command is valid && has enough arguments */
 	if (this->_cmd.size() != 4)
 	{
-		std::cerr << "not enough arguments" << std::endl;
-		return ;
+		return ERR_NEEDMOREPARAMS;
 	}
 	if (this->_cmd[2][0] == '+')
 	{
-		// set topic flag
+		this->_targetChannel->_modeFlagsField |= CHANOP_MODE;
+		this->_targetChannel->setOperator(*this->_author);
 	}
 	else if (this->_cmd[2][0] == '-')
 	{
-		// unset topic flag
+		this->_targetChannel->_modeFlagsField &= ~CHANOP_MODE;
+		this->_targetChannel->removeOperator(*this->_author);
 	}
 
 }
 
-void	Mode::channelLimit( )
+int	Mode::channelLimit( )
 {
 	/* check the channel limit command is valid && has enough arguments */
 	if (this->_cmd.size() != 4)
 	{
-		std::cerr << "not enough arguments" << std::endl;
-		return ;
+		return ERR_NEEDMOREPARAMS;
 	}
+	/* check that this->_cmd[3] is digit */
+	int i = 0;
+	while (this->_cmd[3][i])
+	{
+		if (!std::isdigit(this->_cmd[3][i]))
+			return false;
+	}
+	
 	if (this->_cmd[2][0] == '+')
 	{
-		// set topic flag
+		this->_targetChannel->_modeFlagsField |= CHANLIMIT_MODE;
+		this->_targetChannel->setMaxClients(std::atoi(this->_cmd[3].c_str()));
 	}
 	else if (this->_cmd[2][0] == '-')
 	{
-		// unset topic flag
+		this->_targetChannel->_modeFlagsField &= ~CHANLIMIT_MODE;
 	}
 
 }

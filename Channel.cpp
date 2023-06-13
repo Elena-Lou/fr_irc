@@ -17,7 +17,7 @@ Channel::~Channel()
 #endif
 }
 
-Channel::Channel(std::string name, Client& owner) :  _nbOfClients(0), _name(name), _modeFlagsField(0b00000000)
+Channel::Channel(std::string name, Client& owner) :  _nbOfClients(0), _name(name), _modeFlagsField(0b00000000), _maxClients(0)
 {
 	this->setOperator(owner);
 	this->_protected = false;
@@ -48,6 +48,7 @@ Channel &Channel::operator=(const Channel &rhs)
 	this->_topic = rhs._topic;
 	this->_topicProtected = rhs._topicProtected;
 	this->_modeFlagsField = rhs._modeFlagsField;
+	this->_maxClients = rhs._maxClients;
 	return (*this);
 }
 
@@ -96,7 +97,6 @@ static bool	isCaseInsensitiveEqual(std::string str1, std::string str2)
 	return (true);
 }
 
-
 bool Channel::isUserConnected(std::string nickName)
 {
 	std::map<int, Client*>::iterator it;
@@ -132,12 +132,21 @@ Client	*Channel::getUserIfConnected(std::string nickname)
 
 void	Channel::addUserToChannel(Client& user)
 {
-	if (this->isUserConnected(user) == NOT_CONNECTED)
+	if (this->_modeFlagsField & CHANLIMIT_MODE ||
+		this->_connectedClients.size() < this->_maxClients)
 	{
-		this->_connectedClients.insert(std::make_pair(user.getSocketFD(), &user));
-		this->_nbOfClients++;
-		user.joinChannel(*this);
+		if (this->isUserConnected(user) == NOT_CONNECTED)
+		{
+			this->_connectedClients.insert(std::make_pair(user.getSocketFD(), &user));
+			this->_nbOfClients++;
+			user.joinChannel(*this);
+		}
 	}
+}
+
+void	Channel::setMaxClients(int maxClients)
+{
+	this->_maxClients = maxClients;
 }
 
 /* returns the number of connected clients after the operation to delete chan if empty*/

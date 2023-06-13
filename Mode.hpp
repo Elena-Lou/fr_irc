@@ -22,13 +22,13 @@ class Mode : public ACommand
 		void	confirm() const;
 
 		bool	isAPossibleChannelName(std::string name);
-		void	checkValidCmd();
+		int		checkValidCmd();
 
-		void	invite();
-		void	topic();
-		void	channelKey();
-		void	channelOp();
-		void	channelLimit();
+		int		invite();
+		int		topic();
+		int		channelKey();
+		int		channelOp();
+		int		channelLimit();
 
 		Channel *_targetChannel;
 		Client	*_targetClient;
