@@ -84,7 +84,6 @@ Mode::~Mode()
 		return ;
 	}
 	this->confirm();
-
 }
 
 void	Mode::confirm() const
@@ -119,6 +118,11 @@ void Mode::error( int errorCode ) const
 			this->_author->writeRPLToClient(this->_server, ERR_CHANOPRIVSNEEDED,
 					this->_cmd[1], MSG_CHANOPRIVSNEEDED);
 			break;
+		}
+		case ERR_KEYSET:
+		{
+			this->_author->writeRPLToClient(this->_server, ERR_KEYSET,
+				this->_cmd[1], MSG_KEYSET);
 		}
 		case ERR_NOSUCHNICK:
 		{
@@ -235,13 +239,17 @@ int	Mode::channelKey()
 	}
 	if (this->_cmd[2][0] == '+')
 	{
+		if (this->_targetChannel->isProtected())
+			return ERR_KEYSET;
 		this->_targetChannel->setMode(PASSWORD_MODE);
+		this->_targetChannel->changePassword(this->_cmd[3]);
 		return SUCCESS;
 
 	}
 	else if (this->_cmd[2][0] == '-')
 	{
 		this->_targetChannel->unsetMode(PASSWORD_MODE);
+		this->_targetChannel->changeChannelProtection(false);
 		return SUCCESS;
 	}
 	return ERR_UMODEUNKNOWNFLAG;

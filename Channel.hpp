@@ -30,6 +30,7 @@ class Channel
 		std::string getName() const;
 		std::string getTopic() const;
 		bool	isProtected() const;
+		void	changeChannelProtection(bool flag);
 		bool	isTopicProtected();
 		void	changeTopicProtection(bool);
 
@@ -60,6 +61,8 @@ class Channel
 		void	setMode(char flag);
 		void	unsetMode(char flag);
 		bool	isMode(char flag);
+		int		getNbClients() const;
+		int		getMaxClients() const;
 	protected:
 	private:
 		Channel();

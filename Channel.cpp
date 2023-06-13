@@ -120,6 +120,11 @@ void	Channel::changeTopicProtection(bool flag)
 	this->_topicProtected = flag;
 }
 
+void	Channel::changeChannelProtection(bool flag)
+{
+	this->_protected = flag;
+}
+
 Client	*Channel::getUserIfConnected(std::string nickname)
 {
 	for (std::map<int, Client*>::iterator it = this->_connectedClients.begin();
@@ -268,4 +273,14 @@ void	Channel::unsetMode(char flag)
 bool	Channel::isMode(char flag)
 {
 	return ((this->_modeBitfield & flag) == flag);
+}
+
+int		Channel::getNbClients() const
+{
+	return this->_connectedClients.size();
+}
+
+int		Channel::getMaxClients() const
+{
+	return this->_maxClients;
 }

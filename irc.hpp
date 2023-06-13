@@ -83,6 +83,7 @@
 # define ERR_NOOPERHOST 491
 # define ERR_UMODEUNKNOWNFLAG 501
 # define ERR_USERSDONTMATCH 502
+# define ERR_KEYSET 467
 
 # define MSG_NOTOPIC "No topic is set"
 # define MSG_ENDOFNAMES "End of /NAMES list"
@@ -112,6 +113,7 @@
 # define MSG_NOOPERHOST "No O-lines for your host"
 # define MSG_UMODEUNKOWNFLAG "Unkown MODE flag"
 # define MSG_USERSDONTMATCH "Cant change mode for other users"
+# define MSG_KEYSET "Channel key already set"
 # define CRLF "\r\n"
 
 
