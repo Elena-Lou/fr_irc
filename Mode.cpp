@@ -15,8 +15,11 @@ Mode::Mode( Mode const & src ) : ACommand(src)
 Mode::Mode(Server &server, Client & author, std::string rawInput) : ACommand(server, author, rawInput)
 {
 #if SHOW_CONSTRUCTOR
-	std::cout << "MODE overloaded constructor" << std::endl;
+	std::cout << "Mode full constructor" << std::endl;
 #endif
+	this->_targetChannel = NULL;
+	if (this->_cmd.size() >= 2)
+		this->_targetChannel = this->_server->getChannelIfExist(this->_cmd[1]);
 	this->execute();
 }
 
@@ -27,6 +30,7 @@ Mode & Mode::operator=( Mode const & rhs )
 		this->_cmd = rhs._cmd;
 		this->_server = rhs._server;
 		this->_author = rhs._author;
+		this->_targetChannel = rhs._targetChannel;
 	}
 	return *this;
 }
@@ -38,96 +42,42 @@ Mode::~Mode()
 #endif
 }
 
-Mode::Mode(Server &server, Client & author, std::string rawInput) : ACommand(server, author, rawInput)
-{
-#if SHOW_CONSTRUCTOR
-	std::cout << "Mode full constructor" << std::endl;
-#endif
-	this->_targetChannel = NULL;
-	if (this->_cmd.size() >= 2)
-		this->_targetChannel = this->_server->getChannelIfExist(this->_cmd[1]);
-	this->execute();
-}
-
-Mode::Mode(const Mode &source) : ACommand(source)
-{
-	*this = source;
-}
-
-Mode &Mode::operator=(const Mode &rhs)
-{
-	this->_cmd = rhs._cmd;
-	this->_server = rhs._server;
-	this->_author = rhs._author;
-	return (*this);
-}
-
-// void Mode::execute()
-// {
-// 	if (!this->_author->isRegistered())
-// 		return ;
-// 	if (this->_cmd.size() < 2)
-// 	{
-// 		error(ERR_NEEDMOREPARAMS);
-// 		return;
-// 	}
-// 	if (this->isAPossibleChannelName(this->_cmd[1]) && this->_targetChannel == NULL)
-// 	{
-// 		error(ERR_NOSUCHCHANNEL);
-// 		return;
-// 	}
-// 	if (0 && !this->_targetChannel->isChannelOperator(*this->_author)) //TODO replace 0 by is channel is invite only
-// 	{
-// 		error(ERR_CHANOPRIVSNEEDED);
-// 		return;
-// 	}
-// 	if (!this->isAPossibleChannelName(this->_cmd[1]) && this->_server->getUserIfConnected(this->_cmd[1]) == NULL)
-// 	{
-// 		error(ERR_NOSUCHNICK);
-// 		return;
-// 	}
-// 	if (!this->isAPossibleChannelName(this->_cmd[1]) && this->_cmd[1] != this->_author->getNickname())
-// 	{
-// 		error(ERR_USERSDONTMATCH);
-// 		return;
-// 	}
-// 	this->confirm();
-// }
-
-
-void Mode::execute()
-{
-    if (!this->_author->isRegistered())
+ void Mode::execute()
+ {
+	if (!this->_author->isRegistered())
+		return ;
+	if (this->_cmd.size() < 2)
+	{
+		error(ERR_NEEDMOREPARAMS);
 		return;
-    if (this->_cmd.size() == 1)
-    {
-        error(ERR_NEEDMOREPARAMS);
-        return ;
-    }
-    /* check channel exists */
-	this->_targetChannel = this->_server->getChannelIfExist(this->_cmd[1]);
+	}
 	if (this->isAPossibleChannelName(this->_cmd[1]) && this->_targetChannel == NULL)
 	{
 		error(ERR_NOSUCHCHANNEL);
-		return ;
+		return;
 	}
-
-	/* Is the user connected to that channel ? */
-	if (!this->_targetChannel->isUserConnected(*(this->_author)))
-	{
-		error(ERR_NOTONCHANNEL);
-		return ;
-	}
-
-    /* need to check if author has priviledges before checking the rest of the command */
-    if (!this->_targetChannel->isChannelOperator(*(this->_author)))
+	if (0 && !this->_targetChannel->isChannelOperator(*this->_author)) //TODO replace 0 by is channel is invite only
 	{
 		error(ERR_CHANOPRIVSNEEDED);
-		return ;
+		return;
 	}
-	
-	this->checkValidCmd();  
-
+	if (!this->isAPossibleChannelName(this->_cmd[1]) && this->_server->getUserIfConnected(this->_cmd[1]) == NULL)
+	{
+		error(ERR_NOSUCHNICK);
+		return;
+	}
+	if (!this->isAPossibleChannelName(this->_cmd[1]) && this->_cmd[1] != this->_author->getNickname())
+	{
+		error(ERR_USERSDONTMATCH);
+		return;
+	}
+	if (!this->isAPossibleChannelName(this->_cmd[1]))
+	{
+		// This is not asked by the subject
+		return;
+	}
+	this->checkValidCmd();
+	this->confirm();
 }
 
 void	Mode::confirm() const
@@ -163,7 +113,7 @@ void Mode::error( int errorCode ) const
 					this->_cmd[1], MSG_CHANOPRIVSNEEDED);
 			break;
 		}
-        case ERR_NOSUCHNICK:
+		case ERR_NOSUCHNICK:
 		{
 			this->_author->writeRPLToClient(this->_server,
 					ERR_NOSUCHNICK, this->_cmd[3], MSG_NOSUCHNICK);
@@ -203,41 +153,40 @@ bool	Mode::isAPossibleChannelName(std::string name)
 int Mode::checkValidCmd()
 {
 /* check the command is valid */
-    if (this->_cmd.size() < 5)
-    {
+	if (this->_cmd.size() < 5)
+	{
 		if (this->_cmd[2][0] != '-' || this->_cmd[2][0] != '+')
 		{
 			std::cerr << "Invalid sign" << std::endl;
-			return ;
+			return -1;
 		}
-
 		switch (this->_cmd[2][1])
 		{
-		case ('i'):
-			std::cout << "Invite must be set" << std::endl;
-			this->invite();
-			break;
-		case ('t'):
-			std::cout << "Topic must be set" << std::endl;
-			return topic();
-		case ('k'):
-			std::cout << "Password must be set" << std::endl;
-			this->channelKey();
-			break;
-		case ('o'):
-			std::cout << "ChanOp must be set" << std::endl;
-			this->channelOp();
-			break;
-		case ('l'):
-			std::cout << "Chan Limit must be set" << std::endl;
-			this->channelLimit();
-			break;
-		default:
-			error(ERR_UMODEUNKNOWNFLAG);
-			break;
+			case ('i'):
+				std::cout << "Invite must be set" << std::endl;
+				this->invite();
+				break;
+			case ('t'):
+				std::cout << "Topic must be set" << std::endl;
+				return topic();
+			case ('k'):
+				std::cout << "Password must be set" << std::endl;
+				this->channelKey();
+				break;
+			case ('o'):
+				std::cout << "ChanOp must be set" << std::endl;
+				this->channelOp();
+				break;
+			case ('l'):
+				std::cout << "Chan Limit must be set" << std::endl;
+				this->channelLimit();
+				break;
+			default:
+				error(ERR_UMODEUNKNOWNFLAG);
+				break;
 		}
-        
-    }
+	}
+	return (-1);
 }
 
 int	Mode::topic( )
@@ -245,13 +194,13 @@ int	Mode::topic( )
 	/* check the topic command is valid */
 	if (this->_cmd[2][0] == '+')
 	{
-		this->_targetChannel->_modeFlagsField |= TOPIC_MODE;
+		this->_targetChannel->setMode(TOPIC_MODE);
 		this->_targetChannel->changeTopicProtection(true);
 		return true;
 	}
 	else if (this->_cmd[2][0] == '-')
 	{
-		this->_targetChannel->_modeFlagsField &= ~TOPIC_MODE;
+		this->_targetChannel->unsetMode(TOPIC_MODE);
 		this->_targetChannel->changeTopicProtection(false);
 		return true;
 	}
@@ -263,12 +212,12 @@ int	Mode::invite()
 	/* check the invite command is valid */
 	if (this->_cmd[2][0] == '+')
 	{
-		this->_targetChannel->_modeFlagsField |= INVITE_MODE;
+		this->_targetChannel->setMode(INVITE_MODE);
 		return true;
 	}
 	else if (this->_cmd[2][0] == '-')
 	{
-		this->_targetChannel->_modeFlagsField &= ~INVITE_MODE;
+		this->_targetChannel->unsetMode(INVITE_MODE);
 		return true;
 	}
 	return false;
@@ -283,16 +232,16 @@ int	Mode::channelKey()
 	}
 	if (this->_cmd[2][0] == '+')
 	{
-		this->_targetChannel->_modeFlagsField |= PASSWORD_MODE;
+		this->_targetChannel->setMode(PASSWORD_MODE);
 		return true;
 
 	}
 	else if (this->_cmd[2][0] == '-')
 	{
-		this->_targetChannel->_modeFlagsField &= ~PASSWORD_MODE;
+		this->_targetChannel->unsetMode(PASSWORD_MODE);
 		return true;
 	}
-
+	return (-1);
 }
 
 int	Mode::channelOp( )
@@ -304,24 +253,22 @@ int	Mode::channelOp( )
 	}
 	if (this->_cmd[2][0] == '+')
 	{
-		this->_targetChannel->_modeFlagsField |= CHANOP_MODE;
+		this->_targetChannel->setMode(CHANOP_MODE);
 		this->_targetChannel->setOperator(*this->_author);
 	}
 	else if (this->_cmd[2][0] == '-')
 	{
-		this->_targetChannel->_modeFlagsField &= ~CHANOP_MODE;
+		this->_targetChannel->unsetMode(CHANOP_MODE);
 		this->_targetChannel->removeOperator(*this->_author);
 	}
-
+	return (-1);
 }
 
 int	Mode::channelLimit( )
 {
 	/* check the channel limit command is valid && has enough arguments */
 	if (this->_cmd.size() != 4)
-	{
 		return ERR_NEEDMOREPARAMS;
-	}
 	/* check that this->_cmd[3] is digit */
 	int i = 0;
 	while (this->_cmd[3][i])
@@ -329,15 +276,14 @@ int	Mode::channelLimit( )
 		if (!std::isdigit(this->_cmd[3][i]))
 			return false;
 	}
-	
 	if (this->_cmd[2][0] == '+')
 	{
-		this->_targetChannel->_modeFlagsField |= CHANLIMIT_MODE;
+		this->_targetChannel->setMode(CHANLIMIT_MODE);
 		this->_targetChannel->setMaxClients(std::atoi(this->_cmd[3].c_str()));
 	}
 	else if (this->_cmd[2][0] == '-')
 	{
-		this->_targetChannel->_modeFlagsField &= ~CHANLIMIT_MODE;
+		this->_targetChannel->unsetMode(CHANLIMIT_MODE);
 	}
-
+	return (-1);
 }

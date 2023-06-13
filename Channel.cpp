@@ -17,11 +17,13 @@ Channel::~Channel()
 #endif
 }
 
-Channel::Channel(std::string name, Client& owner) :  _nbOfClients(0), _name(name), _modeFlagsField(0b00000000), _maxClients(0)
+Channel::Channel(std::string name, Client& owner) :  _name(name)
 {
 	this->setOperator(owner);
 	this->_protected = false;
 	this->_topicProtected = false;
+	this->_modeBitfield = 0;
+	this->_maxClients = 0;
 #if SHOW_CONSTRUCTOR
 	std::cout << "Channel string Client constructor" << std::endl;
 #endif
@@ -41,13 +43,12 @@ Channel &Channel::operator=(const Channel &rhs)
 	std::cout << "Channel = overload" << std::endl;
 #endif
 	this->_chanOps = rhs._chanOps;
-	this->_nbOfClients = rhs._nbOfClients;
 	this->_name = rhs._name;
 	this->_protected = rhs._protected;
 	this->_password = rhs._password;
 	this->_topic = rhs._topic;
 	this->_topicProtected = rhs._topicProtected;
-	this->_modeFlagsField = rhs._modeFlagsField;
+	this->_modeBitfield = rhs._modeBitfield;
 	this->_maxClients = rhs._maxClients;
 	return (*this);
 }
@@ -132,15 +133,10 @@ Client	*Channel::getUserIfConnected(std::string nickname)
 
 void	Channel::addUserToChannel(Client& user)
 {
-	if (this->_modeFlagsField & CHANLIMIT_MODE ||
-		this->_connectedClients.size() < this->_maxClients)
+	if (this->isUserConnected(user) == NOT_CONNECTED)
 	{
-		if (this->isUserConnected(user) == NOT_CONNECTED)
-		{
-			this->_connectedClients.insert(std::make_pair(user.getSocketFD(), &user));
-			this->_nbOfClients++;
-			user.joinChannel(*this);
-		}
+		this->_connectedClients.insert(std::make_pair(user.getSocketFD(), &user));
+		user.joinChannel(*this);
 	}
 }
 
@@ -154,14 +150,13 @@ int		Channel::removeUserFromChannel(Client& user)
 {
 	if (this->isUserConnected(user) == CONNECTED)
 	{
-		this->_nbOfClients--;
 		user.quitChannel(*this);
 
 		std::map<int, Client*>::iterator clientIterator = this->_connectedClients.find(user.getSocketFD());
 		if (clientIterator != this->_connectedClients.end())
 			this->_connectedClients.erase(clientIterator);
 	}
-	return (this->_nbOfClients);
+	return (this->_connectedClients.size());
 }
 
 bool Channel::isChannelOperator(Client & user)
@@ -262,15 +257,15 @@ void	Channel::sendTOPICWHOTIME(Server &server, Client &author)
 
 void	Channel::setMode(char flag)
 {
-	this->_modeFlagsField |= flag;
+	this->_modeBitfield |= flag;
 }
 
 void	Channel::unsetMode(char flag)
 {
-	this->_modeFlagsField &= ~(1 << flag);
+	this->_modeBitfield &= ~(flag);
 }
 
 bool	Channel::isMode(char flag)
 {
-	return (this->_modeFlagsField & flag == flag);
+	return ((this->_modeBitfield & flag) == flag);
 }

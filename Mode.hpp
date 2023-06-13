@@ -31,7 +31,6 @@ class Mode : public ACommand
 		int		channelLimit();
 
 		Channel *_targetChannel;
-		Client	*_targetClient;
 };
 
 #endif

@@ -64,7 +64,6 @@ class Channel
 	private:
 		Channel();
 		int					_maxClients;
-		int					_nbOfClients;
 		std::string			_name;
 		std::map<int, Client*>	_chanOps;
 		std::map<int, Client*>	_connectedClients;
@@ -75,7 +74,7 @@ class Channel
 
 		std::string _password;
 		std::string _topic;
-		char		_modeFlagsField;
+		char		_modeBitfield;
 };
 
 #endif
