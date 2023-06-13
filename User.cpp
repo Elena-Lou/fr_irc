@@ -149,7 +149,7 @@ void	User::sendRPLISUPPORT() const
 	replyMessageBuilder1
 		<< "AWAYLEN=255 "
 		<< "CASEMAPPING=ascii "
-		<< "CHANLIMIT=&:0,#: "
+		<< "CHANLIMIT=&:0,#:" << MAX_CHAN_PER_USER << " "
 		<< "CHANMODES=k "
 		<< "CHANNELLEN=64 "
 		<< "CHANTYPES=# "

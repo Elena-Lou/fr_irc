@@ -11,6 +11,8 @@
 
 # define SHOW_CONSTRUCTOR 1
 
+# define MAX_CHAN_PER_USER 20
+
 # include <string>
 # include <iostream>
 # include <iomanip>

@@ -77,7 +77,7 @@ void Join::execute()
 	}
 	if (this->_target && this->_target->isUserConnected(*this->_author))
 		return;
-	if (0) //TODO maximum channel per user
+	if (this->_author->getConnectedChannels().size() >= MAX_CHAN_PER_USER)
 	{
 		error(ERR_TOOMANYCHANNELS);
 		return;
