@@ -145,6 +145,16 @@ void	Channel::addUserToChannel(Client& user)
 	}
 }
 
+bool	Channel::isInvited(Client &user)
+{
+	std::map<int, Client*>::iterator clientIterator = this->_inviteList.find(user.getSocketFD());
+	if (clientIterator != this->_inviteList.end())
+	{
+		return (true);
+	}
+	return (false);
+}
+
 void	Channel::addUserToInviteList(Client& user)
 {
 	if (this->isUserConnected(user) == NOT_CONNECTED)

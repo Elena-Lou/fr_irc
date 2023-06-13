@@ -40,8 +40,9 @@ class Channel
 		Client	*getUserIfConnected(std::string userName);
 		int		removeUserFromChannel(Client& user);
 		void	addUserToChannel(Client&);
-		void	addUserToInviteList(Client&);
 		void	setMaxClients(int);
+		bool	isInvited(Client &user);
+		void	addUserToInviteList(Client&);
 		void	removeUserFromInviteList(Client &user);
 
 		/* Operator handler */

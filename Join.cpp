@@ -99,12 +99,12 @@ void Join::execute()
 		return;
 	}
 	if (this->_target && this->_target->isMode(CHANLIMIT_MODE)
-		&& this->_target->getNbClients() >= this->_target->getMaxClients()) //channel is full
+		&& this->_target->getNbClients() >= this->_target->getMaxClients())
 	{
 		error(ERR_CHANNELISFULL);
 		return;
 	}
-	if (this->_target && this->_target->isMode(INVITE_MODE)) // invite only chan )
+	if (this->_target && this->_target->isMode(INVITE_MODE) && !this->_target->isInvited(*this->_author))
 	{
 		error(ERR_INVITEONLYCHAN);
 		return;
@@ -222,7 +222,7 @@ void	Join::inputToList()
 
 	std::string::iterator start = this->_cmd[1].begin();
 	std::string::iterator it = start;
-	while (start != this->_cmd[1].end()) //raw input not over
+	while (start != this->_cmd[1].end())
 	{
 		if (*it == ',' || it == this->_cmd[1].end())
 		{
@@ -237,7 +237,7 @@ void	Join::inputToList()
 	{
 		start = this->_cmd[2].begin();
 		std::string::iterator it = start;
-		while (start != this->_cmd[2].end()) //raw input not over
+		while (start != this->_cmd[2].end())
 		{
 			if (*it == ',' || it == this->_cmd[2].end())
 			{
