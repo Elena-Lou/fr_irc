@@ -76,8 +76,15 @@ Mode::~Mode()
 		// This is not asked by the subject
 		return;
 	}
-	this->checkValidCmd();
+	
+	int cmdReturn = this->checkValidCmd();
+	if (cmdReturn != 0)
+	{
+		error(cmdReturn);
+		return ;
+	}
 	this->confirm();
+
 }
 
 void	Mode::confirm() const
@@ -158,35 +165,31 @@ int Mode::checkValidCmd()
 		if (this->_cmd[2][0] != '-' || this->_cmd[2][0] != '+')
 		{
 			std::cerr << "Invalid sign" << std::endl;
-			return -1;
+			return ERROR;
 		}
 		switch (this->_cmd[2][1])
 		{
-			case ('i'):
-				std::cout << "Invite must be set" << std::endl;
-				this->invite();
-				break;
-			case ('t'):
-				std::cout << "Topic must be set" << std::endl;
-				return topic();
-			case ('k'):
-				std::cout << "Password must be set" << std::endl;
-				this->channelKey();
-				break;
-			case ('o'):
-				std::cout << "ChanOp must be set" << std::endl;
-				this->channelOp();
-				break;
-			case ('l'):
-				std::cout << "Chan Limit must be set" << std::endl;
-				this->channelLimit();
-				break;
-			default:
-				error(ERR_UMODEUNKNOWNFLAG);
-				break;
+		case ('i'):
+			std::cout << "Invite must be set" << std::endl;
+			return invite();
+		case ('t'):
+			std::cout << "Topic must be set" << std::endl;
+			return topic();
+		case ('k'):
+			std::cout << "Password must be set" << std::endl;
+			return channelKey();
+		case ('o'):
+			std::cout << "ChanOp must be set" << std::endl;
+			return channelOp();
+		case ('l'):
+			std::cout << "Chan Limit must be set" << std::endl;
+			return channelLimit();
+		default:
+			error(ERR_UMODEUNKNOWNFLAG);
+			break;
 		}
 	}
-	return (-1);
+	return ERROR;
 }
 
 int	Mode::topic( )
@@ -196,15 +199,15 @@ int	Mode::topic( )
 	{
 		this->_targetChannel->setMode(TOPIC_MODE);
 		this->_targetChannel->changeTopicProtection(true);
-		return true;
+		return SUCCESS;
 	}
 	else if (this->_cmd[2][0] == '-')
 	{
 		this->_targetChannel->unsetMode(TOPIC_MODE);
 		this->_targetChannel->changeTopicProtection(false);
-		return true;
+		return SUCCESS;
 	}
-	return false;
+	return ERR_UMODEUNKNOWNFLAG;
 }
 
 int	Mode::invite()
@@ -213,14 +216,14 @@ int	Mode::invite()
 	if (this->_cmd[2][0] == '+')
 	{
 		this->_targetChannel->setMode(INVITE_MODE);
-		return true;
+		return SUCCESS;
 	}
 	else if (this->_cmd[2][0] == '-')
 	{
 		this->_targetChannel->unsetMode(INVITE_MODE);
-		return true;
+		return SUCCESS;
 	}
-	return false;
+	return ERR_UMODEUNKNOWNFLAG;
 }
 
 int	Mode::channelKey()
@@ -233,15 +236,15 @@ int	Mode::channelKey()
 	if (this->_cmd[2][0] == '+')
 	{
 		this->_targetChannel->setMode(PASSWORD_MODE);
-		return true;
+		return SUCCESS;
 
 	}
 	else if (this->_cmd[2][0] == '-')
 	{
 		this->_targetChannel->unsetMode(PASSWORD_MODE);
-		return true;
+		return SUCCESS;
 	}
-	return (-1);
+	return ERR_UMODEUNKNOWNFLAG;
 }
 
 int	Mode::channelOp( )
@@ -255,13 +258,15 @@ int	Mode::channelOp( )
 	{
 		this->_targetChannel->setMode(CHANOP_MODE);
 		this->_targetChannel->setOperator(*this->_author);
+		return SUCCESS;
 	}
 	else if (this->_cmd[2][0] == '-')
 	{
 		this->_targetChannel->unsetMode(CHANOP_MODE);
 		this->_targetChannel->removeOperator(*this->_author);
+		return SUCCESS;
 	}
-	return (-1);
+	return ERR_UMODEUNKNOWNFLAG;
 }
 
 int	Mode::channelLimit( )
@@ -274,16 +279,18 @@ int	Mode::channelLimit( )
 	while (this->_cmd[3][i])
 	{
 		if (!std::isdigit(this->_cmd[3][i]))
-			return false;
+			return ERR_UMODEUNKNOWNFLAG;
 	}
 	if (this->_cmd[2][0] == '+')
 	{
 		this->_targetChannel->setMode(CHANLIMIT_MODE);
 		this->_targetChannel->setMaxClients(std::atoi(this->_cmd[3].c_str()));
+		return SUCCESS;
 	}
 	else if (this->_cmd[2][0] == '-')
 	{
 		this->_targetChannel->unsetMode(CHANLIMIT_MODE);
+		return SUCCESS;
 	}
-	return (-1);
+	return ERR_UMODEUNKNOWNFLAG;
 }

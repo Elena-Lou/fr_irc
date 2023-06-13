@@ -4,6 +4,9 @@
 # include "ACommand.hpp"
 # include "irc.hpp"
 
+# define SUCCESS 0
+# define ERROR -1
+
 class Client;
 class Server;
 class Mode : public ACommand
