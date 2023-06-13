@@ -42,8 +42,8 @@ Mode::~Mode()
 #endif
 }
 
- void Mode::execute()
- {
+void Mode::execute()
+{
 	if (!this->_author->isRegistered())
 		return ;
 	if (this->_cmd.size() < 2)
@@ -56,7 +56,7 @@ Mode::~Mode()
 		error(ERR_NOSUCHCHANNEL);
 		return;
 	}
-	if (0 && !this->_targetChannel->isChannelOperator(*this->_author)) //TODO replace 0 by is channel is invite only
+	if (this->_targetChannel->isMode(INVITE_MODE) && !this->_targetChannel->isChannelOperator(*this->_author))
 	{
 		error(ERR_CHANOPRIVSNEEDED);
 		return;
@@ -76,7 +76,7 @@ Mode::~Mode()
 		// This is not asked by the subject
 		return;
 	}
-	
+
 	int cmdReturn = this->checkValidCmd();
 	if (cmdReturn != 0)
 	{
@@ -86,12 +86,12 @@ Mode::~Mode()
 	this->confirm();
 }
 
-void 	Mode::sendRPLCHANNELMODEIS() const 
+void	Mode::sendRPLCHANNELMODEIS() const
 {
 	std::stringstream modeString;
 
-	modeString << ":" << this->_server->getHostname() << " " << 
-	RPL_CHANNELMODEIS << " " << this->_author->getNickname() << " " << this->_cmd[1] << 
+	modeString << ":" << this->_server->getHostname() << " " <<
+	RPL_CHANNELMODEIS << " " << this->_author->getNickname() << " " << this->_cmd[1] <<
 	" " << this->_targetChannel->getModes();
 	this->_author->writeToClient(modeString.str());
 }
@@ -176,8 +176,8 @@ int Mode::checkValidCmd()
 {
 /* check the command is valid */
 	if (this->_cmd.size() == 2)
-		return SUCCESS;	
-		
+		return SUCCESS;
+
 	if (this->_cmd.size() >= 3)
 	{
 		if (this->_cmd[2][0] == '-' || this->_cmd[2][0] == '+')
