@@ -177,21 +177,21 @@ void	User::sendRPLUSERS() const
 		<< " users and 0 invisible on 0 servers";
 	this->_author->writeRPLToClient(this->_server, RPL_LUSERCLIENT,
 			msgBuilder.str());
-	msgBuilder.clear();
+	msgBuilder.ignore();
 	/* LUSERME */
 	msgBuilder << "I have " << this->_server->getNbOfClients()
 		<< " clients and 0 servers";
 	this->_author->writeRPLToClient(this->_server, RPL_LUSERME,
 		msgBuilder.str());
-	msgBuilder.clear();
+	msgBuilder.ignore();
 	/* LUSEROP */
 	msgBuilder << this->_server->getNbOfOps();
 	this->_author->writeRPLToClient(this->_server, RPL_LUSEROP,
 			msgBuilder.str(), MSG_LUSEROP);
-	msgBuilder.clear();
+	msgBuilder.ignore();
 	/* LUSERCHANNELS */
 	msgBuilder << this->_server->getNbOfChannels();
 	this->_author->writeRPLToClient(this->_server, RPL_LUSERCHANNELS,
 			msgBuilder.str(), MSG_LUSERCHANNELS);
-	msgBuilder.clear();
+	msgBuilder.ignore();
 }
