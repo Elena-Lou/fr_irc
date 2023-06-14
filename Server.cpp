@@ -197,6 +197,21 @@ std::deque<Channel> & Server::getChannels( void )
 	return this->_channels;
 }
 
+int	Server::getNbOfClients() const
+{
+	return (this->_clients.size());
+}
+
+int	Server::getNbOfOps() const
+{
+	return (this->_ops.size());
+}
+
+int	Server::getNbOfChannels() const
+{
+	return (this->_channels.size());
+}
+
 static bool	isCaseInsensitiveEqual(std::string str1, std::string str2)
 {
 	if (str1.size() != str2.size())
@@ -262,6 +277,18 @@ void	Server::connectUser(const int socketFD)
 	this->_clients.insert(std::make_pair(socketFD, Client(socketFD)));
 }
 
+void	Server::addOp(Client &client)
+{
+	this->_ops.insert(std::make_pair(client.getSocketFD(), &client));
+}
+
+void	Server::removeOp(Client &client)
+{
+	std::map<int, Client*>::iterator it = this->_ops.find(client.getSocketFD());
+	if (it != this->_ops.end())
+		this->_ops.erase(client.getSocketFD());
+}
+
 void	Server::disconnectUser(int socketFD)
 {
 	for (std::map<int, Client>::iterator it = this->_clients.begin();
@@ -277,9 +304,11 @@ void	Server::disconnectUser(int socketFD)
 
 void	Server::disconnectUser(Client &client)
 {
+	this->removeOp(client);
 	for (std::deque<Channel>::iterator channelIterator = this->_channels.begin();
 		this->_channels.size() && channelIterator != this->_channels.end(); )
 	{
+		channelIterator->removeUserFromInviteList(client);
 		if (channelIterator->removeUserFromChannel(client) == 0)
 		{
 			std::deque<Channel>::iterator channelToDelete = channelIterator;
@@ -362,6 +391,15 @@ void	Server::readLoop()
 				it++;
 				this->disconnectUser(disconnectedClient->second);
 				continue;
+			}
+			else if ( recvRet == 0)
+			{
+				std::map<int, Client>::iterator disconnectedClient = it;
+				std::cerr << "connection closed by the client read loop. Bye Bye" << std::endl;
+				FD_CLR(it->second.getSocketFD(), &(this->_masterSet));
+				it++;
+				this->disconnectUser(disconnectedClient->second);
+				continue ;
 			}
 			else
 			{

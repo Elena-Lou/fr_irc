@@ -145,6 +145,33 @@ void	Channel::addUserToChannel(Client& user)
 	}
 }
 
+bool	Channel::isInvited(Client &user)
+{
+	std::map<int, Client*>::iterator clientIterator = this->_inviteList.find(user.getSocketFD());
+	if (clientIterator != this->_inviteList.end())
+	{
+		return (true);
+	}
+	return (false);
+}
+
+void	Channel::addUserToInviteList(Client& user)
+{
+	if (this->isUserConnected(user) == NOT_CONNECTED)
+	{
+		this->_inviteList.insert(std::make_pair(user.getSocketFD(), &user));
+		user.joinChannel(*this);
+	}
+}
+
+void	Channel::removeUserFromInviteList(Client &user)
+{
+	std::map<int, Client*>::iterator clientIterator;
+	clientIterator = this->_inviteList.find(user.getSocketFD());
+	if (clientIterator != this->_inviteList.end())
+		this->_inviteList.erase(clientIterator);
+}
+
 void	Channel::setMaxClients(int maxClients)
 {
 	this->_maxClients = maxClients;
@@ -153,11 +180,18 @@ void	Channel::setMaxClients(int maxClients)
 /* returns the number of connected clients after the operation to delete chan if empty*/
 int		Channel::removeUserFromChannel(Client& user)
 {
+	std::map<int, Client*>::iterator clientIterator;
+	if (this->isChannelOperator(user))
+	{
+		clientIterator = this->_chanOps.find(user.getSocketFD());
+		if (clientIterator != this->_chanOps.end())
+			this->_chanOps.erase(clientIterator);
+	}
 	if (this->isUserConnected(user) == CONNECTED)
 	{
 		user.quitChannel(*this);
 
-		std::map<int, Client*>::iterator clientIterator = this->_connectedClients.find(user.getSocketFD());
+		clientIterator = this->_connectedClients.find(user.getSocketFD());
 		if (clientIterator != this->_connectedClients.end())
 			this->_connectedClients.erase(clientIterator);
 	}

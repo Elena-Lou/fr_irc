@@ -28,6 +28,7 @@ class User : public ACommand
 		void	sendRPLYOURHOST() const;
 		void	sendRPLCREATED() const;
 		void	sendRPLISUPPORT() const;
+		void	sendRPLUSERS() const;
 };
 
 #endif
