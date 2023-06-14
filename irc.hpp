@@ -10,7 +10,7 @@
 # define CONNECTED 1
 # define NOT_CONNECTED 0
 
-# define SHOW_CONSTRUCTOR 1
+# define SHOW_CONSTRUCTOR 0
 
 # define MAX_CHAN_PER_USER 20
 
@@ -49,6 +49,7 @@
 # include "Invite.hpp"
 # include "Mode.hpp"
 # include "Ping.hpp"
+# include "Oper.hpp"
 # include <ctime>
 
 # define RPL_WELCOME 1

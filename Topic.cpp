@@ -21,9 +21,9 @@ Topic::Topic(Server &server, Client &author, std::string rawInput) : ACommand(se
 #endif
 	if (this->_cmd.size() >= 3)
 	{
-		unsigned int offset = rawInput.find(":");
-		if (offset < rawInput.size())
-			offset++;
+		unsigned int offset = rawInput.find(this->_cmd[1]);
+		offset += this->_cmd[1].size();
+		offset = rawInput.find(this->_cmd[2], offset);
 		this->_message = std::string(rawInput, offset);
 	}
 	if (this->_cmd.size() >= 2)
@@ -58,7 +58,7 @@ void Topic::execute()
 		error(ERR_NOSUCHCHANNEL);
 		return;
 	}
-	if (this->_target && !this->_target->isUserConnected(*this->_author))
+	if (!this->_target->isUserConnected(*this->_author))
 	{
 		error(ERR_NOTONCHANNEL);
 		return;
@@ -119,9 +119,9 @@ void Topic::confirm() const
 			this->_target->sendTOPICWHOTIME(*this->_server, *this->_author);
 		}
 	}
-	else if (this->_cmd[2] == ":")
+	else if (this->_cmd.size() >= 3 && this->_cmd[2] == ":")
 		this->_target->updateTopic(*this->_author, "");
-	else
+	else if (this->_cmd.size() >= 3)
 		this->_target->updateTopic(*this->_author, this->_message);
 }
 

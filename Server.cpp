@@ -547,7 +547,7 @@ std::string	Server::extractCmd(std::string &rawInput)
 
 void Server::parsingCommand( std::string & rawInput, Client & user )
 {
-	std::cout << "parsingCommand - rawInput : [" << rawInput << "]" << std::endl;
+	std::cout << "received [" << rawInput << "]" << std::endl;
 
 	int index = -1;
 	std::string rawCommand;
@@ -609,7 +609,7 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 		}
 		case 4 :
 		{
-			std::cout << "need to create OPER command" << std::endl;
+			Oper(*this, user, rawInput);
 			break;
 		}
 		case 5 :

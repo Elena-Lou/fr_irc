@@ -85,7 +85,7 @@ void Kick::execute()
 void	Kick::confirm() const
 {
 	std::stringstream msgBuilder;
-	msgBuilder << ":" << this->_author->getFullName() << " KICK" << this->_cmd[1] << " " << this->_cmd[2] << " :" << this->_author->getNickname();
+	msgBuilder << ":" << this->_author->getFullName() << " KICK " << this->_cmd[1] << " " << this->_cmd[2] << " :" << this->_author->getNickname();
 	this->_server->broadcastChannel(*this->_foundChannel, msgBuilder.str());
 }
 

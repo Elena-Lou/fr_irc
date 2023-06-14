@@ -278,7 +278,7 @@ void	Channel::updateTopic(Client &author, std::string topic)
 	this->_topic = topic;
 	std::stringstream fullMessage;
 	fullMessage << ":" << author.getFullName() << " TOPIC " << this->_name
-		<< " :" << topic;
+		<< " " << topic;
 	this->broadcastToChannel(fullMessage.str());
 	this->_topicUpdateTimestamp = time(NULL);
 	this->_topicUpdater = author.getNickname();
@@ -332,6 +332,6 @@ std::string Channel::getModes()
 	if (this->isMode(CHANOP_MODE))
 		stringMode << "o";
 	if (this->isMode(CHANLIMIT_MODE))
-		stringMode << "l " << this->_maxClients; 
+		stringMode << "l " << this->_maxClients;
 	return stringMode.str();
 }

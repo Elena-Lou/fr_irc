@@ -9,17 +9,16 @@ class Server;
 class Oper : public ACommand
 {
 	public:
+		Oper(Server & server, Client & author, std::string rawInput);
 		~Oper();
 
-	protected:
-		Oper(Server & server, Client & author, std::string rawInput);
 		Oper(Oper const & src);
 		Oper &operator=(Oper const & rhs);
 
 		void	execute();
 		void	error(int) const;
 		void	confirm() const;
-
+	protected:
 	private:
 		Oper();
 };

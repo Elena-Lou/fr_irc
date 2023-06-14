@@ -14,7 +14,8 @@ SRCS =	main.cpp\
 		Topic.cpp\
 		Invite.cpp\
 		Mode.cpp\
-		Ping.cpp
+		Ping.cpp\
+		Oper.cpp
 
 CXX = c++
 
