@@ -46,7 +46,7 @@ void Mode::execute()
 {
 	if (!this->_author->isRegistered())
 		return ;
-	if (this->_cmd.size() < 2)
+	if (this->_cmd.size() < 3)
 	{
 		error(ERR_NEEDMOREPARAMS);
 		return;
