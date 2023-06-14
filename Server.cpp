@@ -535,10 +535,11 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 								"MODE",
 								"PRIVMSG",
 								"CAP",
-								"PASS"
+								"PASS",
+								"PING"
 							};
 
-	for (int i = 0; i < 11; i++)
+	for (int i = 0; i < 12; i++)
 	{
 		if (commands[i] == rawCommand)
 		{
@@ -601,6 +602,11 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 		case 10 :
 		{
 			Pass(*this, user, rawInput);
+			break;
+		}
+		case 11 :
+		{
+			Ping(*this, user, rawInput);
 			break;
 		}
 		default:

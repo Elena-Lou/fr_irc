@@ -56,7 +56,7 @@ void Mode::execute()
 		error(ERR_NOSUCHCHANNEL);
 		return;
 	}
-	if (this->_targetChannel->isMode(INVITE_MODE) && !this->_targetChannel->isChannelOperator(*this->_author))
+	if (this->_targetChannel && this->_targetChannel->isMode(INVITE_MODE) && !this->_targetChannel->isChannelOperator(*this->_author))
 	{
 		error(ERR_CHANOPRIVSNEEDED);
 		return;
