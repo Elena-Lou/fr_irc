@@ -38,6 +38,9 @@ class Server
 		bool					isPasswordProtected() const { return (this->_restricted);};
 		std::string				getStartTime() const;
 		std::string				getPassword() const;
+		int						getNbOfOps() const;
+		int						getNbOfClients() const;
+		int						getNbOfChannels() const;
 
 
 		/* Client handlers */
@@ -106,6 +109,7 @@ class Server
 		char	buffer[IRC_BUFFER_SIZE];
 
 		std::map<int, Client> _clients;
+		std::map<int, Client*> _ops;
 		std::deque<Channel>	_channels;
 };
 

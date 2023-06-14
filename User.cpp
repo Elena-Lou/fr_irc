@@ -111,6 +111,7 @@ void	User::confirm() const
 	this->sendRPLYOURHOST();
 	this->sendRPLCREATED();
 	this->sendRPLISUPPORT();
+	this->sendRPLUSERS();
 }
 
 void	User::sendRPLWELCOME() const
@@ -166,4 +167,31 @@ void	User::sendRPLISUPPORT() const
 		<< ":are supported by this server";
 	this->_author->writeRPLToClient(this->_server, RPL_ISUPPORT, replyMessageBuilder1.str());
 	this->_author->writeRPLToClient(this->_server, RPL_ISUPPORT, replyMessageBuilder2.str());
+}
+
+void	User::sendRPLUSERS() const
+{
+	std::stringstream msgBuilder;
+	/* LUSERCLIENT */
+	msgBuilder << "There are " << this->_server->getNbOfClients()
+		<< " users and 0 invisible on 0 servers";
+	this->_author->writeRPLToClient(this->_server, RPL_LUSERCLIENT,
+			msgBuilder.str());
+	msgBuilder.clear();
+	/* LUSERME */
+	msgBuilder << "I have " << this->_server->getNbOfClients()
+		<< " clients and 0 servers";
+	this->_author->writeRPLToClient(this->_server, RPL_LUSERME,
+		msgBuilder.str());
+	msgBuilder.clear();
+	/* LUSEROP */
+	msgBuilder << this->_server->getNbOfOps();
+	this->_author->writeRPLToClient(this->_server, RPL_LUSEROP,
+			msgBuilder.str(), MSG_LUSEROP);
+	msgBuilder.clear();
+	/* LUSERCHANNELS */
+	msgBuilder << this->_server->getNbOfChannels();
+	this->_author->writeRPLToClient(this->_server, RPL_LUSERCHANNELS,
+			msgBuilder.str(), MSG_LUSERCHANNELS);
+	msgBuilder.clear();
 }

@@ -1,6 +1,7 @@
 #ifndef IRC_HPP
 # define IRC_HPP
 
+# define OP_PASSWORD "thisisasolidpasswordnonetheless"
 # define IRC_BUFFER_SIZE 80
 # define MYIRC_PORT "3490"
 # define MYIRC_ALLOWED_PENDING_CONNECTIONS 5
@@ -55,6 +56,10 @@
 # define RPL_CREATED 3
 # define RPL_INFO 4
 # define RPL_ISUPPORT 5
+# define RPL_LUSERCLIENT 251
+# define RPL_LUSEROP 252
+# define RPL_LUSERCHANNELS 254
+# define RPL_LUSERME 255
 # define RPL_NOTOPIC 331
 # define RPL_TOPIC 332
 # define RPL_TOPICWHOTIME 333
@@ -89,6 +94,8 @@
 # define ERR_KEYSET 467
 # define RPL_CHANNELMODEIS 324
 
+# define MSG_LUSEROP "operator(s) online"
+# define MSG_LUSERCHANNELS "channels formed"
 # define MSG_NOTOPIC "No topic is set"
 # define MSG_ENDOFNAMES "End of /NAMES list"
 # define MSG_YOUREOPER "You are now an IRC operator"

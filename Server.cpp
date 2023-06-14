@@ -197,6 +197,21 @@ std::deque<Channel> & Server::getChannels( void )
 	return this->_channels;
 }
 
+int	Server::getNbOfClients() const
+{
+	return (this->_clients.size());
+}
+
+int	Server::getNbOfOps() const
+{
+	return (this->_ops.size());
+}
+
+int	Server::getNbOfChannels() const
+{
+	return (this->_channels.size());
+}
+
 static bool	isCaseInsensitiveEqual(std::string str1, std::string str2)
 {
 	if (str1.size() != str2.size())
