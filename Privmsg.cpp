@@ -58,9 +58,13 @@ void Privmsg::execute()
 		error(ERR_NOSUCHNICK);
 		return;
 	}
-	if (0) //TODO replace by mod condition dest is a chan with denied access
+	if (this->verifyChannelName(this->_cmd[1]))
 	{
-		error(ERR_CANNOTSENDTOCHAN);
+		Channel *target = this->_server->getChannelIfExist(this->_cmd[1]);
+		if (target == NULL)
+			error(ERR_NORECIPIENT);
+		else if (!target->isUserConnected(*this->_author))
+			error(ERR_CANNOTSENDTOCHAN);
 		return;
 	}
 	if (this->_cmd.size() < 3)
@@ -119,4 +123,18 @@ void	Privmsg::confirm() const
 	{
 		clientTarget->writePrivmsg(this->_author->getNickname(), this->_cmd[1], this->_message);
 	}
+}
+
+bool	Privmsg::verifyChannelName(std::string name)
+{
+	if (this->_cmd.size() < 2)
+		return (false);
+	if (name[0] != '#' || name.size() < 2)
+		return (false);
+	for (unsigned int i = 1; i < name.size(); i++)
+	{
+		if (!std::isalnum(name[i]))
+			return (false);
+	}
+	return (true);
 }

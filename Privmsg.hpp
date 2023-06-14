@@ -22,6 +22,7 @@ class Privmsg : public ACommand
 		void	confirm() const;
 		void	error(int errorCode) const;
 
+		bool	verifyChannelName(std::string name);
 		std::string _message;
 };
 

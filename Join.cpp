@@ -201,7 +201,6 @@ void Join::confirm() const
 
 bool	Join::verifyChannelName(std::string name)
 {
-
 	if (this->_cmd.size() < 2)
 		return (false);
 	if (name[0] != '#' || name.size() < 2)
@@ -212,7 +211,6 @@ bool	Join::verifyChannelName(std::string name)
 			return (false);
 	}
 	return (true);
-
 }
 
 void	Join::inputToList()
