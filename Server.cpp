@@ -547,7 +547,7 @@ std::string	Server::extractCmd(std::string &rawInput)
 
 void Server::parsingCommand( std::string & rawInput, Client & user )
 {
-	std::cout << "parsingCommand - rawInput : [" << rawInput << "]" << std::endl;
+	std::cout << "received [" << rawInput << "]" << std::endl;
 
 	int index = -1;
 	std::string rawCommand;

@@ -37,7 +37,6 @@ int main( int ac, char** av ) {
 		if (ac == 3)
 			password = av[2];
 		Server	myIrc(av[1], password.c_str());
-		std::cout << "entering the while loop" << std::endl;
 		/* WAITING FOR CONNECTIONS LOOP */
 		while(1)
 		{
