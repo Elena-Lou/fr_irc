@@ -53,7 +53,7 @@ void Oper::execute()
 	}
 
 	/* is the provided password correct ? */
-	if (this->_cmd[2] != this->_server->getPassword())
+	if (this->_cmd[2] != OP_PASSWORD)
 	{
 		error(ERR_PASSWDMISMATCH);
 		return ;
@@ -94,6 +94,7 @@ void Oper::error( int errorCode ) const
 
 void Oper::confirm() const
 {
+	this->_server->addOp(*this->_author);
 	this->_author->writeRPLToClient(this->_server,
 		RPL_YOUREOPER, MSG_YOUREOPER);
 }

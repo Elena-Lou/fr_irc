@@ -277,6 +277,18 @@ void	Server::connectUser(const int socketFD)
 	this->_clients.insert(std::make_pair(socketFD, Client(socketFD)));
 }
 
+void	Server::addOp(Client &client)
+{
+	this->_ops.insert(std::make_pair(client.getSocketFD(), &client));
+}
+
+void	Server::removeOp(Client &client)
+{
+	std::map<int, Client*>::iterator it = this->_ops.find(client.getSocketFD());
+	if (it != this->_ops.end())
+		this->_ops.erase(client.getSocketFD());
+}
+
 void	Server::disconnectUser(int socketFD)
 {
 	for (std::map<int, Client>::iterator it = this->_clients.begin();
@@ -292,6 +304,7 @@ void	Server::disconnectUser(int socketFD)
 
 void	Server::disconnectUser(Client &client)
 {
+	this->removeOp(client);
 	for (std::deque<Channel>::iterator channelIterator = this->_channels.begin();
 		this->_channels.size() && channelIterator != this->_channels.end(); )
 	{
