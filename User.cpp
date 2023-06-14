@@ -171,27 +171,37 @@ void	User::sendRPLISUPPORT() const
 
 void	User::sendRPLUSERS() const
 {
-	std::stringstream msgBuilder;
 	/* LUSERCLIENT */
-	msgBuilder << "There are " << this->_server->getNbOfClients()
-		<< " users and 0 invisible on 0 servers";
-	this->_author->writeRPLToClient(this->_server, RPL_LUSERCLIENT,
-			msgBuilder.str());
-	msgBuilder.ignore();
+	{
+		std::stringstream msgBuilder;
+		msgBuilder << "There are " << this->_server->getNbOfClients()
+			<< " users and 0 invisible on 0 servers";
+		this->_author->writeRPLToClient(this->_server, RPL_LUSERCLIENT,
+				msgBuilder.str());
+	}
 	/* LUSERME */
-	msgBuilder << "I have " << this->_server->getNbOfClients()
-		<< " clients and 0 servers";
-	this->_author->writeRPLToClient(this->_server, RPL_LUSERME,
-		msgBuilder.str());
-	msgBuilder.ignore();
+	{
+		std::stringstream msgBuilder;
+		msgBuilder << "I have " << this->_server->getNbOfClients()
+			<< " clients and 0 servers";
+		this->_author->writeRPLToClient(this->_server, RPL_LUSERME,
+				msgBuilder.str());
+		msgBuilder.flush();
+	}
 	/* LUSEROP */
-	msgBuilder << this->_server->getNbOfOps();
-	this->_author->writeRPLToClient(this->_server, RPL_LUSEROP,
-			msgBuilder.str(), MSG_LUSEROP);
-	msgBuilder.ignore();
+	{
+		std::stringstream msgBuilder;
+		msgBuilder << this->_server->getNbOfOps();
+		this->_author->writeRPLToClient(this->_server, RPL_LUSEROP,
+				msgBuilder.str(), MSG_LUSEROP);
+		msgBuilder.flush();
+	}
 	/* LUSERCHANNELS */
-	msgBuilder << this->_server->getNbOfChannels();
-	this->_author->writeRPLToClient(this->_server, RPL_LUSERCHANNELS,
-			msgBuilder.str(), MSG_LUSERCHANNELS);
-	msgBuilder.ignore();
+	{
+		std::stringstream msgBuilder;
+		msgBuilder << this->_server->getNbOfChannels();
+		this->_author->writeRPLToClient(this->_server, RPL_LUSERCHANNELS,
+				msgBuilder.str(), MSG_LUSERCHANNELS);
+		msgBuilder.flush();
+	}
 }

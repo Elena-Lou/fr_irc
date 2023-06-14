@@ -49,6 +49,7 @@
 # include "Invite.hpp"
 # include "Mode.hpp"
 # include "Ping.hpp"
+# include "Oper.hpp"
 # include <ctime>
 
 # define RPL_WELCOME 1

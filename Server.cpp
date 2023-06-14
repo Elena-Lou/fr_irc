@@ -609,7 +609,7 @@ void Server::parsingCommand( std::string & rawInput, Client & user )
 		}
 		case 4 :
 		{
-			std::cout << "need to create OPER command" << std::endl;
+			Oper(*this, user, rawInput);
 			break;
 		}
 		case 5 :
