@@ -88,14 +88,14 @@ void Privmsg::error(int errorCode) const
 		}
 		case ERR_NOSUCHNICK:
 		{
-			this->_author->writeRPLToClient(this->_server,
-					ERR_NOSUCHNICK, MSG_NOSUCHNICK);
+			this->_author->writeRPLToClient(this->_server, ERR_NOSUCHNICK,
+				this->_cmd[1], MSG_NOSUCHNICK);
 			break;
 		}
 		case ERR_CANNOTSENDTOCHAN:
 		{
-			this->_author->writeRPLToClient(this->_server,
-					ERR_CANNOTSENDTOCHAN, this->_cmd[1], MSG_CANNOTSENDTOCHAN);
+			this->_author->writeRPLToClient(this->_server, ERR_CANNOTSENDTOCHAN,
+				this->_cmd[1], MSG_CANNOTSENDTOCHAN);
 			break;
 		}
 		case ERR_NOTEXTTOSEND:
@@ -138,3 +138,5 @@ bool	Privmsg::verifyChannelName(std::string name)
 	}
 	return (true);
 }
+
+//TODO NOSUCH NICK/CHANNEL VERIF PARAMS
